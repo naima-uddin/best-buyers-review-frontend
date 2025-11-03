@@ -1,0 +1,114 @@
+{
+    "_id": {
+        "$oid": "68f0c6ace2fa859cdd9e765b"
+    },
+    "asin": "B07K3HZSLP",
+    "title": "Beatae quidem ea lau",
+    "brand": "Nemo repellendus De",
+    "images": [
+        {
+            "url": "https://www.xuz.com",
+            "variant": "MAIN",
+            "_id": {
+                "$oid": "68f0c6fce2fa859cdd9e7668"
+            }
+        }
+    ],
+    "price": {
+        "amount": {
+            "$numberInt": "881"
+        },
+        "currency": "USD",
+        "displayAmount": "$881"
+    },
+    "description": "Et inventore soluta ",
+    "features": {
+        "feature": [
+            "BICYCLE FOR KIDS: Teach your child to ride on the Elm or Koen by Schwinn. With 12-20-inch wheels, this bike with training wheels or balance bike is the perfect bicycle for kids from 30\" - 54\" tall. Enjoy learning to ride to the park or down the sidewalk.",
+            "EASY RIDING: Designed for easy rides, this boys and girls bike features a simple, single-speed drivetrain. These bikes are designed to help children build confidence, making for an easy transition to full-sized bicycles.",
+            "GROWS WITH YOUR CHILD: The adjustable seat makes for easy, tool-free adjustments so that this kids bike can grow with your child and prepare them for a big kid bike.",
+            "FANTASTIC FIT: Featuring a SmartStart ergonomic design for kids, this bike is trusted by parents and built for kids’ proportions for easy handling.",
+            "TRUSTED SCHWINN QUALITY: Schwinn is the original American bike brand. We’ve spent over 130 years building the bicycle industry into what it is today, and we’re not done yet. Each ride is designed in Madison, WI."
+        ],
+        "_id": {
+            "$oid": "68f0c6fce2fa859cdd9e7669"
+        }
+    },
+    "colors": [],
+    "styles": [],
+    "factorsToConsider": [],
+    "affiliateUrl": "https://www.wotevyby.co.uk",
+    "isFeatured": true,
+    "availability": "In Stock",
+    "isActive": true,
+    "lastUpdated": {
+        "$date": {
+            "$numberLong": "1760610044593"
+        }
+    },
+    "anchorTags": [],
+    "specifications": [],
+    "commonQuestions": [],
+    "customReviews": [],
+    "__v": {
+        "$numberInt": "0"
+    },
+    "createdAt": {
+        "$date": {
+            "$numberLong": "1760609964514"
+        }
+    },
+    "updatedAt": {
+        "$date": {
+            "$numberLong": "1760610044594"
+        }
+    },
+    "conclusion": {
+        "heading": "Nisi alias non archi",
+        "text": "Mollit sint voluptas"
+    },
+    "customRating": {
+        "rating": {
+            "$numberInt": "4"
+        },
+        "reviewCount": {
+            "$numberInt": "2"
+        }
+    },
+    "descriptionTitle": "Ab laborum Providen",
+    "discount": {
+        "amount": {
+            "$numberInt": "109"
+        },
+        "currency": "USD",
+        "displayAmount": "$109",
+        "percentage": {
+            "$numberInt": "11"
+        }
+    },
+    "introduction": "Et inventore soluta ",
+    "listPrice": {
+        "amount": {
+            "$numberInt": "990"
+        },
+        "currency": "USD",
+        "displayAmount": "$990"
+    },
+    "mainCategory": "In dolore quia et fu",
+    "mostImportantFactors": {
+        "heading": "Amet quaerat exerci",
+        "text": "Et voluptas consecte"
+    },
+    "seo": {
+        "title": "Qui labore repellend",
+        "description": "Ut exercitation pari",
+        "keywords": [
+            "Ex eu dignissimos ea"
+        ],
+        "_id": {
+            "$oid": "68f0c6fce2fa859cdd9e766a"
+        }
+    },
+    "subCategory": "Beatae sunt molestia",
+    "subSubCategory": "Illum quod consequa"
+}
