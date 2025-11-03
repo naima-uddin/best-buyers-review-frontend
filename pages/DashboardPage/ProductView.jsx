@@ -134,11 +134,11 @@ export default function ProductView({ product, onClose }) {
               <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div>
                   <span className="block text-sm font-medium text-gray-700 mb-1">Main Category</span>
-                  <p className="text-gray-900 font-semibold">{product.mainCategory || "—"}</p>
+                  <p className="text-gray-900 font-semibold">{product.mainCategory?.name || "—"}</p>
                 </div>
                 <div>
                   <span className="block text-sm font-medium text-gray-700 mb-1">Sub Category</span>
-                  <p className="text-gray-900 font-semibold">{product.subCategory || "—"}</p>
+                  <p className="text-gray-900 font-semibold">{product.subCategory?.name || "—"}</p>
                 </div>
               </div>
 

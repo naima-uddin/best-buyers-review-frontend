@@ -156,9 +156,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         // Basic Information
         title: product.title || "",
         brand: product.brand || "",
-        mainCategory: product.mainCategory || "",
-        subCategory: product.subCategory || "",
-        subSubCategory: product.subSubCategory || "",
+        mainCategory: product.mainCategory?.name || "",
+        subCategory: product.subCategory?.name  || "",
+        subSubCategory: product.subSubCategory?.name  || "",
         mainImage: mainImage || "",
         affiliateUrl: product.affiliateUrl || "",
         isFeatured: product.isFeatured || false,
@@ -689,7 +689,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   <label className="block text-xs text-gray-600 mb-2">Main Category</label>
                   <select
                     name="mainCategory"
-                    value={formData.mainCategory}
+                    value={formData.mainCategory?.name }
                     onChange={handleChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
@@ -708,7 +708,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                     name="subCategory"
                     value={formData.subCategory}
                     onChange={handleChange}
-                    disabled={!formData.mainCategory}
+                    disabled={!formData.mainCategory?.name }
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   >
                     <option value="">Select Sub Category</option>
@@ -724,7 +724,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   <label className="block text-xs text-gray-600 mb-2">Sub-Sub Category</label>
                   <select
                     name="subSubCategory"
-                    value={formData.subSubCategory}
+                    value={formData.subSubCategory?.name }
                     onChange={handleChange}
                     disabled={!formData.subCategory}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
