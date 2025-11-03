@@ -175,13 +175,13 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
                       {/* Category */}
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {product.mainCategory ||
-                            product.category ||
+                          {product.mainCategory?.name ||
+                            product.subCategory?.name||
                             "Uncategorized"}
                         </div>
-                        {product.subCategory && (
+                        {product.subCategory?.name && (
                           <div className="text-xs text-gray-500">
-                            {product.subCategory}
+                            {product.subCategory?.name}
                           </div>
                         )}
                       </td>
