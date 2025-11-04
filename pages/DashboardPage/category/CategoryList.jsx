@@ -19,7 +19,6 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
         }
       }
     }, []);
-console.log(first)
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };

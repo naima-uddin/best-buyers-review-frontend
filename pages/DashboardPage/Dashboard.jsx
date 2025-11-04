@@ -16,23 +16,46 @@ export default function Dashboard() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [viewingProduct, setViewingProduct] = useState(null);
   const [userRole, setUserRole] = useState("admin"); // Get this from auth context
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Fetch products
-  const fetchProducts = async () => {
+  // ✅ Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/categories");
+        const data = await res.json();
+        setCategories(data || []);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // ✅ Fetch products (with category filter)
+  const fetchProducts = async (pageNum = 1, categoryId = "") => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        "http://localhost:5000/api/products",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      let url = `http://localhost:5000/api/products?page=${pageNum}&limit=10`;
+      if (categoryId) url += `&category=${categoryId}`;
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const result = await response.json();
+
       if (response.ok) {
         setProducts(result.data?.products || []);
+        if (result.data?.pagination) {
+          setPage(result.data.pagination.page);
+          setPages(result.data.pagination.pages);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch products:", error);
@@ -41,15 +64,12 @@ export default function Dashboard() {
     }
   };
 
+  // Reload when section/view/page/category changes
   useEffect(() => {
-    if (
-      activeSection === "view-products" &&
-      !editingProduct &&
-      !viewingProduct
-    ) {
-      fetchProducts();
+    if (activeSection === "view-products" && !editingProduct && !viewingProduct) {
+      fetchProducts(page, selectedCategory);
     }
-  }, [activeSection, editingProduct, viewingProduct]);
+  }, [activeSection, editingProduct, viewingProduct, page, selectedCategory]);
 
   // Handle edit
   const handleEdit = (product) => {
@@ -82,7 +102,7 @@ export default function Dashboard() {
 
         if (response.ok) {
           alert("Product deleted successfully!");
-          fetchProducts(); // This should now exclude the soft-deleted product
+          fetchProducts(page, selectedCategory);
         } else {
           alert(result.message || "Failed to delete product");
         }
@@ -98,37 +118,23 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      // Create update data - MAKE SURE TO INCLUDE anchorTags
       const updateData = {
-        // Basic Information
         title: updatedProduct.title,
         brand: updatedProduct.brand,
         mainCategory: updatedProduct.mainCategory,
         subCategory: updatedProduct.subCategory,
         subSubCategory: updatedProduct.subSubCategory,
-
-        // Images
         images: updatedProduct.images,
-
-        // Pricing
         price: updatedProduct.price,
         listPrice: updatedProduct.listPrice,
         discount: updatedProduct.discount,
-
-        // Custom Rating
         customRating: updatedProduct.customRating,
-
-        // Features & Content
         features: updatedProduct.features,
         colors: updatedProduct.colors,
         styles: updatedProduct.styles,
         specifications: updatedProduct.specifications,
         customReviews: updatedProduct.customReviews,
-
-        // SEO
         seo: updatedProduct.seo,
-
-        // Description Content
         description: updatedProduct.description,
         descriptionTitle: updatedProduct.descriptionTitle,
         introduction: updatedProduct.introduction,
@@ -136,12 +142,9 @@ export default function Dashboard() {
         mostImportantFactors: updatedProduct.mostImportantFactors,
         commonQuestions: updatedProduct.commonQuestions,
         conclusion: updatedProduct.conclusion,
-
-        // Affiliate & Status
         affiliateUrl: updatedProduct.affiliateUrl,
         isFeatured: updatedProduct.isFeatured,
         availability: updatedProduct.availability || "In Stock",
-
         anchorTags: updatedProduct.anchorTags || [],
       };
 
@@ -163,7 +166,7 @@ export default function Dashboard() {
         alert("Product updated successfully!");
         setEditingProduct(null);
         setActiveSection("view-products");
-        fetchProducts();
+        fetchProducts(page, selectedCategory);
       } else {
         alert(result.message || "Failed to update product");
       }
@@ -173,14 +176,12 @@ export default function Dashboard() {
     }
   };
 
-  // Back to products list
   const handleBackToList = () => {
     setEditingProduct(null);
     setViewingProduct(null);
     setActiveSection("view-products");
   };
 
-  // Get user role from auth context or token
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -193,11 +194,10 @@ export default function Dashboard() {
     }
   }, []);
 
-  // Handle logout
   const handleLogout = () => {
     if (confirm("Are you sure you want to log out?")) {
       localStorage.removeItem("token");
-      window.location.href = "/login"; // redirect to login page
+      window.location.href = "/login";
     }
   };
 
@@ -216,7 +216,7 @@ export default function Dashboard() {
       <div className="ml-64 flex-1 p-8">
         {activeSection === "add-product" && (
           <ProductForm
-            onSubmit={fetchProducts}
+            onSubmit={() => fetchProducts(page, selectedCategory)}
             onCancel={() => setActiveSection("view-products")}
           />
         )}
@@ -224,14 +224,58 @@ export default function Dashboard() {
         {activeSection === "view-products" &&
           !editingProduct &&
           !viewingProduct && (
-            <ProductList
-              products={products}
-              loading={loading}
-              onRefresh={fetchProducts}
-              onEdit={handleEdit}
-              onView={handleView}
-              onDelete={handleDelete}
-            />
+            <>
+              {/* ✅ Category Filter Dropdown */}
+              <div className="flex justify-center mb-4">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setPage(1); // reset to first page when changing category
+                  }}
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <ProductList
+                products={products}
+                loading={loading}
+                onRefresh={() => fetchProducts(page, selectedCategory)}
+                onEdit={handleEdit}
+                onView={handleView}
+                onDelete={handleDelete}
+              />
+
+              {/* Pagination Controls */}
+              <div className="flex justify-center items-center space-x-2 mt-6">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
+                >
+                  Prev
+                </button>
+
+                <span className="text-gray-700 text-sm">
+                  Page {page} of {pages}
+                </span>
+
+                <button
+                  onClick={() => setPage((p) => Math.min(pages, p + 1))}
+                  disabled={page === pages}
+                  className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </>
           )}
 
         {activeSection === "edit-product" && editingProduct && (

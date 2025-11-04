@@ -2,13 +2,13 @@
 
 import React from 'react';
 import CategoryGrid from './CategoryGrid';
-import ProductShowcase from '@/components/Category/ProductShowcase';
+import Pagination from './Pagination';
 
 const HomePage = () => {
     return (
       <>
         <CategoryGrid/>
-        <ProductShowcase/>
+        <Pagination/>
       </>
     );
 };

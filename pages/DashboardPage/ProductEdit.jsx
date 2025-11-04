@@ -156,9 +156,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         // Basic Information
         title: product.title || "",
         brand: product.brand || "",
-        mainCategory: product.mainCategory?.name || "",
-        subCategory: product.subCategory?.name  || "",
-        subSubCategory: product.subSubCategory?.name  || "",
+        mainCategory: product.mainCategory?._id || product.mainCategory || "",
+        subCategory: product.subCategory?._id || product.subCategory || "",
+        subSubCategory: product.subSubCategory?._id || product.subSubCategory || "",
         mainImage: mainImage || "",
         affiliateUrl: product.affiliateUrl || "",
         isFeatured: product.isFeatured || false,
@@ -625,6 +625,8 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
 
   if (!product) return null;
 
+  console.log("form data",formData)
+
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
@@ -689,7 +691,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   <label className="block text-xs text-gray-600 mb-2">Main Category</label>
                   <select
                     name="mainCategory"
-                    value={formData.mainCategory?.name }
+                    value={formData.mainCategory}
                     onChange={handleChange}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
@@ -708,7 +710,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                     name="subCategory"
                     value={formData.subCategory}
                     onChange={handleChange}
-                    disabled={!formData.mainCategory?.name }
+                    disabled={!formData.mainCategory}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   >
                     <option value="">Select Sub Category</option>
@@ -724,7 +726,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   <label className="block text-xs text-gray-600 mb-2">Sub-Sub Category</label>
                   <select
                     name="subSubCategory"
-                    value={formData.subSubCategory?.name }
+                    value={formData.subSubCategory }
                     onChange={handleChange}
                     disabled={!formData.subCategory}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
@@ -738,8 +740,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   </select>
                 </div>
               </div>
-
-            
             </div>
             {/* Right Column */}
             <div className="space-y-6">
