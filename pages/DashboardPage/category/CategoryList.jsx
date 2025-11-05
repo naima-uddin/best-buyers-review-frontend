@@ -3,22 +3,23 @@ import React, { useEffect, useState } from "react";
 import { ChevronRight, ChevronDown, Trash2, Pencil } from "lucide-react";
 import api from "@/lib/api/axios";
 import { getImageUrl } from "@/utils/imageHelper";
+import Image from "next/image";
 
 const CategoryList = ({ categories, onUpdated, onEdit }) => {
   const [expanded, setExpanded] = useState({});
-    const [userRole, setUserRole] = useState("admin");
-  
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split(".")[1]));
-          setUserRole(payload.role);
-        } catch (error) {
-          console.error("Error parsing token:", error);
-        }
+  const [userRole, setUserRole] = useState("admin");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUserRole(payload.role);
+      } catch (error) {
+        console.error("Error parsing token:", error);
       }
-    }, []);
+    }
+  }, []);
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -34,11 +35,13 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
     }
   };
 
-  
+  // console.log(cats, "cats");
 
   // Recursive rendering function
   const renderCategories = (cats, level = 1) => {
+    console.log(cats, "cats");
 
+    console.log(`${process.env.NEXT_PUBLIC_IMAGE_API_URL}${cats?.[0].image}`);
     return (
       <ul className="space-y-2">
         {cats.map((cat) => {
@@ -68,11 +71,13 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
 
                   {/* Category Image */}
                   {cat.image && level <= 2 && (
-                    <img
-                        src={getImageUrl(cat.image)}
-                        alt={cat.name}
-                        className="w-10 h-10 object-cover rounded-md border"
-                      />
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_API_URL}${cat?.image}`}
+                      alt={cat.name}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 object-cover rounded-md border"
+                    />
                   )}
 
                   {/* Category Name */}
@@ -98,12 +103,12 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
                   </button>
 
                   {userRole === "admin" && (
-                  <button
-                    onClick={() => handleDelete(cat._id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                    <button
+                      onClick={() => handleDelete(cat._id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   )}
                 </div>
               </div>
@@ -139,4 +144,3 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
 };
 
 export default CategoryList;
-
