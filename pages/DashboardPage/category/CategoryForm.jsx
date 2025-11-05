@@ -53,13 +53,18 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
   // --- Utility function to check duplicate sub-sub names ---
 const hasDuplicateSubSub = (subCategories) => {
   for (const sub of subCategories) {
-    const names = sub.subSub.map((s) => s.name.trim().toLowerCase());
-    const nameSet = new Set(names);
-    if (nameSet.size !== names.length) {
-      return true; // duplicate found in this subcategory
+    const seen = new Set();
+    for (const subSub of sub.subSub || []) {
+      const name = subSub.name?.trim().toLowerCase();
+      if (!name) continue; // skip empty names
+      if (seen.has(name)) {
+        // return both the duplicate flag and the name
+        return { hasDuplicate: true, duplicateName: subSub.name.trim() };
+      }
+      seen.add(name);
     }
   }
-  return false;
+  return { hasDuplicate: false };
 };
 
 
@@ -67,13 +72,12 @@ const hasDuplicateSubSub = (subCategories) => {
   const handleSubmit = async (e) => {
   e.preventDefault();
   setMessage("");
-
-  // 🛑 Check duplicates first
- if (hasDuplicateSubSub(subCategories)) {
-  setMessage("❌ Duplicate sub–sub category names found. Please remove or rename them.");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  return;
-}
+const { hasDuplicate, duplicateName } = hasDuplicateSubSub(subCategories);
+  if (hasDuplicate) {
+    setMessage(`❌ Duplicate sub–sub category name "${duplicateName}" found. Please remove or rename it.`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return; // stop submission
+  }
 
  setLoading(true);
 
