@@ -10,6 +10,7 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (editCategory) {
@@ -17,25 +18,66 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
       setParent(editCategory.parent || "");
       setImage(null);
       setSubCategories([]);
+      setErrors({});
     }
   }, [editCategory]);
 
+  // --- Validation function ---
+  const validateDuplicates = () => {
+    const newErrors = {};
+
+    // Check for duplicate subcategories
+    const subNames = subCategories.map(sub => sub.name.trim().toLowerCase());
+    const duplicateSubs = subNames.filter((name, index) => 
+      name && subNames.indexOf(name) !== index
+    );
+    
+    if (duplicateSubs.length > 0) {
+      newErrors.subCategories = "Duplicate subcategory names found";
+    }
+
+    // Check for duplicate sub-subcategories within each subcategory
+    subCategories.forEach((sub, i) => {
+      if (sub.subSub && sub.subSub.length > 0) {
+        const subSubNames = sub.subSub.map(ss => ss.name.trim().toLowerCase());
+        const duplicateSubSubs = subSubNames.filter((name, index) => 
+          name && subSubNames.indexOf(name) !== index
+        );
+        
+        if (duplicateSubSubs.length > 0) {
+          newErrors[`subSub_${i}`] = `Duplicate sub-subcategory names in "${sub.name || `Subcategory ${i+1}`}"`;
+        }
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // --- Subcategory handlers ---
-  const addSubCategory = () =>
+  const addSubCategory = () => {
     setSubCategories([...subCategories, { name: "", image: null, subSub: [] }]);
-  const removeSubCategory = (index) =>
+    setErrors({});
+  };
+
+  const removeSubCategory = (index) => {
     setSubCategories(subCategories.filter((_, i) => i !== index));
+    setErrors({});
+  };
 
   // --- Sub-subcategory handlers ---
   const addSubSubCategory = (i) => {
     const updated = [...subCategories];
     updated[i].subSub.push({ name: "", image: null });
     setSubCategories(updated);
+    setErrors({});
   };
+
   const removeSubSubCategory = (i, j) => {
     const updated = [...subCategories];
     updated[i].subSub.splice(j, 1);
     setSubCategories(updated);
+    setErrors({});
   };
 
   // --- Input change handlers ---
@@ -43,43 +85,37 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     const updated = [...subCategories];
     updated[i][field] = value;
     setSubCategories(updated);
+    
+    // Clear errors when user types
+    if (field === 'name') {
+      setErrors({});
+    }
   };
+
   const handleSubSubChange = (i, j, field, value) => {
     const updated = [...subCategories];
     updated[i].subSub[j][field] = value;
     setSubCategories(updated);
-  };
-
-  // --- Utility function to check duplicate sub-sub names ---
-const hasDuplicateSubSub = (subCategories) => {
-  for (const sub of subCategories) {
-    const seen = new Set();
-    for (const subSub of sub.subSub || []) {
-      const name = subSub.name?.trim().toLowerCase();
-      if (!name) continue; // skip empty names
-      if (seen.has(name)) {
-        // return both the duplicate flag and the name
-        return { hasDuplicate: true, duplicateName: subSub.name.trim() };
-      }
-      seen.add(name);
+    
+    // Clear errors when user types
+    if (field === 'name') {
+      setErrors({});
     }
-  }
-  return { hasDuplicate: false };
-};
-
+  };
 
   // --- Submit Handler ---
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setMessage("");
-const { hasDuplicate, duplicateName } = hasDuplicateSubSub(subCategories);
-  if (hasDuplicate) {
-    setMessage(`❌ Duplicate sub–sub category name "${duplicateName}" found. Please remove or rename it.`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return; // stop submission
-  }
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setErrors({});
 
- setLoading(true);
+    // Validate duplicates before submitting
+    if (!validateDuplicates()) {
+      setMessage("❌ Please fix duplicate category names before submitting.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -130,15 +166,13 @@ const { hasDuplicate, duplicateName } = hasDuplicateSubSub(subCategories);
   };
 
   // --- Flatten categories for dropdown ---
-// --- Flatten categories for dropdown ---
-const flattenCategories = (cats = [], depth = 0) =>
-  cats.flatMap((c) => [
-    { _id: c._id, name: "—".repeat(depth) + " " + c.name },
-    ...flattenCategories(c.children || [], depth + 1),
-  ]);
+  const flattenCategories = (cats = [], depth = 0) =>
+    cats.flatMap((c) => [
+      { _id: c._id, name: "—".repeat(depth) + " " + c.name },
+      ...flattenCategories(c.children || [], depth + 1),
+    ]);
 
-const allOptions = flattenCategories(categories || []);
-
+  const allOptions = flattenCategories(categories || []);
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
@@ -206,6 +240,13 @@ const allOptions = flattenCategories(categories || []);
             </button>
           </div>
 
+          {/* Duplicate Error Message */}
+          {errors.subCategories && (
+            <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm font-medium">{errors.subCategories}</p>
+            </div>
+          )}
+
           {subCategories.length === 0 && (
             <p className="text-gray-500 text-sm italic">
               No subcategories added yet.
@@ -264,6 +305,13 @@ const allOptions = flattenCategories(categories || []);
                   </button>
                 </div>
 
+                {/* Sub-subcategory duplicate error */}
+                {errors[`subSub_${i}`] && (
+                  <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-600 text-xs font-medium">{errors[`subSub_${i}`]}</p>
+                  </div>
+                )}
+
                 {sub.subSub.map((ss, j) => (
                   <div
                     key={j}
@@ -308,12 +356,16 @@ const allOptions = flattenCategories(categories || []);
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium"
+            className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-blue-400 disabled:cursor-not-allowed"
           >
             {loading ? "Saving..." : "Save Category"}
           </button>
           {message && (
-            <p className="text-sm text-gray-600 mt-3 font-medium">{message}</p>
+            <p className={`text-sm mt-3 font-medium ${
+              message.includes("❌") ? "text-red-600" : "text-green-600"
+            }`}>
+              {message}
+            </p>
           )}
         </div>
       </form>
