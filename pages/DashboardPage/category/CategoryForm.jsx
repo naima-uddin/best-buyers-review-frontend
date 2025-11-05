@@ -105,12 +105,15 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
   };
 
   // --- Flatten categories for dropdown ---
-  const flattenCategories = (cats, depth = 0) =>
-    cats.flatMap((c) => [
-      { _id: c._id, name: "—".repeat(depth) + " " + c.name },
-      ...flattenCategories(c.children || [], depth + 1),
-    ]);
-  const allOptions = flattenCategories(categories);
+// --- Flatten categories for dropdown ---
+const flattenCategories = (cats = [], depth = 0) =>
+  cats.flatMap((c) => [
+    { _id: c._id, name: "—".repeat(depth) + " " + c.name },
+    ...flattenCategories(c.children || [], depth + 1),
+  ]);
+
+const allOptions = flattenCategories(categories || []);
+
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
