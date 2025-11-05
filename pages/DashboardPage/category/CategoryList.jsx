@@ -129,18 +129,19 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
   // Top-level categories logging
   console.log("🚀 Initial categories received:", categories);
 
-  return (
-    <div className="bg-white p-6 rounded-2xl shadow-md">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Category Management
-      </h2>
-      {categories.length === 0 ? (
-        <p className="text-gray-500">No categories found.</p>
-      ) : (
-        renderCategories(categories)
-      )}
-    </div>
-  );
+return (
+  <div className="bg-white p-6 rounded-2xl shadow-md">
+    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+      Category Management
+    </h2>
+    {!categories || categories.length === 0 ? (
+      <p className="text-gray-500">No categories found.</p>
+    ) : (
+      renderCategories(categories || [])
+    )}
+  </div>
+);
+
 };
 
 export default CategoryList;
