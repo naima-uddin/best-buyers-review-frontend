@@ -25,46 +25,39 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
   // --- Improved Validation function ---
   const validateDuplicates = () => {
     const newErrors = {};
+    let hasDuplicates = false;
 
     // Check for duplicate subcategories
-    const subNames = subCategories.map(sub => sub.name.trim().toLowerCase());
-    const subNameCount = {};
-    
-    subNames.forEach(name => {
-      if (name) {
-        subNameCount[name] = (subNameCount[name] || 0) + 1;
-      }
-    });
-
-    const duplicateSubs = Object.keys(subNameCount).filter(name => subNameCount[name] > 1);
+    const subNames = subCategories.map(sub => sub.name.trim());
+    const duplicateSubs = subNames.filter((name, index) => 
+      name && subNames.indexOf(name) !== index
+    );
     
     if (duplicateSubs.length > 0) {
-      newErrors.subCategories = `Duplicate subcategory names found: ${duplicateSubs.map(name => `"${name}"`).join(', ')}`;
+      const uniqueDuplicates = [...new Set(duplicateSubs)];
+      newErrors.subCategories = `Duplicate subcategory names found: ${uniqueDuplicates.join(', ')}`;
+      hasDuplicates = true;
     }
 
     // Check for duplicate sub-subcategories within each subcategory
     subCategories.forEach((sub, i) => {
       if (sub.subSub && sub.subSub.length > 0) {
-        const subSubNames = sub.subSub.map(ss => ss.name.trim().toLowerCase());
-        const subSubNameCount = {};
-        
-        subSubNames.forEach(name => {
-          if (name) {
-            subSubNameCount[name] = (subSubNameCount[name] || 0) + 1;
-          }
-        });
-
-        const duplicateSubSubs = Object.keys(subSubNameCount).filter(name => subSubNameCount[name] > 1);
+        const subSubNames = sub.subSub.map(ss => ss.name.trim());
+        const duplicateSubSubs = subSubNames.filter((name, index) => 
+          name && subSubNames.indexOf(name) !== index
+        );
         
         if (duplicateSubSubs.length > 0) {
+          const uniqueDuplicates = [...new Set(duplicateSubSubs)];
           const subNameDisplay = sub.name || `Subcategory ${i+1}`;
-          newErrors[`subSub_${i}`] = `Duplicate sub-subcategory names in "${subNameDisplay}": ${duplicateSubSubs.map(name => `"${name}"`).join(', ')}`;
+          newErrors[`subSub_${i}`] = `Duplicate sub-subcategory names in "${subNameDisplay}": ${uniqueDuplicates.join(', ')}`;
+          hasDuplicates = true;
         }
       }
     });
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !hasDuplicates;
   };
 
   // --- Subcategory handlers ---
@@ -133,8 +126,31 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     setErrors({});
 
     // Validate duplicates before submitting
-    if (!validateDuplicates()) {
-      setMessage("❌ Please fix duplicate category names before submitting.");
+    const isValid = validateDuplicates();
+    if (!isValid) {
+      // Get all duplicate names for the main error message
+      const allDuplicateNames = [];
+      
+      // Collect duplicate subcategory names
+      if (errors.subCategories) {
+        const subMatches = errors.subCategories.match(/Duplicate subcategory names found: (.*)/);
+        if (subMatches) {
+          allDuplicateNames.push(...subMatches[1].split(', '));
+        }
+      }
+      
+      // Collect duplicate sub-subcategory names
+      Object.keys(errors).forEach(key => {
+        if (key.startsWith('subSub_')) {
+          const subSubMatches = errors[key].match(/Duplicate sub-subcategory names in "[^"]*": (.*)/);
+          if (subSubMatches) {
+            allDuplicateNames.push(...subSubMatches[1].split(', '));
+          }
+        }
+      });
+
+      const uniqueDuplicates = [...new Set(allDuplicateNames)];
+      setMessage(`❌ Please fix duplicate category names before submitting: ${uniqueDuplicates.join(', ')}`);
       setLoading(false);
       return;
     }
