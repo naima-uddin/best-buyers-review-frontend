@@ -65,14 +65,17 @@ const hasDuplicateSubSub = (subCategories) => {
 
   // --- Submit Handler ---
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+  e.preventDefault();
+  setMessage("");
 
-      if (hasDuplicateSubSub(subCategories)) {
-    setMessage("❌ Duplicate sub–sub category names found. Please remove or rename them.");
-    return; // stop submission
-  }
+  // 🛑 Check duplicates first
+ if (hasDuplicateSubSub(subCategories)) {
+  setMessage("❌ Duplicate sub–sub category names found. Please remove or rename them.");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  return;
+}
+
+ setLoading(true);
 
     try {
       const formData = new FormData();
