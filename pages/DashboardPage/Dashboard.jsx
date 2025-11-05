@@ -25,7 +25,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/categories");
+        const res = await fetch("https://best-buyers-review-backend-q2rp.onrender.com/api/categories");
         const data = await res.json();
         setCategories(data || []);
       } catch (error) {
@@ -40,7 +40,7 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      let url = `http://localhost:5000/api/products?page=${pageNum}&limit=10`;
+      let url = `https://best-buyers-review-backend-q2rp.onrender.com/api/products?page=${pageNum}&limit=10`;
       if (categoryId) url += `&category=${categoryId}`;
 
       const response = await fetch(url, {
@@ -89,7 +89,7 @@ export default function Dashboard() {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `http://localhost:5000/api/products/${product.asin}`,
+          `https://best-buyers-review-backend-q2rp.onrender.com/api/products/${product.asin}`,
           {
             method: "DELETE",
             headers: {
@@ -149,7 +149,7 @@ export default function Dashboard() {
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/products/${updatedProduct.asin}`,
+        `https://best-buyers-review-backend-q2rp.onrender.com/api/products/${updatedProduct.asin}`,
         {
           method: "PUT",
           headers: {

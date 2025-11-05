@@ -17,7 +17,7 @@ export default function UserManagement() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch("https://best-buyers-review-backend-q2rp.onrender.com/api/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -43,8 +43,8 @@ export default function UserManagement() {
     try {
       const token = localStorage.getItem("token");
       const url = editingUser 
-        ? `http://localhost:5000/api/users/${editingUser._id}`
-        : "http://localhost:5000/api/users";
+        ? `https://best-buyers-review-backend-q2rp.onrender.com/api/users/${editingUser._id}`
+        : "https://best-buyers-review-backend-q2rp.onrender.com/api/users";
       
       const method = editingUser ? "PUT" : "POST";
 
@@ -89,7 +89,7 @@ export default function UserManagement() {
     if (confirm(`Are you sure you want to delete ${user.name}?`)) {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`http://localhost:5000/api/users/${user._id}`, {
+        const response = await fetch(`https://best-buyers-review-backend-q2rp.onrender.com/api/users/${user._id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

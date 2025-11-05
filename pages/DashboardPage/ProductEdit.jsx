@@ -23,7 +23,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/categories");
+        const response = await fetch("https://best-buyers-review-backend-q2rp.onrender.com/api/categories");
         const data = await response.json();
         setCategories(data || []);
       } catch (error) {
