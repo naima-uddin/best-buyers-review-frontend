@@ -50,11 +50,29 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     setSubCategories(updated);
   };
 
+  // --- Utility function to check duplicate sub-sub names ---
+const hasDuplicateSubSub = (subCategories) => {
+  for (const sub of subCategories) {
+    const names = sub.subSub.map((s) => s.name.trim().toLowerCase());
+    const nameSet = new Set(names);
+    if (nameSet.size !== names.length) {
+      return true; // duplicate found in this subcategory
+    }
+  }
+  return false;
+};
+
+
   // --- Submit Handler ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+
+      if (hasDuplicateSubSub(subCategories)) {
+    setMessage("❌ Duplicate sub–sub category names found. Please remove or rename them.");
+    return; // stop submission
+  }
 
     try {
       const formData = new FormData();
