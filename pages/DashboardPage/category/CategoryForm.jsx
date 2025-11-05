@@ -22,30 +22,43 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     }
   }, [editCategory]);
 
-  // --- Validation function ---
+  // --- Improved Validation function ---
   const validateDuplicates = () => {
     const newErrors = {};
 
     // Check for duplicate subcategories
     const subNames = subCategories.map(sub => sub.name.trim().toLowerCase());
-    const duplicateSubs = subNames.filter((name, index) => 
-      name && subNames.indexOf(name) !== index
-    );
+    const subNameCount = {};
+    
+    subNames.forEach(name => {
+      if (name) {
+        subNameCount[name] = (subNameCount[name] || 0) + 1;
+      }
+    });
+
+    const duplicateSubs = Object.keys(subNameCount).filter(name => subNameCount[name] > 1);
     
     if (duplicateSubs.length > 0) {
-      newErrors.subCategories = "Duplicate subcategory names found";
+      newErrors.subCategories = `Duplicate subcategory names found: ${duplicateSubs.map(name => `"${name}"`).join(', ')}`;
     }
 
     // Check for duplicate sub-subcategories within each subcategory
     subCategories.forEach((sub, i) => {
       if (sub.subSub && sub.subSub.length > 0) {
         const subSubNames = sub.subSub.map(ss => ss.name.trim().toLowerCase());
-        const duplicateSubSubs = subSubNames.filter((name, index) => 
-          name && subSubNames.indexOf(name) !== index
-        );
+        const subSubNameCount = {};
+        
+        subSubNames.forEach(name => {
+          if (name) {
+            subSubNameCount[name] = (subSubNameCount[name] || 0) + 1;
+          }
+        });
+
+        const duplicateSubSubs = Object.keys(subSubNameCount).filter(name => subSubNameCount[name] > 1);
         
         if (duplicateSubSubs.length > 0) {
-          newErrors[`subSub_${i}`] = `Duplicate sub-subcategory names in "${sub.name || `Subcategory ${i+1}`}"`;
+          const subNameDisplay = sub.name || `Subcategory ${i+1}`;
+          newErrors[`subSub_${i}`] = `Duplicate sub-subcategory names in "${subNameDisplay}": ${duplicateSubSubs.map(name => `"${name}"`).join(', ')}`;
         }
       }
     });
@@ -101,6 +114,15 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     if (field === 'name') {
       setErrors({});
     }
+  };
+
+  // --- Real-time validation on blur ---
+  const handleSubCategoryBlur = () => {
+    validateDuplicates();
+  };
+
+  const handleSubSubBlur = () => {
+    validateDuplicates();
   };
 
   // --- Submit Handler ---
@@ -278,6 +300,7 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
                 onChange={(e) =>
                   handleSubCategoryChange(i, "name", e.target.value)
                 }
+                onBlur={handleSubCategoryBlur}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2 focus:ring-2 focus:ring-blue-500 outline-none"
                 required
               />
@@ -325,6 +348,7 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
                         onChange={(e) =>
                           handleSubSubChange(i, j, "name", e.target.value)
                         }
+                        onBlur={handleSubSubBlur}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
                         required
                       />
