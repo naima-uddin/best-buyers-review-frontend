@@ -7,17 +7,17 @@ export default function UserManagement() {
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'moderator'
+    name: "",
+    email: "",
+    password: "",
+    role: "moderator",
   });
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("https://best-buyers-review-backend-q2rp.onrender.com/api/users", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,10 +42,10 @@ export default function UserManagement() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const url = editingUser 
-        ? `https://best-buyers-review-backend-q2rp.onrender.com/api/users/${editingUser._id}`
-        : "https://best-buyers-review-backend-q2rp.onrender.com/api/users";
-      
+      const url = editingUser
+        ? `${process.env.NEXT_PUBLIC_API_URL}/users/${editingUser._id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/users`;
+
       const method = editingUser ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -60,10 +60,14 @@ export default function UserManagement() {
       const result = await response.json();
 
       if (response.ok) {
-        alert(editingUser ? "User updated successfully!" : "User created successfully!");
+        alert(
+          editingUser
+            ? "User updated successfully!"
+            : "User created successfully!"
+        );
         setShowForm(false);
         setEditingUser(null);
-        setFormData({ name: '', email: '', password: '', role: 'moderator' });
+        setFormData({ name: "", email: "", password: "", role: "moderator" });
         fetchUsers();
       } else {
         alert(result.message || "Failed to save user");
@@ -79,8 +83,8 @@ export default function UserManagement() {
     setFormData({
       name: user.name,
       email: user.email,
-      password: '', // Don't fill password for security
-      role: user.role
+      password: "", // Don't fill password for security
+      role: user.role,
     });
     setShowForm(true);
   };
@@ -89,12 +93,15 @@ export default function UserManagement() {
     if (confirm(`Are you sure you want to delete ${user.name}?`)) {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`https://best-buyers-review-backend-q2rp.onrender.com/api/users/${user._id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/users/${user._id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const result = await response.json();
 
@@ -114,7 +121,7 @@ export default function UserManagement() {
   const resetForm = () => {
     setShowForm(false);
     setEditingUser(null);
-    setFormData({ name: '', email: '', password: '', role: 'moderator' });
+    setFormData({ name: "", email: "", password: "", role: "moderator" });
   };
 
   return (
@@ -123,7 +130,9 @@ export default function UserManagement() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
-          <p className="text-gray-600 mt-1">Manage admin and moderator accounts</p>
+          <p className="text-gray-600 mt-1">
+            Manage admin and moderator accounts
+          </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -137,7 +146,7 @@ export default function UserManagement() {
       {showForm && (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6">
           <h2 className="text-xl font-semibold mb-4">
-            {editingUser ? 'Edit User' : 'Add New User'}
+            {editingUser ? "Edit User" : "Add New User"}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -150,7 +159,9 @@ export default function UserManagement() {
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -162,7 +173,9 @@ export default function UserManagement() {
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -175,8 +188,12 @@ export default function UserManagement() {
                   required={!editingUser}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  placeholder={editingUser ? "Leave blank to keep current password" : ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  placeholder={
+                    editingUser ? "Leave blank to keep current password" : ""
+                  }
                 />
               </div>
               <div>
@@ -186,7 +203,9 @@ export default function UserManagement() {
                 <select
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value })
+                  }
                 >
                   <option value="moderator">Moderator</option>
                   <option value="admin">Admin</option>
@@ -198,7 +217,7 @@ export default function UserManagement() {
                 type="submit"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                {editingUser ? 'Update User' : 'Create User'}
+                {editingUser ? "Update User" : "Create User"}
               </button>
               <button
                 type="button"
@@ -251,33 +270,38 @@ export default function UserManagement() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {users.map((user) => (
-                  <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={user._id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-6 py-4">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900">
                           {user.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
-                          {user.email}
-                        </p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.role === 'admin' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          user.role === "admin"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
                         {user.role}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        user.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.isActive ? 'Active' : 'Inactive'}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          user.isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {user.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-6 py-4">

@@ -14,7 +14,9 @@ export default function Pagination() {
 
   const fetchProducts = async (pageNumber) => {
     try {
-      const res = await axios.get(`https://best-buyers-review-backend-q2rp.onrender.com/api/products?page=${pageNumber}&limit=${limit}`);
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/products?page=${pageNumber}&limit=${limit}`
+      );
       const { products, pagination } = res.data.data;
 
       setProducts(products);

@@ -43,8 +43,7 @@ export default function ProductForm({ onSubmit, onCancel }) {
   };
 
   const removeAsinField = (index) => {
-    if (asins.length > 1)
-      setAsins(asins.filter((_, i) => i !== index));
+    if (asins.length > 1) setAsins(asins.filter((_, i) => i !== index));
   };
 
   const updateAsin = (index, value) => {
@@ -96,19 +95,24 @@ export default function ProductForm({ onSubmit, onCancel }) {
         };
       }
 
-      const response = await fetch("https://best-buyers-review-backend-q2rp.onrender.com/api/products/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(requestData),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
 
       const result = await response.json();
 
       if (response.ok) {
-        alert(`✅ Successfully added ${result.data?.added?.length || 0} products!`);
+        alert(
+          `✅ Successfully added ${result.data?.added?.length || 0} products!`
+        );
         setAsins([""]);
         setSelectedMain("");
         setSelectedSub("");
@@ -131,7 +135,9 @@ export default function ProductForm({ onSubmit, onCancel }) {
       <div className="bg-white rounded-2xl shadow-md border border-gray-200">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-800">Add Products by ASIN</h1>
+          <h1 className="text-2xl font-bold text-gray-800">
+            Add Products by ASIN
+          </h1>
           <p className="text-gray-600 mt-1">
             Enter Amazon ASINs to fetch product data automatically.
           </p>
@@ -253,7 +259,9 @@ export default function ProductForm({ onSubmit, onCancel }) {
 
           {/* SEO Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-800">SEO Information</h3>
+            <h3 className="text-sm font-semibold text-gray-800">
+              SEO Information
+            </h3>
 
             <input
               type="text"
