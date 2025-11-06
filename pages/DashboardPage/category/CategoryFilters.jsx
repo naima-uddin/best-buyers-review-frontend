@@ -7,6 +7,10 @@ export default function CategoryFilters({
   setSelectedSub,
   setPage,
 }) {
+  if (!categories || categories.length === 0) {
+    return <p>Loading categories...</p>;
+  }
+
   return (
     <div className="flex gap-3 mb-4 justify-center">
       {/* MAIN CATEGORY */}
