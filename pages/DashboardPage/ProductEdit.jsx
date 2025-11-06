@@ -47,6 +47,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     // Basic Information
     title: "",
     brand: "",
+    labels: [],
     mainCategory: "",
     subCategory: "",
     subSubCategory: "",
@@ -179,7 +180,8 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         mainCategory: product.mainCategory?._id || product.mainCategory || "",
         subCategory: product.subCategory?._id || product.subCategory || "",
         subSubCategory:
-          product.subSubCategory?._id || product.subSubCategory || "",
+        product.subSubCategory?._id || product.subSubCategory || "",
+        labels: product.labels || [],
         mainImage: mainImage || "",
         affiliateUrl: product.affiliateUrl || "",
         isFeatured: product.isFeatured || false,
@@ -587,6 +589,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       // Basic Information
       title: formData.title,
       brand: formData.brand,
+      labels: formData.labels,
       mainCategory: formData.mainCategory,
       subCategory: formData.subCategory,
       subSubCategory: formData.subSubCategory,
@@ -809,6 +812,29 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
             </div>
             {/* Right Column */}
             <div className="space-y-6">
+              <label className="block text-sm font-semibold text-gray-800 mb-3">
+                Labels
+              </label>
+              <select
+                multiple
+                value={formData.labels || []}
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+                  setFormData((prev) => ({ ...prev, labels: selected }));
+                }}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
+              >
+                <option value="best seller">Best Seller</option>
+                <option value="trending">Trending</option>
+                <option value="new">New Arrival</option>
+                <option value="featured">Featured</option>
+                <option value="hot">Hot</option>
+                <option value="amazon-choice">Amazon's choice</option>
+                <option value="popular">Popular</option>
+                <option value="top-pick">Top Picks</option>
+              </select>
+
+
               <div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">
                   Main Image
