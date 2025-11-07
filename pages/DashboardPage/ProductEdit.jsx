@@ -54,6 +54,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     mainImage: "",
     affiliateUrl: "",
     isFeatured: false,
+    isFullReview: false,
 
     // Pricing
     originalPrice: "",
@@ -180,11 +181,12 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         mainCategory: product.mainCategory?._id || product.mainCategory || "",
         subCategory: product.subCategory?._id || product.subCategory || "",
         subSubCategory:
-        product.subSubCategory?._id || product.subSubCategory || "",
+          product.subSubCategory?._id || product.subSubCategory || "",
         labels: product.labels || [],
         mainImage: mainImage || "",
         affiliateUrl: product.affiliateUrl || "",
         isFeatured: product.isFeatured || false,
+        isFullReview: product.isFullReview || false,
 
         originalPrice: originalPrice.toString(),
         discountPrice: discountPrice.toString(),
@@ -595,6 +597,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       subSubCategory: formData.subSubCategory,
       affiliateUrl: formData.affiliateUrl,
       isFeatured: formData.isFeatured,
+      isFullReview: formData.isFullReview,
       anchorTags: formData.anchorTags || [],
 
       // ✅ CORRECTED PRICING STRUCTURE
@@ -702,8 +705,8 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           </button>
         </div>
       </div>
-
-      <form onSubmit={handleSubmit} className="space-y-8">
+      description: formData.introduction,
+      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
         {/* Basic Information */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
@@ -722,7 +725,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  required
                   className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
@@ -809,6 +811,32 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   </select>
                 </div>
               </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label className="ml-2 text-sm font-medium text-gray-800">
+                  Featured Product
+                </label>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="isFullReview"
+                  checked={formData.isFullReview}
+                  onChange={handleChange}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label className="ml-2 text-sm font-medium text-gray-800">
+                  Full Detailed Review
+                </label>
+              </div>
             </div>
             {/* Right Column */}
             <div className="space-y-6">
@@ -819,7 +847,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 multiple
                 value={formData.labels || []}
                 onChange={(e) => {
-                  const selected = Array.from(e.target.selectedOptions, (option) => option.value);
+                  const selected = Array.from(
+                    e.target.selectedOptions,
+                    (option) => option.value
+                  );
                   setFormData((prev) => ({ ...prev, labels: selected }));
                 }}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 h-32"
@@ -833,7 +864,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 <option value="popular">Popular</option>
                 <option value="top-pick">Top Picks</option>
               </select>
-
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-4">
@@ -881,19 +911,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                   />
                 </div>
               )}
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="isFeatured"
-                  checked={formData.isFeatured}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label className="ml-2 text-sm font-medium text-gray-800">
-                  Featured Product
-                </label>
-              </div>
             </div>
           </div>
         </div>
@@ -1499,7 +1516,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 name="descriptionTitle"
                 value={formData.descriptionTitle}
                 onChange={handleChange}
-                required
                 className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -1513,7 +1529,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 value={formData.introduction}
                 onChange={handleChange}
                 rows={6}
-                required
                 className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -1688,7 +1703,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 value={formData.conclusionText}
                 onChange={handleChange}
                 rows={6}
-                required
                 className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

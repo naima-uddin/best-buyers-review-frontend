@@ -33,7 +33,9 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`
+        );
         const data = await res.json();
         setCategories(flattenCategories(data));
       } catch (e) {
@@ -52,7 +54,9 @@ export default function Dashboard() {
       if (selectedSub) url += `&subCategory=${selectedSub}`;
       else if (selectedMain) url += `&mainCategory=${selectedMain}`;
 
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const result = await res.json();
 
       if (res.ok) {
@@ -69,10 +73,21 @@ export default function Dashboard() {
 
   // 🧲 Reload Products When Filters or Section Change
   useEffect(() => {
-    if (activeSection === "view-products" && !editingProduct && !viewingProduct) {
+    if (
+      activeSection === "view-products" &&
+      !editingProduct &&
+      !viewingProduct
+    ) {
       fetchProducts(page);
     }
-  }, [activeSection, editingProduct, viewingProduct, page, selectedMain, selectedSub]);
+  }, [
+    activeSection,
+    editingProduct,
+    viewingProduct,
+    page,
+    selectedMain,
+    selectedSub,
+  ]);
 
   const handleEdit = (product) => {
     setEditingProduct(product);
@@ -88,20 +103,80 @@ export default function Dashboard() {
     if (!confirm(`Delete "${product.title}"?`)) return;
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${product.asin}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${product.asin}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       fetchProducts(page);
     } catch (e) {
       console.error("Delete failed", e);
     }
   };
 
-  const handleSaveEdit = () => {
-    setEditingProduct(null);
-    setActiveSection("view-products");
-    fetchProducts(page);
+  const handleSaveEdit = async (updatedProduct) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const updateData = {
+        title: updatedProduct.title,
+        brand: updatedProduct.brand,
+        mainCategory: updatedProduct.mainCategory,
+        subCategory: updatedProduct.subCategory,
+        subSubCategory: updatedProduct.subSubCategory,
+        images: updatedProduct.images,
+        price: updatedProduct.price,
+        listPrice: updatedProduct.listPrice,
+        discount: updatedProduct.discount,
+        customRating: updatedProduct.customRating,
+        features: updatedProduct.features,
+        colors: updatedProduct.colors,
+        styles: updatedProduct.styles,
+        specifications: updatedProduct.specifications,
+        customReviews: updatedProduct.customReviews,
+        seo: updatedProduct.seo,
+        description: updatedProduct.description,
+        descriptionTitle: updatedProduct.descriptionTitle,
+        introduction: updatedProduct.introduction,
+        factorsToConsider: updatedProduct.factorsToConsider,
+        mostImportantFactors: updatedProduct.mostImportantFactors,
+        commonQuestions: updatedProduct.commonQuestions,
+        conclusion: updatedProduct.conclusion,
+        affiliateUrl: updatedProduct.affiliateUrl,
+        isFeatured: updatedProduct.isFeatured,
+        isFullReview: updatedProduct.isFullReview, // Add this line
+        availability: updatedProduct.availability || "In Stock",
+        anchorTags: updatedProduct.anchorTags || [],
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${updatedProduct.asin}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Product updated successfully!");
+        setEditingProduct(null);
+        setActiveSection("view-products");
+        fetchProducts(page);
+      } else {
+        alert(result.message || "Failed to update product");
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("Error updating product");
+    }
   };
 
   const handleBackToList = () => {
@@ -121,7 +196,9 @@ export default function Dashboard() {
   const renderSection = () => {
     switch (activeSection) {
       case "add-product":
-        return <ProductForm onSubmit={fetchProducts} onCancel={handleBackToList} />;
+        return (
+          <ProductForm onSubmit={fetchProducts} onCancel={handleBackToList} />
+        );
 
       case "view-products":
         return (
@@ -144,13 +221,23 @@ export default function Dashboard() {
             />
 
             <div className="flex justify-center items-center space-x-2 mt-6">
-              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
+              >
                 Prev
               </button>
 
-              <span className="text-gray-700 text-sm">Page {page} of {pages}</span>
+              <span className="text-gray-700 text-sm">
+                Page {page} of {pages}
+              </span>
 
-              <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page === pages} className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50">
+              <button
+                onClick={() => setPage((p) => Math.min(pages, p + 1))}
+                disabled={page === pages}
+                className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
+              >
                 Next
               </button>
             </div>
@@ -158,10 +245,18 @@ export default function Dashboard() {
         );
 
       case "edit-product":
-        return <ProductEdit product={editingProduct} onSave={handleSaveEdit} onCancel={handleBackToList} />;
+        return (
+          <ProductEdit
+            product={editingProduct}
+            onSave={handleSaveEdit}
+            onCancel={handleBackToList}
+          />
+        );
 
       case "view-product":
-        return <ProductView product={viewingProduct} onClose={handleBackToList} />;
+        return (
+          <ProductView product={viewingProduct} onClose={handleBackToList} />
+        );
 
       case "categories":
         return <Categories />;
@@ -176,7 +271,15 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} onBackToList={editingProduct || viewingProduct ? handleBackToList : null} userRole={userRole} onLogout={handleLogout} />
+      <Sidebar
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        onBackToList={
+          editingProduct || viewingProduct ? handleBackToList : null
+        }
+        userRole={userRole}
+        onLogout={handleLogout}
+      />
       <div className="ml-64 flex-1 p-8">{renderSection()}</div>
     </div>
   );
