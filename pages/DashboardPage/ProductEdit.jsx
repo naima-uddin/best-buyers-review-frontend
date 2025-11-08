@@ -14,6 +14,7 @@ import {
 export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
   const [userRole, setUserRole] = useState("admin");
   const [categories, setCategories] = useState([]);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -580,8 +581,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     );
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsUpdating(true);
     console.log("🔄 FORM DATA specifications:", formData.specifications);
     console.log("🔄 FORM DATA specifications count:", formData.specifications?.length);
     console.log("🔄 FORM DATA anchorTags:", formData.anchorTags);
@@ -714,7 +717,14 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     console.log("🚀 Specifications being sent:", updatedProduct.specifications);
     console.log("🚀 Specifications count:", updatedProduct.specifications?.length);
     console.log("🚀 Does it have anchorTags?", updatedProduct.anchorTags);
-    onSave(updatedProduct);
+
+    try {
+      await onSave(updatedProduct);
+    } catch (error) {
+      console.error("Error updating product:", error);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (!product) return null;
@@ -1887,16 +1897,27 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            disabled={isUpdating}
+            className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            disabled={isUpdating}
+            className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save size={16} />
-            Update Product
+            {isUpdating ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Updating...
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                Update Product
+              </>
+            )}
           </button>
         </div>
       </form>
