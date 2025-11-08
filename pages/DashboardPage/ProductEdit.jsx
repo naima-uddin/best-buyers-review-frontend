@@ -201,15 +201,27 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         subImages: subImages,
 
         // Features & Content
-        features: product.features?.feature || [],
-        colors: product.colors || [],
-        styles: product.styles || [],
+        features: (product.features?.feature || []).map((f, idx) => ({
+          value: f,
+          _tempId: `feature-${idx}`
+        })),
+        colors: (product.colors || []).map((c, idx) => ({
+          value: c,
+          _tempId: `color-${idx}`
+        })),
+        styles: (product.styles || []).map((s, idx) => ({
+          value: s,
+          _tempId: `style-${idx}`
+        })),
         specifications: (product.specifications || []).map(({ key, value }, idx) => ({
           key,
           value,
-          _tempId: `existing-${idx}` // Temp ID for React rendering
+          _tempId: `spec-${idx}` // Temp ID for React rendering
         })),
-        customReviews: product.customReviews || [],
+        customReviews: (product.customReviews || []).map((r, idx) => ({
+          ...r,
+          _tempId: `review-${idx}`
+        })),
 
         // SEO
         seoTitle: product.seo?.title || "",
@@ -222,13 +234,19 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         anchorTags: product.anchorTags || [],
 
         // Factors
-        factorsToConsider: product.factorsToConsider || [],
+        factorsToConsider: (product.factorsToConsider || []).map((f, idx) => ({
+          value: f,
+          _tempId: `factor-${idx}`
+        })),
         mostImportantFactorsHeading:
           product.mostImportantFactors?.heading || "",
         mostImportantFactorsText: product.mostImportantFactors?.text || "",
 
         // Common Questions
-        commonQuestions: product.commonQuestions || [],
+        commonQuestions: (product.commonQuestions || []).map((q, idx) => ({
+          ...q,
+          _tempId: `question-${idx}`
+        })),
 
         // Conclusion
         conclusionHeading: product.conclusion?.heading || "",
@@ -322,7 +340,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     if (newFeature.trim()) {
       setFormData((prev) => ({
         ...prev,
-        features: [...prev.features, newFeature.trim()],
+        features: [...prev.features, {
+          value: newFeature.trim(),
+          _tempId: Date.now() + Math.random()
+        }],
       }));
       setNewFeature("");
     }
@@ -339,7 +360,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     if (newColor.trim()) {
       setFormData((prev) => ({
         ...prev,
-        colors: [...prev.colors, newColor.trim()],
+        colors: [...prev.colors, {
+          value: newColor.trim(),
+          _tempId: Date.now() + Math.random()
+        }],
       }));
       setNewColor("");
     }
@@ -356,7 +380,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     if (newStyle.trim()) {
       setFormData((prev) => ({
         ...prev,
-        styles: [...prev.styles, newStyle.trim()],
+        styles: [...prev.styles, {
+          value: newStyle.trim(),
+          _tempId: Date.now() + Math.random()
+        }],
       }));
       setNewStyle("");
     }
@@ -436,7 +463,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     if (newFactor.trim()) {
       setFormData((prev) => ({
         ...prev,
-        factorsToConsider: [...prev.factorsToConsider, newFactor.trim()],
+        factorsToConsider: [...prev.factorsToConsider, {
+          value: newFactor.trim(),
+          _tempId: Date.now() + Math.random()
+        }],
       }));
       setNewFactor("");
     }
@@ -458,6 +488,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           {
             question: newQuestion.trim(),
             answer: "",
+            _tempId: Date.now() + Math.random()
           },
         ],
       }));
@@ -491,6 +522,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
             ...newReview,
             rating: parseFloat(newReview.rating) || 0,
             date: new Date(),
+            _tempId: Date.now() + Math.random()
           },
         ],
       }));
@@ -673,13 +705,19 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       // Images
       images: images,
 
-      // Features & Content
-      features: { feature: formData.features },
-      colors: formData.colors,
-      styles: formData.styles,
+      // Features & Content - Strip _tempId before sending
+      features: { feature: formData.features.map(f => f.value || f) },
+      colors: formData.colors.map(c => c.value || c),
+      styles: formData.styles.map(s => s.value || s),
       // Strip _id and _tempId fields before sending to backend
       specifications: formData.specifications.map(({ key, value }) => ({ key, value })),
-      customReviews: formData.customReviews,
+      customReviews: formData.customReviews.map(({ author, rating, title, content, date }) => ({
+        author,
+        rating,
+        title,
+        content,
+        date
+      })),
 
       // SEO
       seo: {
@@ -696,15 +734,18 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       introduction: formData.introduction,
       description: formData.introduction, // Fallback
 
-      // Factors
-      factorsToConsider: formData.factorsToConsider,
+      // Factors - Strip _tempId
+      factorsToConsider: formData.factorsToConsider.map(f => f.value || f),
       mostImportantFactors: {
         heading: formData.mostImportantFactorsHeading,
         text: formData.mostImportantFactorsText,
       },
 
-      // Common Questions
-      commonQuestions: formData.commonQuestions,
+      // Common Questions - Strip _tempId
+      commonQuestions: formData.commonQuestions.map(({ question, answer }) => ({
+        question,
+        answer
+      })),
 
       // Conclusion
       conclusion: {
@@ -1151,9 +1192,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
 
           <div className="space-y-3">
             {formData.features.map((feature, index) => (
-              <div key={index} className="flex items-center space-x-3">
+              <div key={feature._tempId || index} className="flex items-center space-x-3">
                 <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                  {feature}
+                  {feature.value || feature}
                 </span>
                 <button
                   type="button"
@@ -1193,9 +1234,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
 
             <div className="space-y-3">
               {formData.colors.map((color, index) => (
-                <div key={index} className="flex items-center space-x-3">
+                <div key={color._tempId || index} className="flex items-center space-x-3">
                   <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                    {color}
+                    {color.value || color}
                   </span>
                   <button
                     type="button"
@@ -1233,9 +1274,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
 
             <div className="space-y-3">
               {formData.styles.map((style, index) => (
-                <div key={index} className="flex items-center space-x-3">
+                <div key={style._tempId || index} className="flex items-center space-x-3">
                   <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                    {style}
+                    {style.value || style}
                   </span>
                   <button
                     type="button"
@@ -1613,9 +1654,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
 
           <div className="space-y-4">
             {formData.factorsToConsider.map((factor, index) => (
-              <div key={index} className="flex items-center space-x-3">
+              <div key={factor._tempId || index} className="flex items-center space-x-3">
                 <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                  {factor}
+                  {factor.value || factor}
                 </span>
                 <button
                   type="button"
@@ -1692,7 +1733,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           <div className="space-y-6">
             {formData.commonQuestions.map((question, index) => (
               <div
-                key={index}
+                key={question._tempId || index}
                 className="space-y-3 p-4 border border-gray-200 rounded-lg"
               >
                 <div className="flex items-center space-x-3">
@@ -1788,7 +1829,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           <div className="space-y-6">
             {formData.customReviews.map((review, index) => (
               <div
-                key={index}
+                key={review._tempId || index}
                 className="p-4 border border-gray-200 rounded-lg space-y-3"
               >
                 <div className="grid grid-cols-2 gap-3">
