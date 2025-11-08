@@ -5,9 +5,9 @@ import HomePage from "@/pages/HomePage/HomePage";
 export default function Home() {
   return (
     <>
-      <Navbar/>
-      <HomePage/>
-      <Footer/>
+      <Navbar />
+      <HomePage />
+      <Footer />
     </>
   );
 }

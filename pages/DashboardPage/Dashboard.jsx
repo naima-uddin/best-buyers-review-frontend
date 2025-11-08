@@ -120,41 +120,83 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem("token");
 
-      const updateData = {
-        title: updatedProduct.title,
-        brand: updatedProduct.brand,
-        mainCategory: updatedProduct.mainCategory,
-        subCategory: updatedProduct.subCategory,
-        subSubCategory: updatedProduct.subSubCategory,
-        images: updatedProduct.images,
-        price: updatedProduct.price,
-        listPrice: updatedProduct.listPrice,
-        discount: updatedProduct.discount,
-        customRating: updatedProduct.customRating,
-        features: updatedProduct.features,
-        colors: updatedProduct.colors,
-        styles: updatedProduct.styles,
-        specifications: updatedProduct.specifications,
-        customReviews: updatedProduct.customReviews,
-        seo: updatedProduct.seo,
-        description: updatedProduct.description,
-        descriptionTitle: updatedProduct.descriptionTitle,
-        introduction: updatedProduct.introduction,
-        factorsToConsider: updatedProduct.factorsToConsider,
-        mostImportantFactors: updatedProduct.mostImportantFactors,
-        commonQuestions: updatedProduct.commonQuestions,
-        conclusion: updatedProduct.conclusion,
-        affiliateUrl: updatedProduct.affiliateUrl,
-        isFeatured: updatedProduct.isFeatured,
-        isFullReview: updatedProduct.isFullReview, // Add this line
-        availability: updatedProduct.availability || "In Stock",
-        anchorTags: updatedProduct.anchorTags || [],
-      };
+      // Helper function to check if a value is not empty
+      const hasValue = (val) => val !== null && val !== undefined && val !== '';
+
+      // Build update data with only fields that have values
+      const updateData = {};
+
+      // Always include these if they exist and have value
+      if (hasValue(updatedProduct.title)) updateData.title = updatedProduct.title;
+      if (hasValue(updatedProduct.brand)) updateData.brand = updatedProduct.brand;
+      if (updatedProduct.images) updateData.images = updatedProduct.images;
+
+      // Pricing
+      if (updatedProduct.price) updateData.price = updatedProduct.price;
+      if (updatedProduct.listPrice) updateData.listPrice = updatedProduct.listPrice;
+      if (updatedProduct.discount) updateData.discount = updatedProduct.discount;
+
+      // Rating
+      if (updatedProduct.customRating) updateData.customRating = updatedProduct.customRating;
+
+      // Arrays
+      if (updatedProduct.features) updateData.features = updatedProduct.features;
+      if (updatedProduct.colors) updateData.colors = updatedProduct.colors;
+      if (updatedProduct.styles) updateData.styles = updatedProduct.styles;
+      if (updatedProduct.specifications) updateData.specifications = updatedProduct.specifications;
+      if (updatedProduct.customReviews) updateData.customReviews = updatedProduct.customReviews;
+      if (updatedProduct.factorsToConsider) updateData.factorsToConsider = updatedProduct.factorsToConsider;
+      if (updatedProduct.commonQuestions) updateData.commonQuestions = updatedProduct.commonQuestions;
+
+      // SEO - only include if at least one field has value
+      if (updatedProduct.seo) {
+        const hasValidSeo = hasValue(updatedProduct.seo.title) ||
+                           hasValue(updatedProduct.seo.description) ||
+                           (updatedProduct.seo.keywords && updatedProduct.seo.keywords.length > 0);
+        if (hasValidSeo) {
+          updateData.seo = updatedProduct.seo;
+        }
+      }
+
+      // Most Important Factors - only include if at least one field has value
+      if (updatedProduct.mostImportantFactors) {
+        const hasValidFactors = hasValue(updatedProduct.mostImportantFactors.heading) ||
+                                hasValue(updatedProduct.mostImportantFactors.text);
+        if (hasValidFactors) {
+          updateData.mostImportantFactors = updatedProduct.mostImportantFactors;
+        }
+      }
+
+      // Conclusion - only include if at least one field has value
+      if (updatedProduct.conclusion) {
+        const hasValidConclusion = hasValue(updatedProduct.conclusion.heading) ||
+                                    hasValue(updatedProduct.conclusion.text);
+        if (hasValidConclusion) {
+          updateData.conclusion = updatedProduct.conclusion;
+        }
+      }
+
+      // Optional strings (only if not empty)
+      if (hasValue(updatedProduct.description)) updateData.description = updatedProduct.description;
+      if (hasValue(updatedProduct.descriptionTitle)) updateData.descriptionTitle = updatedProduct.descriptionTitle;
+      if (hasValue(updatedProduct.introduction)) updateData.introduction = updatedProduct.introduction;
+      if (hasValue(updatedProduct.affiliateUrl)) updateData.affiliateUrl = updatedProduct.affiliateUrl;
+
+      // Categories (only if not empty)
+      if (hasValue(updatedProduct.mainCategory)) updateData.mainCategory = updatedProduct.mainCategory;
+      if (hasValue(updatedProduct.subCategory)) updateData.subCategory = updatedProduct.subCategory;
+      if (hasValue(updatedProduct.subSubCategory)) updateData.subSubCategory = updatedProduct.subSubCategory;
+
+      // Booleans and special fields
+      if (updatedProduct.isFeatured !== undefined) updateData.isFeatured = updatedProduct.isFeatured;
+      if (updatedProduct.isFullReview !== undefined) updateData.isFullReview = updatedProduct.isFullReview;
+      if (hasValue(updatedProduct.availability)) updateData.availability = updatedProduct.availability;
+      if (updatedProduct.anchorTags) updateData.anchorTags = updatedProduct.anchorTags;
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/products/${updatedProduct.asin}`,
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
