@@ -203,7 +203,11 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         features: product.features?.feature || [],
         colors: product.colors || [],
         styles: product.styles || [],
-        specifications: product.specifications || [],
+        specifications: (product.specifications || []).map(({ key, value }, idx) => ({
+          key,
+          value,
+          _tempId: `existing-${idx}` // Temp ID for React rendering
+        })),
         customReviews: product.customReviews || [],
 
         // SEO
@@ -231,6 +235,12 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       });
     }
   }, [product]);
+
+  // Track specifications changes for debugging
+  useEffect(() => {
+    console.log("📊 Specifications state updated:", formData.specifications);
+    console.log("📊 Current count:", formData.specifications?.length);
+  }, [formData.specifications]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -358,20 +368,45 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     }));
   };
 
-  const addSpecification = () => {
+  const addSpecification = (e) => {
+    // Prevent form submission if called from Enter key
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    console.log("🔵 Add button clicked!");
+    console.log("🔵 newSpecKey:", newSpecKey);
+    console.log("🔵 newSpecValue:", newSpecValue);
+    console.log("🔵 Current specifications count BEFORE add:", formData.specifications.length);
+
     if (newSpecKey.trim() && newSpecValue.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        specifications: [
-          ...prev.specifications,
-          {
-            key: newSpecKey.trim(),
-            value: newSpecValue.trim(),
-          },
-        ],
-      }));
+      const newSpec = {
+        key: newSpecKey.trim(),
+        value: newSpecValue.trim(),
+        _tempId: Date.now() + Math.random(), // Temporary ID for React keys only
+      };
+
+      setFormData((prev) => {
+        const updatedSpecs = [...prev.specifications, newSpec];
+        console.log("✅ Adding specification:", newSpec);
+        console.log("📋 Updated specifications array:", updatedSpecs);
+        console.log("📋 Total specifications count AFTER add:", updatedSpecs.length);
+
+        // Force a re-render by creating a completely new object
+        return {
+          ...prev,
+          specifications: updatedSpecs,
+          _lastUpdate: Date.now(), // Force re-render
+        };
+      });
+
       setNewSpecKey("");
       setNewSpecValue("");
+      console.log("✅ Specification added successfully! Count should update above.");
+    } else {
+      console.warn("⚠️ Cannot add specification: Key or Value is empty");
+      alert("Please fill in both Key and Value fields");
     }
   };
 
@@ -547,6 +582,8 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("🔄 FORM DATA specifications:", formData.specifications);
+    console.log("🔄 FORM DATA specifications count:", formData.specifications?.length);
     console.log("🔄 FORM DATA anchorTags:", formData.anchorTags);
     console.log("🔄 FORM DATA all fields:", formData);
 
@@ -637,7 +674,8 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       features: { feature: formData.features },
       colors: formData.colors,
       styles: formData.styles,
-      specifications: formData.specifications,
+      // Strip _id and _tempId fields before sending to backend
+      specifications: formData.specifications.map(({ key, value }) => ({ key, value })),
       customReviews: formData.customReviews,
 
       // SEO
@@ -673,6 +711,8 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     };
 
     console.log("🚀 FINAL DATA being sent to backend:", updatedProduct);
+    console.log("🚀 Specifications being sent:", updatedProduct.specifications);
+    console.log("🚀 Specifications count:", updatedProduct.specifications?.length);
     console.log("🚀 Does it have anchorTags?", updatedProduct.anchorTags);
     onSave(updatedProduct);
   };
@@ -1221,12 +1261,12 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         {/* Specifications */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Specifications
+            Specifications ({formData.specifications.length})
           </h2>
 
           <div className="space-y-4">
             {formData.specifications.map((spec, index) => (
-              <div key={index} className="flex items-center space-x-3">
+              <div key={spec._tempId || index} className="flex items-center space-x-3">
                 <input
                   type="text"
                   value={spec.key}
@@ -1254,25 +1294,45 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 type="text"
                 value={newSpecKey}
                 onChange={(e) => setNewSpecKey(e.target.value)}
-                placeholder="Key"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addSpecification(e);
+                  }
+                }}
+                placeholder="Key (e.g., Material, Size, Weight)"
                 className="w-1/3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <input
                 type="text"
                 value={newSpecValue}
                 onChange={(e) => setNewSpecValue(e.target.value)}
-                placeholder="Value"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addSpecification(e);
+                  }
+                }}
+                placeholder="Value (e.g., Plastic, 10 inches, 2 lbs)"
                 className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 type="button"
-                onClick={addSpecification}
+                onClick={(e) => {
+                  e.preventDefault();
+                  addSpecification(e);
+                }}
                 className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Plus size={16} />
                 Add
               </button>
             </div>
+            <p className="text-sm text-gray-500 mt-2">
+              Click "Add" to add specification. The count will update immediately. You can add as many as you need.
+              <br />
+              <strong className="text-orange-600">Important:</strong> After adding specifications, wait for the count to update above before clicking "Update Product".
+            </p>
           </div>
         </div>
 
