@@ -349,6 +349,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     }
   };
 
+  const updateFeature = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      features: prev.features.map((f, i) =>
+        i === index ? { ...f, value } : f
+      ),
+    }));
+  };
+
   const removeFeature = (index) => {
     setFormData((prev) => ({
       ...prev,
@@ -369,6 +378,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     }
   };
 
+  const updateColor = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      colors: prev.colors.map((c, i) =>
+        i === index ? { ...c, value } : c
+      ),
+    }));
+  };
+
   const removeColor = (index) => {
     setFormData((prev) => ({
       ...prev,
@@ -387,6 +405,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       }));
       setNewStyle("");
     }
+  };
+
+  const updateStyle = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      styles: prev.styles.map((s, i) =>
+        i === index ? { ...s, value } : s
+      ),
+    }));
   };
 
   const removeStyle = (index) => {
@@ -438,6 +465,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     }
   };
 
+  const updateSpecification = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      specifications: prev.specifications.map((spec, i) =>
+        i === index ? { ...spec, [field]: value } : spec
+      ),
+    }));
+  };
+
   const removeSpecification = (index) => {
     setFormData((prev) => ({
       ...prev,
@@ -470,6 +506,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
       }));
       setNewFactor("");
     }
+  };
+
+  const updateFactor = (index, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      factorsToConsider: prev.factorsToConsider.map((f, i) =>
+        i === index ? { ...f, value } : f
+      ),
+    }));
   };
 
   const removeFactor = (index) => {
@@ -992,7 +1037,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                     Affiliate Link
                   </label>
                   <input
-                    onClick={() => onEdit(formData.affiliateUrl)}
                     type="url"
                     name="affiliateUrl"
                     value={formData.affiliateUrl}
@@ -1193,9 +1237,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           <div className="space-y-3">
             {formData.features.map((feature, index) => (
               <div key={feature._tempId || index} className="flex items-center space-x-3">
-                <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                  {feature.value || feature}
-                </span>
+                <input
+                  type="text"
+                  value={feature.value || feature}
+                  onChange={(e) => updateFeature(index, e.target.value)}
+                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Feature"
+                />
                 <button
                   type="button"
                   onClick={() => removeFeature(index)}
@@ -1235,9 +1283,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
             <div className="space-y-3">
               {formData.colors.map((color, index) => (
                 <div key={color._tempId || index} className="flex items-center space-x-3">
-                  <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                    {color.value || color}
-                  </span>
+                  <input
+                    type="text"
+                    value={color.value || color}
+                    onChange={(e) => updateColor(index, e.target.value)}
+                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Color"
+                  />
                   <button
                     type="button"
                     onClick={() => removeColor(index)}
@@ -1275,9 +1327,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
             <div className="space-y-3">
               {formData.styles.map((style, index) => (
                 <div key={style._tempId || index} className="flex items-center space-x-3">
-                  <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                    {style.value || style}
-                  </span>
+                  <input
+                    type="text"
+                    value={style.value || style}
+                    onChange={(e) => updateStyle(index, e.target.value)}
+                    className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Style"
+                  />
                   <button
                     type="button"
                     onClick={() => removeStyle(index)}
@@ -1321,14 +1377,16 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
                 <input
                   type="text"
                   value={spec.key}
-                  readOnly
-                  className="w-1/3 p-3 border border-gray-300 rounded-lg bg-gray-50"
+                  onChange={(e) => updateSpecification(index, 'key', e.target.value)}
+                  placeholder="Key"
+                  className="w-1/3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <input
                   type="text"
                   value={spec.value}
-                  readOnly
-                  className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50"
+                  onChange={(e) => updateSpecification(index, 'value', e.target.value)}
+                  placeholder="Value"
+                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <button
                   type="button"
@@ -1655,9 +1713,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           <div className="space-y-4">
             {formData.factorsToConsider.map((factor, index) => (
               <div key={factor._tempId || index} className="flex items-center space-x-3">
-                <span className="flex-1 p-3 border border-gray-300 rounded-lg bg-white">
-                  {factor.value || factor}
-                </span>
+                <input
+                  type="text"
+                  value={factor.value || factor}
+                  onChange={(e) => updateFactor(index, e.target.value)}
+                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Factor"
+                />
                 <button
                   type="button"
                   onClick={() => removeFactor(index)}
