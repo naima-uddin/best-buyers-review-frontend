@@ -70,7 +70,7 @@ const CategoryGrid = () => {
   const hasMoreCategories = categories.length > visibleCount;
 
   return (
-    <div className="shadow-lg">
+    <div className="">
       <div className="max-w-7xl mx-auto px-1 py-2">
         {/* Category Grid */}
         <div className="flex flex-wrap justify-center gap-6">
@@ -78,9 +78,7 @@ const CategoryGrid = () => {
             <div
               key={index}
               className="flex flex-col items-center text-center cursor-pointer group"
-              onClick={() =>
-                router.push(`/category/${category.name.toLowerCase()}`)
-              }
+              onClick={() => router.push(`/category`)}
             >
               {/* Circular Image */}
               <div className="w-9 h-9 md:w-14 md:h-14 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
