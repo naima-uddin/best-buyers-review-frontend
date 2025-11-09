@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import "hover.css/css/hover-min.css";
+import { CategoryProvider } from "@/context/CategoryContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,9 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <CategoryProvider>{children}</CategoryProvider>
+        </AuthProvider>
       </body>
     </html>
   );

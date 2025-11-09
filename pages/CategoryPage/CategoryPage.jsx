@@ -1,119 +1,101 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { useCategories } from "@/context/CategoryContext";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CategoryPage() {
-  const searchParams = useSearchParams();
-  const categoryName = searchParams.get("name");
+  const { categories, loading } = useCategories();
+  const router = useRouter();
 
-  const [mainCategory, setMainCategory] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!categoryName) return;
-
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
-        if (!res.ok) throw new Error("Failed to fetch categories");
-        const data = await res.json();
-
-        // Find the clicked main category (level 1)
-        const selected = data.find(
-          (cat) => cat.level === 1 && cat.name.toLowerCase() === categoryName.toLowerCase()
-        );
-
-        setMainCategory(selected || null);
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, [categoryName]);
-
-  if (loading)
+  // Handle undefined state
+  if (!categories || loading) {
     return (
-      <div className="py-20 text-center text-gray-500">
-        Loading category data...
+      <div className="flex justify-center items-center h-screen text-gray-500">
+        Loading categories...
       </div>
     );
+  }
 
-  if (error)
-    return (
-      <div className="py-20 text-center text-red-500">
-        Error: {error}
-      </div>
-    );
-
-  if (!mainCategory)
-    return (
-      <div className="py-20 text-center text-gray-500">
-        Category not found.
-      </div>
-    );
+  // Additional safety check
+  const safeCategories = Array.isArray(categories) ? categories : [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Page Header */}
-      <h1 className="text-2xl font-bold text-gray-800 text-center mb-4">
-        {mainCategory.name}
-      </h1>
-      <p className="text-center text-gray-600 mb-8 max-w-3xl mx-auto">
-        Browse top {mainCategory.name} categories and subcategories to find exactly what you need.
-      </p>
-
-      {/* Subcategories (level 2) */}
-      {mainCategory.children && mainCategory.children.length > 0 ? (
-        mainCategory.children.map((sub) => (
-          <div key={sub._id} className="mb-10">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-1">
-              {sub.name.toUpperCase()}
-            </h2>
-
-            {/* Nested children (level 3) */}
-            {sub.children && sub.children.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {sub.children.map((item) => (
-                  <div
-                    key={item._id}
-                    className="flex flex-col items-center text-center bg-white rounded-lg p-3 shadow-sm border hover:shadow-md transition cursor-pointer"
-                  >
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={80}
-                        height={80}
-                        className="object-contain mb-2"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded mb-2 text-gray-500 font-bold">
-                        {item.name.charAt(0)}
-                      </div>
-                    )}
-                    <span className="text-sm text-gray-700 font-medium">
-                      {item.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">No subcategories found.</p>
-            )}
-          </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-500">
-          No subcategories available.
+    <div className="max-w-7xl mx-auto px-4 py-10">
+      {/* Header Section */}
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-semibold mb-2">Categories</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          We've spent hundreds of hours researching and summarizing the most
+          important things you should consider in making online purchases.
+          You'll find these guides helpful, informative, and time-saving in
+          considering the products we've reviewed.
         </p>
-      )}
+      </div>
+
+      {/* Category List */}
+      <div className="space-y-10">
+        {safeCategories.length > 0 ? (
+          safeCategories.map((main) => (
+            <div
+              key={main._id}
+              className="border border-gray-200 rounded-xl p-6 shadow-sm"
+            >
+              {/* Main Category Title */}
+              <h2 className="text-xl font-bold text-gray-800 mb-5 uppercase">
+                {main.name}
+              </h2>
+
+              {/* Subcategories Grid */}
+              {main.children && main.children.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-0 gap-y-6">
+                  {main.children.map((sub) => {
+                    const imageSrc = sub.image
+                      ? sub.image.startsWith("http")
+                        ? sub.image
+                        : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
+                      : "/placeholder-image.jpg";
+
+                    return (
+                      <div
+                        key={sub._id}
+                        onClick={() =>
+                          router.push(
+                            `/category/${encodeURIComponent(
+                              main.name
+                            )}/${encodeURIComponent(sub.name)}`
+                          )
+                        }
+                        className="flex flex-col items-center text-center group cursor-pointer hover:scale-105 transition-transform duration-200"
+                      >
+                        <div className="w-16 h-18 md:w-20 md:h-20 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                          <Image
+                            src={imageSrc}
+                            alt={sub.name}
+                            width={112}
+                            height={112}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                        <span className="mt-2 text-sm text-gray-700 group-hover:text-blue-600 font-medium text-center">
+                          {sub.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  No subcategories available
+                </p>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-10">
+            <p className="text-gray-500">No categories available</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
