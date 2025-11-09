@@ -23,23 +23,25 @@ export default function CategoryPage() {
     }
   }, [loading, scrollTo]);
 
-  if (loading) {
+  // Add this check to handle the case where categories might be undefined
+  if (loading || !categories) {
     return (
       <div className="flex justify-center items-center h-screen text-gray-500">
         Loading categories...
       </div>
     );
   }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       {/* Header Section */}
       <div className="text-center mb-10">
         <h1 className="text-3xl font-semibold mb-2">Categories</h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          We’ve spent hundreds of hours researching and summarizing the most
+          We've spent hundreds of hours researching and summarizing the most
           important things you should consider in making online purchases.
-          You’ll find these guides helpful, informative, and time-saving in
-          considering the products we’ve reviewed.
+          You'll find these guides helpful, informative, and time-saving in
+          considering the products we've reviewed.
         </p>
       </div>
 

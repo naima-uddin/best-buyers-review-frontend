@@ -29,5 +29,12 @@ export function CategoryProvider({ children }) {
 }
 
 export function useCategories() {
-  return useContext(CategoryContext);
+  const context = useContext(CategoryContext);
+
+  // Add this check to handle SSR/undefined context
+  if (context === undefined) {
+    return { categories: [], loading: true };
+  }
+
+  return context;
 }

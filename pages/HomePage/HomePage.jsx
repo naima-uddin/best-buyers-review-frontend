@@ -1,5 +1,4 @@
 import React from "react";
-import Pagination from "./Pagination";
 import BannerSlider from "./BannerSlider";
 import CategoryGrid from "./CategoryGrid";
 import ReviewsSection from "./reviews-section";
@@ -12,7 +11,6 @@ const HomePage = () => {
       <BannerSlider />
       <ReviewsSection />
       <TrustSection />
-      <Pagination />
     </>
   );
 };
