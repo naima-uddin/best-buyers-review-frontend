@@ -78,7 +78,11 @@ const CategoryGrid = () => {
             <div
               key={index}
               className="flex flex-col items-center text-center cursor-pointer group"
-              onClick={() => router.push("/category")}
+              onClick={() =>
+                router.push(
+                  `/category?scrollTo=${encodeURIComponent(category.name)}`
+                )
+              }
             >
               {/* Circular Image */}
               <div className="w-9 h-9 md:w-14 md:h-14 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
