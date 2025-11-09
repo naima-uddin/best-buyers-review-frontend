@@ -3,14 +3,8 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-// 👇 add this line
-export const dynamic = "force-dynamic";
-
-export default function ProductByCategory() {
-  // 👇 safe handling for build-time rendering
-  const params = useParams() || {};
-  const { mainCategory, subCategory } = params;
-
+export default function () {
+  const { mainCategory, subCategory } = useParams();
   const searchParams = useSearchParams();
   const pageParam = parseInt(searchParams.get("page")) || 1;
 
@@ -18,11 +12,9 @@ export default function ProductByCategory() {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
-  const limit = 10;
+  const limit = 10; // 10 products per page
 
   useEffect(() => {
-    if (!subCategory) return; // 👈 prevent running before params available
-
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -45,13 +37,13 @@ export default function ProductByCategory() {
     fetchProducts();
   }, [subCategory, pageParam]);
 
-  if (!mainCategory || !subCategory) {
-    return (
-      <div className="flex justify-center items-center h-screen text-gray-500">
-        Loading category...
-      </div>
-    );
-  }
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("page", newPage);
+      window.location.search = params.toString();
+    }
+  };
 
   if (loading)
     return (
