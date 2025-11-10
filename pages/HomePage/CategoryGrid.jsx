@@ -70,8 +70,8 @@ const CategoryGrid = () => {
   const hasMoreCategories = categories.length > visibleCount;
 
   return (
-    <div className="">
-      <div className="max-w-7xl mx-auto px-1 py-2">
+    <div className="mb-2">
+      <div className="max-w-7xl mx-auto  py-2">
         {/* Category Grid */}
         <div className="flex flex-wrap justify-center gap-6">
           {displayCategories.map((category, index) => (
@@ -114,7 +114,7 @@ const CategoryGrid = () => {
               </div>
 
               {/* Category Name */}
-              <span className="text-[13px] md:text-sm text-[#0782F5] font-medium leading-tight group-hover:text-[#FFBC03] transition-colors max-w-[80px] break-words">
+              <span className="text-[13px] md:text-sm text-[#001eff] font-medium leading-tight group-hover:text-[#FFBC03] transition-colors max-w-[80px] break-words">
                 {category.name}
               </span>
             </div>

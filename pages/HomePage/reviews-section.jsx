@@ -48,7 +48,7 @@ function ReviewsSection() {
   // Quote icon component
   const QuoteIcon = ({ className = "" }) => (
     <svg
-      className={`w-8 h-8 text-blue-500/20 ${className}`}
+      className={`w-8 h-8 text-[#0215A6]/20 ${className}`}
       fill="currentColor"
       viewBox="0 0 24 24"
     >
@@ -60,12 +60,12 @@ function ReviewsSection() {
     <section className="max-w-7xl mx-auto  relative overflow-hidden py-10 mt-10">
       <div className="container mx-auto relative z-10">
         <div className="text-center mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#0215A6] to-[#0215A6] bg-clip-text text-transparent">
             Why Shoppers Trust Us
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
             Join over{" "}
-            <span className="font-bold text-blue-600">1 million+</span>{" "}
+            <span className="font-bold text-[#0215A6]">1 million+</span>{" "}
             satisfied shoppers who find the best products with our expert
             guidance
           </p>
@@ -78,7 +78,7 @@ function ReviewsSection() {
               className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
             >
               {/* Gradient top border */}
-              <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+              <div className="h-1 bg-gradient-to-r from-[#0215A6] to-[#0215A6]"></div>
 
               <div className="p-6">
                 {/* Quote icon */}
@@ -95,11 +95,11 @@ function ReviewsSection() {
 
                 {/* Review text */}
                 <p className="text-gray-700 mb-6 leading-relaxed text-sm relative">
-                  <span className="absolute -top-2 -left-1 text-2xl text-blue-200 font-serif">
+                  <span className="absolute -top-2 -left-1 text-2xl text-[#0215A6]/30 font-serif">
                     "
                   </span>
                   {review.text}
-                  <span className="absolute -bottom-4 -right-1 text-2xl text-blue-200 font-serif">
+                  <span className="absolute -bottom-4 -right-1 text-2xl text-[#0215A6]/30 font-serif">
                     "
                   </span>
                 </p>
@@ -107,7 +107,7 @@ function ReviewsSection() {
                 {/* Reviewer info */}
                 <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm relative">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#0215A6] to-[#0215A6] flex items-center justify-center text-white font-semibold text-sm relative">
                       {review.name
                         .split(" ")
                         .map((n) => n[0])
@@ -131,7 +131,7 @@ function ReviewsSection() {
               </div>
 
               {/* Hover effect background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0215A6]/10 to-[#0215A6]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
             </div>
           ))}
         </div>
@@ -149,11 +149,11 @@ function ReviewsSection() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <div className="w-3 h-3 bg-[#0215A6] rounded-full animate-pulse"></div>
               <span className="text-sm text-gray-600">Expert Verified</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+              <div className="w-3 h-3 bg-[#0215A6] rounded-full animate-pulse"></div>
               <span className="text-sm text-gray-600">Real User Feedback</span>
             </div>
           </div>

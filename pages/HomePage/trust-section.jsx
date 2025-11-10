@@ -26,10 +26,10 @@ function TrustSection() {
             const Icon = stat.icon;
             return (
               <div key={idx} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                  <Icon className="h-8 w-8 text-primary" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#0215A6]/10 mb-4">
+                  <Icon className="h-8 w-8 text-[#0215A6]" />
                 </div>
-                <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                <div className="text-3xl md:text-4xl font-bold text-[#0215A6] mb-2">
                   {stat.value}
                 </div>
                 <div className="text-sm text-muted-foreground">
