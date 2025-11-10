@@ -1,17 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import ProductPageSidebar from "./ProductPageSidebar";
 
-export default function ProductByCategory() {
-  const { mainCategory, subCategory } = useParams();
+function ProductByCategoryContent() {
+  const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const mainName = searchParams.get("mainName");
-  const subName = searchParams.get("subName");
-  const pageParam = parseInt(searchParams.get("page")) || 1;
+  // Handle null params during build/prerender
+  const mainCategory = params?.mainCategory;
+  const subCategory = params?.subCategory;
+
+  const mainName = searchParams?.get("mainName");
+  const subName = searchParams?.get("subName");
+  const pageParam = parseInt(searchParams?.get("page")) || 1;
 
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -19,11 +23,18 @@ export default function ProductByCategory() {
   const [hoveredProduct, setHoveredProduct] = useState(null);
 
   useEffect(() => {
+    // Don't fetch if params are not available yet (during SSR/build)
+    if (!mainCategory || !subCategory) {
+      setLoading(false);
+      return;
+    }
+
     async function fetchProducts() {
       try {
         setLoading(true);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.bestbuyersview.com/api';
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategory=${mainCategory}&subCategory=${subCategory}&page=${pageParam}&limit=10`
+          `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}&page=${pageParam}&limit=10`
         );
         const data = await res.json();
 
@@ -320,5 +331,13 @@ export default function ProductByCategory() {
         />
       </div>
     </div>
+  );
+}
+
+export default function ProductByCategory() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>}>
+      <ProductByCategoryContent />
+    </Suspense>
   );
 }
