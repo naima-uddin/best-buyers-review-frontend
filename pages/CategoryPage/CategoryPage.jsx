@@ -2,12 +2,12 @@
 import { useCategories } from "@/context/CategoryContext";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 
-export default function CategoryPage() {
+function CategoryPageContent() {
   const { categories, loading } = useCategories();
   const searchParams = useSearchParams();
-  const scrollTo = searchParams.get("scrollTo");
+  const scrollTo = searchParams?.get("scrollTo");
   const router = useRouter();
 
   // Create refs for each main category
@@ -107,5 +107,13 @@ export default function CategoryPage() {
         ))}
       </div>
     </div>
+  );
+}
+
+export default function CategoryPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>}>
+      <CategoryPageContent />
+    </Suspense>
   );
 }
