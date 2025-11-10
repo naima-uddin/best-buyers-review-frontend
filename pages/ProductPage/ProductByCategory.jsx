@@ -9,10 +9,8 @@ function ProductByCategoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Handle null params during build/prerender
   const mainCategory = params?.mainCategory;
   const subCategory = params?.subCategory;
-
   const mainName = searchParams?.get("mainName");
   const subName = searchParams?.get("subName");
   const pageParam = parseInt(searchParams?.get("page")) || 1;
@@ -20,10 +18,9 @@ function ProductByCategoryContent() {
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [activeProductImages, setActiveProductImages] = useState({});
 
   useEffect(() => {
-    // Don't fetch if params are not available yet (during SSR/build)
     if (!mainCategory || !subCategory) {
       setLoading(false);
       return;
@@ -41,6 +38,13 @@ function ProductByCategoryContent() {
         if (data.success && data.data) {
           setProducts(data.data.products || []);
           setTotalPages(data.data.pagination?.pages || 1);
+          
+          const initialImages = {};
+          data.data.products.forEach(product => {
+            const mainImage = product.images?.find(img => img.variant === "MAIN")?.url || product.images?.[0]?.url;
+            initialImages[product._id] = mainImage;
+          });
+          setActiveProductImages(initialImages);
         } else {
           setProducts([]);
         }
@@ -70,12 +74,19 @@ function ProductByCategoryContent() {
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
     return (
-      <div className="flex items-center">
+      <div className="flex items-center text-yellow-500 text-lg">
         {"★".repeat(fullStars)}
         {hasHalfStar && "★"}
         {"☆".repeat(emptyStars)}
       </div>
     );
+  };
+
+  const handleThumbnailHover = (productId, imageUrl) => {
+    setActiveProductImages(prev => ({
+      ...prev,
+      [productId]: imageUrl
+    }));
   };
 
   if (loading)
@@ -109,56 +120,42 @@ function ProductByCategoryContent() {
         {/* Product List */}
         <div className="flex-1 space-y-6">
           {products.map((product, index) => {
-            const mainImage =
-              product.images?.find((img) => img.variant === "MAIN")?.url ||
-              product.images?.[0]?.url;
-            const thumbImages =
-              product.images?.filter((img) => img.variant === "SUB") ||
-              product.images?.slice(1, 5) ||
-              [];
-            const currentImage =
-              hoveredProduct === product._id && thumbImages.length > 0
-                ? thumbImages[0].url
-                : mainImage;
+            const mainImage = product.images?.find(img => img.variant === "MAIN")?.url || product.images?.[0]?.url;
+            const thumbImages = product.images?.filter(img => img.variant === "SUB") || product.images?.slice(1, 5) || [];
+            const currentImage = activeProductImages[product._id] || mainImage;
 
             return (
               <div
                 key={product._id}
-                className="border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all bg-white"
+                className="border border-gray-300 rounded-lg shadow-sm bg-white overflow-hidden"
               >
-                <div className="flex flex-col md:flex-row p-6">
-                  {/* Left Section - Rank and Rating */}
-                  <div className="flex flex-col items-center mb-4 md:mb-0 md:mr-6 md:w-20">
-                    <div className="text-3xl font-bold text-blue-600 mb-2">
-                      {index + 1 + (pageParam - 1) * 10}
-                    </div>
-                    {product.customRating && (
-                      <div className="text-center">
-                        <div className="flex flex-col items-center mb-1">
-                          <span className="text-2xl font-bold text-black leading-tight">
-                            {product.customRating.rating.toFixed(1)}
-                          </span>
-                          <div className="text-yellow-500 text-lg leading-none">
-                            {getStarRating(product.customRating.rating)}
-                          </div>
-                        </div>
-                        <div className="text-gray-500 text-xs mt-1">
-                          {product.customRating.reviewCount}+ bought in past
-                          month
-                        </div>
+                {/* Top Banner */}
+                <div className=" text-white py-2 px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-bold">#ELECTRIC</span>
+                      <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        Save {product.discount?.percentage || 36}%
                       </div>
-                    )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-yellow-500 text-lg">
+                        {getStarRating(product.customRating?.rating || 4.5)}
+                      </div>
+                      <span className="text-white text-sm">
+                        ({product.customRating?.reviewCount || 29} reviews)
+                      </span>
+                    </div>
                   </div>
+                </div>
 
-                  {/* Middle Section - Image and Product Info */}
-                  <div className="flex-1 flex flex-col md:flex-row">
-                    {/* Product Image with Thumbnails */}
-                    <div
-                      className="flex flex-col items-center mb-4 md:mb-0 md:mr-6"
-                      onMouseEnter={() => setHoveredProduct(product._id)}
-                      onMouseLeave={() => setHoveredProduct(null)}
-                    >
-                      <div className="relative w-48 h-48 mb-3">
+                {/* Product Content */}
+                <div className="p-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    {/* Left Section - Image Gallery */}
+                    <div className="flex flex-col items-center md:w-48">
+                      {/* Main Image */}
+                      <div className="relative w-48 h-48 mb-4">
                         <Image
                           src={currentImage || "/placeholder-image.jpg"}
                           alt={product.title}
@@ -166,26 +163,19 @@ function ProductByCategoryContent() {
                           className="object-contain rounded-lg"
                         />
                       </div>
+                      
                       {/* Thumbnail Images */}
                       {thumbImages.length > 0 && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 flex-wrap justify-center">
                           {thumbImages.slice(0, 4).map((thumb, thumbIndex) => (
                             <div
                               key={thumbIndex}
-                              className="relative w-12 h-12 border border-gray-200 rounded cursor-pointer hover:border-blue-500"
-                              onMouseEnter={() => {
-                                const newImages = [...thumbImages];
-                                const hoverImage = newImages[thumbIndex];
-                                newImages.splice(thumbIndex, 1);
-                                newImages.unshift(hoverImage);
-                                // You can implement image swap logic here
-                              }}
+                              className="relative w-10 h-10 border border-gray-300 rounded cursor-pointer hover:border-blue-500 transition-colors"
+                              onMouseEnter={() => handleThumbnailHover(product._id, thumb.url)}
                             >
                               <Image
                                 src={thumb.url}
-                                alt={`${product.title} thumbnail ${
-                                  thumbIndex + 1
-                                }`}
+                                alt={`${product.title} thumbnail ${thumbIndex + 1}`}
                                 fill
                                 className="object-cover rounded"
                               />
@@ -195,85 +185,97 @@ function ProductByCategoryContent() {
                       )}
                     </div>
 
-                    {/* Product Details */}
+                    {/* Middle Section - Product Info */}
                     <div className="flex-1">
                       {/* Product Title */}
-                      <h2 className="text-xl font-bold mb-3 leading-tight">
+                      <h2 className="text-xl font-bold mb-3 leading-tight text-gray-900">
                         {product.title}
                       </h2>
 
-                      {/* Brand */}
-                      {product.brand && (
-                        <p className="text-gray-800 font-semibold mb-2 text-lg">
-                          {product.brand}
-                        </p>
-                      )}
-
                       {/* Specifications */}
-                      <div className="space-y-1.5 mb-4">
-                        {product.specifications
-                          ?.slice(0, 5)
-                          .map((spec, specIndex) => (
-                            <div key={specIndex} className="flex items-start">
-                              <span className="text-green-600 mr-2 text-lg">
-                                ✓
-                              </span>
-                              <span className="text-gray-800">
-                                <strong>{spec.key}:</strong> {spec.value}
+                      <div className="space-y-2 mb-4">
+                        {product.specifications?.slice(0, 4).map((spec, specIndex) => (
+                          <div key={specIndex} className="flex items-start">
+                            <span className="text-gray-800 text-sm">
+                              <strong>{spec.key}:</strong> {spec.value}
+                            </span>
+                          </div>
+                        ))}
+                        {/* Fallback specs if none available */}
+                        {(!product.specifications || product.specifications.length === 0) && (
+                          <>
+                            <div className="flex items-start">
+                              <span className="text-gray-800 text-sm">
+                                <strong>Wheel Size:</strong> 16 Inches
                               </span>
                             </div>
-                          ))}
+                            <div className="flex items-start">
+                              <span className="text-gray-800 text-sm">
+                                <strong>Frame:</strong> Carbon Steel
+                              </span>
+                            </div>
+                            <div className="flex items-start">
+                              <span className="text-gray-800 text-sm">
+                                <strong>Features:</strong> Dual suspension system with 4 shock absorbers
+                              </span>
+                            </div>
+                            <div className="flex items-start">
+                              <span className="text-gray-800 text-sm">
+                                <strong>Tires:</strong> 16" X 4" fat tires suitable for mountains, sand, snow, and grass
+                              </span>
+                            </div>
+                          </>
+                        )}
                       </div>
 
-                      {/* Available Colors */}
-                      {product.colors && product.colors.length > 0 && (
-                        <p className="text-gray-600 mb-4">
-                          Available in: {product.colors.length} colors
-                        </p>
-                      )}
+                      {/* Read More Link */}
+                      <button className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2">
+                        Read Full Details Specification →
+                      </button>
                     </div>
-                  </div>
 
-                  {/* Right Section - Price and Action */}
-                  <div className="flex flex-col items-center md:items-end justify-between md:w-48">
-                    {/* Save Percentage */}
-                    {product.discount?.percentage && (
-                      <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold mb-3">
-                        Save {product.discount.percentage}%
-                      </div>
-                    )}
+                    {/* Right Section - Price and Action */}
+                    <div className="flex flex-col items-center md:items-end justify-between md:w-48">
+                      {/* Save Percentage Box */}
+                      <div className="text-center w-full mb-4">
+                        <div className="bg-red-600 text-white px-4 py-3 rounded-lg mb-3">
+                          <div className="text-2xl font-bold">Save {product.discount?.percentage || 36}%</div>
+                        </div>
 
-                    {/* Check Price Box */}
-                    <div className="text-center w-full">
-                      <a
-                        href={product.affiliateUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors mb-2"
-                      >
-                        Check Price
-                      </a>
-
-                      {/* Amazon Logo */}
-                      <div className="flex items-center justify-center gap-2 mb-3">
-                        <span className="text-gray-900 font-semibold text-sm">
-                          amazon
-                        </span>
-                      </div>
-
-                      {/* Compare Checkbox */}
-                      <div className="flex items-center justify-center">
-                        <input
-                          type="checkbox"
-                          id={`compare-${product._id}`}
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                        <label
-                          htmlFor={`compare-${product._id}`}
-                          className="ml-2 text-sm text-gray-700"
+                        {/* Check Price Button */}
+                        <a
+                          href={product.affiliateUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors mb-3"
                         >
-                          Compare
-                        </label>
+                          Check Price
+                        </a>
+
+                        {/* Amazon Logo */}
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <span className="text-gray-900 font-semibold text-lg">amazon</span>
+                        </div>
+
+                        {/* Prime Delivery */}
+                        <div className="text-center mb-3">
+                          <span className="text-green-600 font-bold text-sm">Prime Delivery</span>
+                        </div>
+
+                        {/* Compare Checkbox */}
+                        <div className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            id={`compare-${product._id}`}
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <label
+                            htmlFor={`compare-${product._id}`}
+                            className="ml-2 text-sm text-gray-700"
+                          >
+                            Compare
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
