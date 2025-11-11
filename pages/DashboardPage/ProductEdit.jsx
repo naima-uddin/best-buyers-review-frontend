@@ -55,6 +55,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     mainImage: "",
     affiliateUrl: "",
     isFeatured: false,
+    isCoupon:false,
     isFullReview: false,
 
     // Pricing

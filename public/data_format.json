@@ -39,6 +39,7 @@
     "factorsToConsider": [],
     "affiliateUrl": "https://www.wotevyby.co.uk",
     "isFeatured": true,
+    "isCoupon": true,
     "availability": "In Stock",
     "isActive": true,
     "lastUpdated": {
