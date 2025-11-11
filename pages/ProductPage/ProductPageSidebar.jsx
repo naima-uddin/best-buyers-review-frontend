@@ -45,7 +45,7 @@ const subName = searchParams.get("subName");
                 onClick={() => handleSubCategoryClick(sub)}
                 className={`block w-full text-left px-3 py-1 rounded-lg transition ${
                   sub._id === currentSubCategory
-                    ? "bg-blue-500 text-white font-semibold"
+                    ? "bg-blue-700 text-white font-semibold"
                     : "hover:bg-gray-100 text-gray-700"
                 }`}
               >

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import ProductPageSidebar from "./ProductPageSidebar";
@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useCompare } from "@/context/CompareContext";
 import CompareBox from "../ProductCompare/CompareBox";
 import CompareModal from "../ProductCompare/CompareModal";
+import CouponPopup from "./CouponPopup";
 
 function ProductByCategoryContent() {
   const params = useParams();
@@ -24,46 +25,58 @@ function ProductByCategoryContent() {
   const [loading, setLoading] = useState(true);
   const [activeProductImages, setActiveProductImages] = useState({});
 
+ const sortParam = searchParams.get("sort") || "default";
+
   const { compareItems, addToCompare } = useCompare();
 
+  const [showCoupon, setShowCoupon] = useState(false);
+    const [couponProduct, setCouponProduct] = useState(null);
+    const [couponQueue, setCouponQueue] = useState([]);
+    const [couponIndex, setCouponIndex] = useState(0);
+    const timerRef = useRef(null);
+
+
+
+
   useEffect(() => {
-    if (!mainCategory || !subCategory) {
-      setLoading(false);
-      return;
-    }
+  if (!mainCategory || !subCategory) {
+    setLoading(false);
+    return;
+  }
 
-    async function fetchProducts() {
-      try {
-        setLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.bestbuyersview.com/api';
-        const res = await fetch(
-          `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}&page=${pageParam}&limit=10`
-        );
-        const data = await res.json();
+  async function fetchProducts() {
+    try {
+      setLoading(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.bestbuyersview.com/api';
+      const res = await fetch(
+        `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}&page=${pageParam}&limit=10&sort=${sortParam}`
+      );
+      const data = await res.json();
 
-        if (data.success && data.data) {
-          setProducts(data.data.products || []);
-          setTotalPages(data.data.pagination?.pages || 1);
-          
-          const initialImages = {};
-          data.data.products.forEach(product => {
-            const mainImage = product.images?.find(img => img.variant === "MAIN")?.url || product.images?.[0]?.url;
-            initialImages[product._id] = mainImage;
-          });
-          setActiveProductImages(initialImages);
-        } else {
-          setProducts([]);
-        }
-      } catch (err) {
-        console.error("Error fetching products:", err);
+      if (data.success && data.data) {
+        setProducts(data.data.products || []);
+        setTotalPages(data.data.pagination?.pages || 1);
+
+        const initialImages = {};
+        data.data.products.forEach(product => {
+          const mainImage = product.images?.find(img => img.variant === "MAIN")?.url || product.images?.[0]?.url;
+          initialImages[product._id] = mainImage;
+        });
+        setActiveProductImages(initialImages);
+      } else {
         setProducts([]);
-      } finally {
-        setLoading(false);
       }
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setProducts([]);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchProducts();
-  }, [mainCategory, subCategory, pageParam]);
+  fetchProducts();
+}, [mainCategory, subCategory, pageParam, sortParam]); // ✅ Also add sortParam dependency
+
 
   const handlePageChange = (newPage) => {
     router.push(
@@ -107,12 +120,61 @@ function ProductByCategoryContent() {
     }
   };
 
+  useEffect(() => {
+    if (!products || products.length === 0) return;
+
+    const coupons = products.filter(p => p.isCoupon);
+    setCouponQueue(coupons);
+    setCouponIndex(0);
+  }, [products, subCategory]);
+
+
+  useEffect(() => {
+    // clear any old timers when category changes
+    clearTimeout(timerRef.current);
+
+    if (couponQueue.length === 0) return;
+
+    // show the first coupon after 4 seconds
+    timerRef.current = setTimeout(() => {
+      setCouponProduct(couponQueue[0]);
+      setShowCoupon(true);
+      setCouponIndex(0);
+    }, 4000);
+
+    return () => clearTimeout(timerRef.current);
+  }, [couponQueue, subCategory]);
+
+  const handleCloseCoupon = () => {
+    setShowCoupon(false);
+
+    // clear any existing timer
+    clearTimeout(timerRef.current);
+
+    // schedule next coupon after 15 seconds
+    timerRef.current = setTimeout(() => {
+      setCouponIndex(prev => {
+        const nextIndex = (prev + 1) % couponQueue.length;
+        setCouponProduct(couponQueue[nextIndex]);
+        setShowCoupon(true);
+        return nextIndex;
+      });
+    }, 15000);
+  };
+
+  const handleSortChange = (e) => {
+  const newSort = e.target.value;
+  router.push(
+    `/category/${mainCategory}/${subCategory}?page=${pageParam}&sort=${newSort}&mainName=${encodeURIComponent(mainName)}&subName=${encodeURIComponent(subName)}`
+  );
+};
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold mb-2">
+          <h1 className="text-2xl md:text-3xl font-semibold mb-2 text-[#0215A6]">
             Best {subName} ({mainName})
           </h1>
           <p className="text-gray-600">
@@ -120,6 +182,8 @@ function ProductByCategoryContent() {
             Updated November 2025 • Top-rated {subName} selected by experts.
           </p>
         </div>
+
+
 
         {/* Content Layout */}
         <div className="flex flex-col md:flex-row md:items-start gap-8">
@@ -152,6 +216,23 @@ function ProductByCategoryContent() {
           Updated November 2025 • Top-rated {subName} selected by experts.
         </p>
       </div>
+
+      {/* sorting option */}
+      <div className="flex justify-start mb-4 ml-4">
+        
+        <select
+          value={sortParam}
+          onChange={handleSortChange}
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+        >
+          <option value="rating">Ratings (High to Low)</option>
+          <option value="reviews">Reviews Count (High to Low)</option>
+          <option value="popularity">Popularity</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
+        </select>
+      </div>
+
 
       {/* Content Layout */}
       <div className="flex flex-col md:flex-row md:items-start gap-8">
@@ -420,8 +501,13 @@ function ProductByCategoryContent() {
       </div>
 
       <CompareBox />
-
       <CompareModal />
+      <CouponPopup
+        show={showCoupon}
+        onClose={handleCloseCoupon}
+        couponProduct={couponProduct}
+      />
+
     </div>
   );
 }

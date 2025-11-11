@@ -28,8 +28,11 @@ export default function CompareModal() {
   };
 
   return (
-<dialog id="compare_modal" className="modal modal-middle">
-  <div className="modal-box max-w-4xl max-h-[65vh] w-full p-0 overflow-hidden flex flex-col">
+<dialog
+  id="compare_modal"
+  className="modal flex justify-center items-center"
+>
+      <div className="modal-box max-w-4xl max-h-[65vh] w-full mx-auto my-auto p-0 overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white sticky top-0 z-10">
           <h3 className="font-bold text-2xl text-gray-900">Compare Products</h3>
