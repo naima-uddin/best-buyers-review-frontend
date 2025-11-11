@@ -1,28 +1,35 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useCategories } from "@/context/CategoryContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation"; // ✅ add useSearchParams
 import Image from "next/image";
 
 export default function RelatedSidebar({ mainCategory, currentSubCategory }) {
   const { categories } = useCategories();
   const router = useRouter();
+const searchParams = useSearchParams(); // ✅ capture query params
+
+const mainName = searchParams.get("mainName");
+const subName = searchParams.get("subName");
+
   const [visibleCount, setVisibleCount] = useState(7);
 
-  // Reset visible count when main category changes
   useEffect(() => {
     setVisibleCount(7);
   }, [mainCategory]);
 
-  // Safe to compute now
   const mainCat = categories?.find((cat) => cat._id === mainCategory);
-  if (!mainCat) {
-    // Return fallback UI (instead of null directly at the top)
-    return <aside className="hidden md:block w-72"></aside>;
-  }
+  if (!mainCat) return <aside className="hidden md:block w-72"></aside>;
 
   const subcategories = mainCat.children || [];
   const hasMore = subcategories.length > visibleCount;
+
+  const handleSubCategoryClick = (sub) => {
+    router.push(
+     `/category/${mainCategory}/${sub._id}?mainName=${encodeURIComponent(mainName)}&subName=${encodeURIComponent(sub.name)}`
+    );
+  };
+
 
   return (
     <aside className="w-full md:w-72 lg:w-80 border-l border-gray-200 pl-6 mt-10 md:mt-0">
@@ -31,18 +38,12 @@ export default function RelatedSidebar({ mainCategory, currentSubCategory }) {
         <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
           <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             {subcategories.slice(0, visibleCount).map((sub) => (
               <button
                 key={sub._id}
-                onClick={() =>
-                  router.push(
-                    `/category/${mainCat._id}/${sub._id}?mainName=${encodeURIComponent(
-                      mainCat.name
-                    )}&subName=${encodeURIComponent(sub.name)}`
-                  )
-                }
-                className={`block w-full text-left px-3 py-2 rounded-lg transition ${
+                onClick={() => handleSubCategoryClick(sub)}
+                className={`block w-full text-left px-3 py-1 rounded-lg transition ${
                   sub._id === currentSubCategory
                     ? "bg-blue-500 text-white font-semibold"
                     : "hover:bg-gray-100 text-gray-700"

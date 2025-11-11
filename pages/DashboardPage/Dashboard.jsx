@@ -116,135 +116,99 @@ export default function Dashboard() {
     }
   };
 
-  const handleSaveEdit = async (updatedProduct) => {
-    try {
-      const token = localStorage.getItem("token");
+ const handleSaveEdit = async (updatedProduct) => {
+  try {
+    const token = localStorage.getItem("token");
 
-      // Helper function to check if a value is not empty
-      const hasValue = (val) => val !== null && val !== undefined && val !== "";
+    // Build update data with ALL fields from updatedProduct
+    // This ensures everything gets sent to the backend
+    const updateData = {
+      // Basic Information - always include
+      title: updatedProduct.title || "",
+      brand: updatedProduct.brand || "",
+      labels: updatedProduct.labels || [],
+      mainCategory: updatedProduct.mainCategory || "",
+      subCategory: updatedProduct.subCategory || "",
+      subSubCategory: updatedProduct.subSubCategory || "",
+      affiliateUrl: updatedProduct.affiliateUrl || "",
+      isFeatured: updatedProduct.isFeatured || false,
+      isFullReview: updatedProduct.isFullReview || false,
+      isCoupon: updatedProduct.isCoupon || false,
 
-      // Build update data with only fields that have values
-      const updateData = {};
+      // Pricing - always include
+      price: updatedProduct.price || { amount: 0, currency: "USD", displayAmount: "$0.00" },
+      listPrice: updatedProduct.listPrice || { amount: 0, currency: "USD", displayAmount: "$0.00" },
+      discount: updatedProduct.discount || { amount: 0, currency: "USD", displayAmount: "0%", percentage: 0 },
 
-      // Always include these if they exist and have value
-      if (hasValue(updatedProduct.title))
-        updateData.title = updatedProduct.title;
-      if (hasValue(updatedProduct.brand))
-        updateData.brand = updatedProduct.brand;
-      if (updatedProduct.images) updateData.images = updatedProduct.images;
+      // Custom Rating - always include
+      customRating: updatedProduct.customRating || { rating: 0, reviewCount: 0 },
 
-      // Pricing
-      if (updatedProduct.price) updateData.price = updatedProduct.price;
-      if (updatedProduct.listPrice)
-        updateData.listPrice = updatedProduct.listPrice;
-      if (updatedProduct.discount)
-        updateData.discount = updatedProduct.discount;
+      // Images - always include
+      images: updatedProduct.images || [],
 
-      // Rating
-      if (updatedProduct.customRating)
-        updateData.customRating = updatedProduct.customRating;
+      // Features & Content - always include
+      features: updatedProduct.features || { feature: [] },
+      colors: updatedProduct.colors || [],
+      styles: updatedProduct.styles || [],
+      specifications: updatedProduct.specifications || [],
+      customReviews: updatedProduct.customReviews || [],
+      anchorTags: updatedProduct.anchorTags || [],
 
-      // Arrays
-      if (updatedProduct.features)
-        updateData.features = updatedProduct.features;
-      if (updatedProduct.colors) updateData.colors = updatedProduct.colors;
-      if (updatedProduct.styles) updateData.styles = updatedProduct.styles;
-      if (updatedProduct.specifications)
-        updateData.specifications = updatedProduct.specifications;
-      if (updatedProduct.customReviews)
-        updateData.customReviews = updatedProduct.customReviews;
-      if (updatedProduct.factorsToConsider)
-        updateData.factorsToConsider = updatedProduct.factorsToConsider;
-      if (updatedProduct.commonQuestions)
-        updateData.commonQuestions = updatedProduct.commonQuestions;
+      // SEO - always include
+      seo: updatedProduct.seo || { title: "", description: "", keywords: [] },
 
-      // SEO - only include if at least one field has value
-      if (updatedProduct.seo) {
-        const hasValidSeo =
-          hasValue(updatedProduct.seo.title) ||
-          hasValue(updatedProduct.seo.description) ||
-          (updatedProduct.seo.keywords &&
-            updatedProduct.seo.keywords.length > 0);
-        if (hasValidSeo) {
-          updateData.seo = updatedProduct.seo;
-        }
+      // Description - always include
+      descriptionTitle: updatedProduct.descriptionTitle || "",
+      introduction: updatedProduct.introduction || "",
+      description: updatedProduct.description || "",
+
+      // Factors - always include
+      factorsToConsider: updatedProduct.factorsToConsider || [],
+      mostImportantFactors: updatedProduct.mostImportantFactors || { heading: "", text: "" },
+
+      // Common Questions - always include
+      commonQuestions: updatedProduct.commonQuestions || [],
+
+      // Conclusion - always include
+      conclusion: updatedProduct.conclusion || { heading: "", text: "" },
+
+      // Status - always include
+      availability: updatedProduct.availability || "In Stock",
+      isActive: updatedProduct.isActive !== undefined ? updatedProduct.isActive : true,
+    };
+
+    console.log("🚀 FINAL UPDATE DATA:", updateData);
+    console.log("🔍 Specifications count:", updateData.specifications?.length);
+    console.log("🔍 Anchor tags count:", updateData.anchorTags?.length);
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${updatedProduct.asin}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData),
       }
+    );
 
-      // Most Important Factors - only include if at least one field has value
-      if (updatedProduct.mostImportantFactors) {
-        const hasValidFactors =
-          hasValue(updatedProduct.mostImportantFactors.heading) ||
-          hasValue(updatedProduct.mostImportantFactors.text);
-        if (hasValidFactors) {
-          updateData.mostImportantFactors = updatedProduct.mostImportantFactors;
-        }
-      }
+    const result = await response.json();
 
-      // Conclusion - only include if at least one field has value
-      if (updatedProduct.conclusion) {
-        const hasValidConclusion =
-          hasValue(updatedProduct.conclusion.heading) ||
-          hasValue(updatedProduct.conclusion.text);
-        if (hasValidConclusion) {
-          updateData.conclusion = updatedProduct.conclusion;
-        }
-      }
-
-      // Optional strings (only if not empty)
-      if (hasValue(updatedProduct.description))
-        updateData.description = updatedProduct.description;
-      if (hasValue(updatedProduct.descriptionTitle))
-        updateData.descriptionTitle = updatedProduct.descriptionTitle;
-      if (hasValue(updatedProduct.introduction))
-        updateData.introduction = updatedProduct.introduction;
-      if (hasValue(updatedProduct.affiliateUrl))
-        updateData.affiliateUrl = updatedProduct.affiliateUrl;
-
-      // Categories (only if not empty)
-      if (hasValue(updatedProduct.mainCategory))
-        updateData.mainCategory = updatedProduct.mainCategory;
-      if (hasValue(updatedProduct.subCategory))
-        updateData.subCategory = updatedProduct.subCategory;
-      if (hasValue(updatedProduct.subSubCategory))
-        updateData.subSubCategory = updatedProduct.subSubCategory;
-
-      // Booleans and special fields
-      if (updatedProduct.isFeatured !== undefined)
-        updateData.isFeatured = updatedProduct.isFeatured;
-      if (updatedProduct.isFullReview !== undefined)
-        updateData.isFullReview = updatedProduct.isFullReview;
-      if (hasValue(updatedProduct.availability))
-        updateData.availability = updatedProduct.availability;
-      if (updatedProduct.anchorTags)
-        updateData.anchorTags = updatedProduct.anchorTags;
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/products/${updatedProduct.asin}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updateData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert("Product updated successfully!");
-        setEditingProduct(null);
-        setActiveSection("view-products");
-        fetchProducts(page);
-      } else {
-        alert(result.message || "Failed to update product");
-      }
-    } catch (error) {
-      console.error("Update error:", error);
-      alert("Error updating product");
+    if (response.ok) {
+      alert("Product updated successfully!");
+      setEditingProduct(null);
+      setActiveSection("view-products");
+      fetchProducts(page);
+    } else {
+      console.error("Backend error:", result);
+      alert(result.message || "Failed to update product");
     }
-  };
+  } catch (error) {
+    console.error("Update error:", error);
+    alert("Error updating product");
+  }
+};
 
   const handleBackToList = () => {
     setEditingProduct(null);

@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import "hover.css/css/hover-min.css";
 import { CategoryProvider } from "@/context/CategoryContext";
+import { CompareProvider } from "@/context/CompareContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,11 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning={true}
       >
         <AuthProvider>
-          <CategoryProvider>{children}</CategoryProvider>
+          <CategoryProvider>
+            <CompareProvider>
+              {children}
+            </CompareProvider>
+          </CategoryProvider>
         </AuthProvider>
       </body>
     </html>
