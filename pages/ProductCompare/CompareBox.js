@@ -16,24 +16,7 @@ export default function CompareBox() {
           <h3 className="text-lg font-semibold">
             Compare Products ({compareItems.length}/3)
           </h3>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={clearCompare}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
-              Clear All
-            </button>
-            {compareItems.length >= 2 && (
-              <button
-                onClick={() =>
-                  document.getElementById("compare_modal").showModal()
-                }
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Compare Now
-              </button>
-            )}
-          </div>
+          
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

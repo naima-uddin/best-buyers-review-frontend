@@ -192,30 +192,7 @@ function ReviewsSection() {
           ))}
         </div>
 
-        {/* Trust badges */}
-        <div className={`text-center mt-16 pt-8 border-t border-gray-200 transition-all duration-700 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}>
-          <p className="text-gray-600 text-sm mb-6 font-medium">
-            Trusted by shoppers worldwide
-          </p>
-          <div className="flex justify-center items-center gap-8 flex-wrap">
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600 font-medium">
-                100% Unbiased Reviews
-              </span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-3 h-3 bg-[#0215A6] rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600 font-medium">Expert Verified</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-3 h-3 bg-[#0215A6] rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600 font-medium">Real User Feedback</span>
-            </div>
-          </div>
-        </div>
+       
       </div>
 
       <style jsx>{`

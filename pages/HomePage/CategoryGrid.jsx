@@ -55,9 +55,9 @@ const CategoryGrid = () => {
     setShowAll(!showAll);
     if (showAll) {
       const width = window.innerWidth;
-      if (width < 768) setVisibleCount(5);
-      else if (width >= 768 && width < 1024) setVisibleCount(9);
-      else setVisibleCount(12);
+      if (width < 768) setVisibleCount(4);
+      else if (width >= 768 && width < 1024) setVisibleCount(7);
+      else setVisibleCount(10);
     } else {
       setVisibleCount(categories.length);
     }
@@ -70,10 +70,10 @@ const CategoryGrid = () => {
   const hasMoreCategories = categories.length > visibleCount;
 
   return (
-    <div className="my-2">
+    <div className="my-3">
       <div className="max-w-7xl mx-auto  py-2">
         {/* Category Grid */}
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="flex flex-wrap justify-center gap-4">
           {displayCategories.map((category, index) => (
             <div
               key={index}
@@ -85,7 +85,7 @@ const CategoryGrid = () => {
               }
             >
               {/* Circular Image */}
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
                 {category.image ? (
                   <Image
                     src={getCategoryImage(category)}

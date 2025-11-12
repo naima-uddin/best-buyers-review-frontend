@@ -23,6 +23,9 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
     couponProduct.images?.slice(1, 5) ||
     [];
 
+  // 🎯 Get discount percentage from product data
+  const discountPercentage = couponProduct.discount?.percentage;
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl w-[90%] max-w-2xl relative overflow-hidden animate-fadeIn">
@@ -41,10 +44,14 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               Best {couponProduct.subCategory?.name || "Deal"}
             </h2>
             <div className="bg-white text-blue-700 font-bold px-4 py-1 rounded mb-3">
-              Exclusive Savings
+              {discountPercentage ? (
+                <span className="text-lg">{discountPercentage}% OFF</span>
+              ) : (
+                "Exclusive Savings"
+              )}
             </div>
             <p className="text-sm mb-4 text-white/90">
-              {couponProduct.title.slice(0, 70)}...
+              {couponProduct.title.slice(0, 100)}...
             </p>
             <a
               href={couponProduct.affiliateUrl}
@@ -52,12 +59,13 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               rel="noopener noreferrer"
               className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center w-full max-w-xs"
             >
-              View Deal
+              View 
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                 alt="Amazon"
-                className="h-5 ml-2"
+                className="h-5 ml-2 mr-2 flex items-center justify-center"
               />
+              Deal
             </a>
           </div>
 

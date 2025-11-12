@@ -89,7 +89,7 @@ function CategoryPageContent() {
                           alt={sub.name}
                           width={112}
                           height={112}
-                          className="object-cover w-full h-full"
+                          className="object-contain w-full h-full"
                         />
                       </div>
                       <span className="mt-2 text-sm text-gray-700 group-hover:text-blue-600 font-medium text-center">
