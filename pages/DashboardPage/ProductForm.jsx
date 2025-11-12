@@ -2,9 +2,8 @@
 import { useState, useEffect } from "react";
 import api from "@/lib/api/axios";
 
-export default function ProductForm({ onSubmit, onCancel }) {
+export default function ProductForm({ onSubmit, onCancel, categories, categoriesLoading }) {
   const [asins, setAsins] = useState([""]);
-  const [categories, setCategories] = useState([]);
   const [selectedMain, setSelectedMain] = useState("");
   const [selectedSub, setSelectedSub] = useState("");
   const [selectedSubSub, setSelectedSubSub] = useState("");
@@ -17,25 +16,16 @@ export default function ProductForm({ onSubmit, onCancel }) {
     keywords: "",
   });
 
-  // ✅ Fetch categories on mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await api.get("/categories");
-        setCategories(res.data || []);
-      } catch (err) {
-        console.error("❌ Failed to load categories:", err);
-      }
-    };
-    fetchCategories();
-  }, []);
+  // ✅ REMOVED the useEffect that fetches categories - using passed categories instead
 
-  // ✅ Helpers for category dropdowns
-  const mainCategories = categories;
-  const subCategories =
-    mainCategories.find((cat) => cat._id === selectedMain)?.children || [];
-  const subSubCategories =
-    subCategories.find((sub) => sub._id === selectedSub)?.children || [];
+  // ✅ Helpers for category dropdowns - USING PASSED CATEGORIES
+  const mainCategories = categories || [];
+  const subCategories = selectedMain 
+    ? categories.find(cat => cat._id === selectedMain)?.children || []
+    : [];
+  const subSubCategories = selectedSub
+    ? subCategories.find(sub => sub._id === selectedSub)?.children || []
+    : [];
 
   // ✅ Add/remove ASINs
   const addAsinField = () => {
@@ -144,6 +134,13 @@ export default function ProductForm({ onSubmit, onCancel }) {
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Show categories loading state if needed */}
+          {categoriesLoading && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">Loading categories...</p>
+            </div>
+          )}
+
           {/* ASIN Inputs */}
           <div>
             <label className="block text-sm font-semibold text-gray-800 mb-3">

@@ -11,9 +11,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
+export default function ProductEdit({ product, onSave, onCancel, onEdit, categories, categoriesLoading }) {
   const [userRole, setUserRole] = useState("admin");
-  const [categories, setCategories] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
@@ -28,21 +27,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     }
   }, []);
 
-  // Fetch categories from backend
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/categories`
-        );
-        const data = await response.json();
-        setCategories(data || []);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
+  // ✅ REMOVED the useEffect that fetches categories - using passed categories instead
 
   const [formData, setFormData] = useState({
     // Basic Information
@@ -134,7 +119,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
     }));
   };
 
-  // Helper functions to get categories by level
+  // Helper functions to get categories by level - USING PASSED CATEGORIES
   const getMainCategories = () => categories.filter((cat) => cat.level === 1);
 
   const getSubCategories = (mainCategoryId) => {
@@ -189,6 +174,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
         affiliateUrl: product.affiliateUrl || "",
         isFeatured: product.isFeatured || false,
         isFullReview: product.isFullReview || false,
+        isCoupon: product.isCoupon || false,
 
         originalPrice: originalPrice.toString(),
         discountPrice: discountPrice.toString(),
@@ -843,7 +829,14 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit }) {
           </button>
         </div>
       </div>
-      description: formData.introduction,
+
+      {/* Show categories loading state if needed */}
+      {categoriesLoading && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-700">Loading categories...</p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-8" noValidate>
         {/* Basic Information */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">

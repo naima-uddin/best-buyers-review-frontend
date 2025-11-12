@@ -1,3 +1,4 @@
+// Dashboard.jsx - UPDATED
 "use client";
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
@@ -12,7 +13,7 @@ import CategoryFilters from "../DashboardPage/category/CategoryFilters";
 // ✅ Shorter Flatten Function
 const flattenCategories = (nodes) =>
   nodes.flatMap((n) => [
-    { _id: n._id, name: n.name, parent: n.parent, level: n.level },
+    { _id: n._id, name: n.name, parent: n.parent, level: n.level, children: n.children || [] },
     ...(n.children ? flattenCategories(n.children) : []),
   ]);
 
@@ -25,24 +26,48 @@ export default function Dashboard() {
   const [userRole, setUserRole] = useState("admin");
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
+  
+  // ✅ CATEGORIES STATE - Load once and share across components
   const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [selectedMain, setSelectedMain] = useState("");
   const [selectedSub, setSelectedSub] = useState("");
 
-  // ✅ Fetch Categories
+  // ✅ Fetch Categories ONCE when dashboard loads
   useEffect(() => {
-    (async () => {
+    const fetchCategories = async () => {
       try {
+        setCategoriesLoading(true);
+        console.log("🔄 Loading categories...");
+        
+        const token = localStorage.getItem("token");
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/categories`
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
+        
+        if (!res.ok) throw new Error('Failed to fetch categories');
+        
         const data = await res.json();
-        setCategories(flattenCategories(data));
-      } catch (e) {
-        console.error("Category fetch failed:", e);
+        console.log("✅ Categories loaded:", data.length);
+        
+        // Store both hierarchical and flattened versions
+        setCategories(data || []);
+        
+      } catch (error) {
+        console.error("❌ Category fetch failed:", error);
+        setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
       }
-    })();
-  }, []);
+    };
+
+    fetchCategories();
+  }, []); // Empty dependency array - runs only once on mount
 
   // ✅ Fetch products
   const fetchProducts = async (pageNum = 1) => {
@@ -116,99 +141,108 @@ export default function Dashboard() {
     }
   };
 
- const handleSaveEdit = async (updatedProduct) => {
-  try {
-    const token = localStorage.getItem("token");
+  const handleSaveEdit = async (updatedProduct) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    // Build update data with ALL fields from updatedProduct
-    // This ensures everything gets sent to the backend
-    const updateData = {
-      // Basic Information - always include
-      title: updatedProduct.title || "",
-      brand: updatedProduct.brand || "",
-      labels: updatedProduct.labels || [],
-      mainCategory: updatedProduct.mainCategory || "",
-      subCategory: updatedProduct.subCategory || "",
-      subSubCategory: updatedProduct.subSubCategory || "",
-      affiliateUrl: updatedProduct.affiliateUrl || "",
-      isFeatured: updatedProduct.isFeatured || false,
-      isFullReview: updatedProduct.isFullReview || false,
-      isCoupon: updatedProduct.isCoupon || false,
+      // Convert empty strings to null for ObjectId fields
+      const cleanObjectIdFields = (obj) => {
+        const cleaned = { ...obj };
+        ['mainCategory', 'subCategory', 'subSubCategory'].forEach(field => {
+          if (cleaned[field] === '') {
+            cleaned[field] = null;
+          }
+        });
+        return cleaned;
+      };
 
-      // Pricing - always include
-      price: updatedProduct.price || { amount: 0, currency: "USD", displayAmount: "$0.00" },
-      listPrice: updatedProduct.listPrice || { amount: 0, currency: "USD", displayAmount: "$0.00" },
-      discount: updatedProduct.discount || { amount: 0, currency: "USD", displayAmount: "0%", percentage: 0 },
+      const cleanedProduct = cleanObjectIdFields(updatedProduct);
 
-      // Custom Rating - always include
-      customRating: updatedProduct.customRating || { rating: 0, reviewCount: 0 },
+      const updateData = {
+        // Basic Information
+        title: cleanedProduct.title || "",
+        brand: cleanedProduct.brand || "",
+        labels: cleanedProduct.labels || [],
+        mainCategory: cleanedProduct.mainCategory || null,
+        subCategory: cleanedProduct.subCategory || null,
+        subSubCategory: cleanedProduct.subSubCategory || null,
+        affiliateUrl: cleanedProduct.affiliateUrl || "",
+        isFeatured: cleanedProduct.isFeatured || false,
+        isFullReview: cleanedProduct.isFullReview || false,
+        isCoupon: cleanedProduct.isCoupon || false,
 
-      // Images - always include
-      images: updatedProduct.images || [],
+        // Pricing
+        price: cleanedProduct.price || { amount: 0, currency: "USD", displayAmount: "$0.00" },
+        listPrice: cleanedProduct.listPrice || { amount: 0, currency: "USD", displayAmount: "$0.00" },
+        discount: cleanedProduct.discount || { amount: 0, currency: "USD", displayAmount: "0%", percentage: 0 },
 
-      // Features & Content - always include
-      features: updatedProduct.features || { feature: [] },
-      colors: updatedProduct.colors || [],
-      styles: updatedProduct.styles || [],
-      specifications: updatedProduct.specifications || [],
-      customReviews: updatedProduct.customReviews || [],
-      anchorTags: updatedProduct.anchorTags || [],
+        // Custom Rating
+        customRating: cleanedProduct.customRating || { rating: 0, reviewCount: 0 },
 
-      // SEO - always include
-      seo: updatedProduct.seo || { title: "", description: "", keywords: [] },
+        // Images
+        images: cleanedProduct.images || [],
 
-      // Description - always include
-      descriptionTitle: updatedProduct.descriptionTitle || "",
-      introduction: updatedProduct.introduction || "",
-      description: updatedProduct.description || "",
+        // Features & Content
+        features: cleanedProduct.features || { feature: [] },
+        colors: cleanedProduct.colors || [],
+        styles: cleanedProduct.styles || [],
+        specifications: cleanedProduct.specifications || [],
+        customReviews: cleanedProduct.customReviews || [],
+        anchorTags: cleanedProduct.anchorTags || [],
 
-      // Factors - always include
-      factorsToConsider: updatedProduct.factorsToConsider || [],
-      mostImportantFactors: updatedProduct.mostImportantFactors || { heading: "", text: "" },
+        // SEO
+        seo: cleanedProduct.seo || { title: "", description: "", keywords: [] },
 
-      // Common Questions - always include
-      commonQuestions: updatedProduct.commonQuestions || [],
+        // Description
+        descriptionTitle: cleanedProduct.descriptionTitle || "",
+        introduction: cleanedProduct.introduction || "",
+        description: cleanedProduct.description || "",
 
-      // Conclusion - always include
-      conclusion: updatedProduct.conclusion || { heading: "", text: "" },
+        // Factors
+        factorsToConsider: cleanedProduct.factorsToConsider || [],
+        mostImportantFactors: cleanedProduct.mostImportantFactors || { heading: "", text: "" },
 
-      // Status - always include
-      availability: updatedProduct.availability || "In Stock",
-      isActive: updatedProduct.isActive !== undefined ? updatedProduct.isActive : true,
-    };
+        // Common Questions
+        commonQuestions: cleanedProduct.commonQuestions || [],
 
-    console.log("🚀 FINAL UPDATE DATA:", updateData);
-    console.log("🔍 Specifications count:", updateData.specifications?.length);
-    console.log("🔍 Anchor tags count:", updateData.anchorTags?.length);
+        // Conclusion
+        conclusion: cleanedProduct.conclusion || { heading: "", text: "" },
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/${updatedProduct.asin}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updateData),
+        // Status
+        availability: cleanedProduct.availability || "In Stock",
+        isActive: cleanedProduct.isActive !== undefined ? cleanedProduct.isActive : true,
+      };
+
+      console.log("🚀 FINAL UPDATE DATA:", updateData);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/products/${updatedProduct.asin}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Product updated successfully!");
+        setEditingProduct(null);
+        setActiveSection("view-products");
+        fetchProducts(page);
+      } else {
+        console.error("Backend error:", result);
+        alert(result.message || "Failed to update product");
       }
-    );
-
-    const result = await response.json();
-
-    if (response.ok) {
-      alert("Product updated successfully!");
-      setEditingProduct(null);
-      setActiveSection("view-products");
-      fetchProducts(page);
-    } else {
-      console.error("Backend error:", result);
-      alert(result.message || "Failed to update product");
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("Error updating product");
     }
-  } catch (error) {
-    console.error("Update error:", error);
-    alert("Error updating product");
-  }
-};
+  };
 
   const handleBackToList = () => {
     setEditingProduct(null);
@@ -223,12 +257,39 @@ export default function Dashboard() {
     }
   };
 
-  // ✅ Clean Section Rendering
+  // ✅ Refresh categories function (for Categories page)
+  const refreshCategories = async () => {
+    try {
+      setCategoriesLoading(true);
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+      const data = await res.json();
+      setCategories(data || []);
+    } catch (error) {
+      console.error("❌ Category refresh failed:", error);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  };
+
+  // ✅ Clean Section Rendering - PASS CATEGORIES TO ALL COMPONENTS
   const renderSection = () => {
     switch (activeSection) {
       case "add-product":
         return (
-          <ProductForm onSubmit={fetchProducts} onCancel={handleBackToList} />
+          <ProductForm 
+            onSubmit={fetchProducts} 
+            onCancel={handleBackToList}
+            categories={categories} // Pass categories
+            categoriesLoading={categoriesLoading}
+          />
         );
 
       case "view-products":
@@ -236,6 +297,7 @@ export default function Dashboard() {
           <>
             <CategoryFilters
               categories={categories}
+              categoriesLoading={categoriesLoading}
               selectedMain={selectedMain}
               setSelectedMain={setSelectedMain}
               selectedSub={selectedSub}
@@ -281,6 +343,8 @@ export default function Dashboard() {
             product={editingProduct}
             onSave={handleSaveEdit}
             onCancel={handleBackToList}
+            categories={categories} // Pass categories
+            categoriesLoading={categoriesLoading}
           />
         );
 
@@ -290,7 +354,13 @@ export default function Dashboard() {
         );
 
       case "categories":
-        return <Categories />;
+        return (
+          <Categories 
+            categories={categories} // Pass categories
+            categoriesLoading={categoriesLoading}
+            onRefresh={refreshCategories} // Pass refresh function
+          />
+        );
 
       case "user-management":
         return <UserManagement />;
@@ -311,7 +381,15 @@ export default function Dashboard() {
         userRole={userRole}
         onLogout={handleLogout}
       />
-      <div className="ml-64 flex-1 p-8">{renderSection()}</div>
+      <div className="ml-64 flex-1 p-8">
+        {/* Show loading state for categories if needed */}
+        {categoriesLoading && activeSection !== "categories" && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-700">Loading categories...</p>
+          </div>
+        )}
+        {renderSection()}
+      </div>
     </div>
   );
 }

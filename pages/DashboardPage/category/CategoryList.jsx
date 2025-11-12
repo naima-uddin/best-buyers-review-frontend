@@ -5,7 +5,7 @@ import api from "@/lib/api/axios";
 import { getImageUrl } from "@/utils/imageHelper";
 import Image from "next/image";
 
-const CategoryList = ({ categories, onUpdated, onEdit }) => {
+const CategoryList = ({ categories, onUpdated, onEdit, categoriesLoading }) => {
   const [expanded, setExpanded] = useState({});
   const [userRole, setUserRole] = useState("admin");
 
@@ -20,6 +20,7 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
       }
     }
   }, []);
+
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -35,16 +36,18 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
     }
   };
 
-  // console.log(cats, "cats");
-
-  // Recursive rendering function
+  // Recursive rendering function - FIXED
   const renderCategories = (cats, level = 1) => {
-    console.log(cats, "cats");
+    if (!cats || cats.length === 0) {
+      return <p className="text-gray-500 p-2">No categories found.</p>;
+    }
 
-    console.log(`${process.env.NEXT_PUBLIC_IMAGE_API_URL}${cats?.[0].image}`);
     return (
       <ul className="space-y-2">
         {cats.map((cat) => {
+          // Safely check for children
+          const hasChildren = cat.children && cat.children.length > 0;
+          
           return (
             <li key={cat._id}>
               <div
@@ -56,7 +59,7 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
               >
                 <div className="flex items-center gap-2">
                   {/* Expand/Collapse Button */}
-                  {cat.children?.length > 0 && (
+                  {hasChildren && (
                     <button
                       onClick={() => toggleExpand(cat._id)}
                       className="text-gray-600 hover:text-black"
@@ -69,15 +72,21 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
                     </button>
                   )}
 
-                  {/* Category Image */}
+                  {/* Category Image - FIXED image display */}
                   {cat.image && level <= 2 && (
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_API_URL}${cat?.image}`}
-                      alt={cat.name}
-                      width={40}
-                      height={40}
-                      className="w-10 h-10 object-cover rounded-md border"
-                    />
+                    <div className="w-10 h-10 flex-shrink-0">
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_API_URL || ''}${cat.image}`}
+                        alt={cat.name}
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 object-cover rounded-md border"
+                        onError={(e) => {
+                          console.error("Image failed to load:", cat.image);
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
                   )}
 
                   {/* Category Name */}
@@ -97,7 +106,8 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
                       console.log("✏️ Editing category:", cat);
                       onEdit(cat);
                     }}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:text-blue-800 p-1 hover:bg-blue-50 rounded"
+                    title="Edit Category"
                   >
                     <Pencil size={16} />
                   </button>
@@ -105,7 +115,8 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
                   {userRole === "admin" && (
                     <button
                       onClick={() => handleDelete(cat._id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="text-red-600 hover:text-red-800 p-1 hover:bg-red-50 rounded"
+                      title="Delete Category"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -113,9 +124,9 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
                 </div>
               </div>
 
-              {/* Render Subcategories */}
-              {expanded[cat._id] && cat.children?.length > 0 && (
-                <div className="ml-6 border-l border-gray-200 pl-4">
+              {/* Render Subcategories - FIXED conditional rendering */}
+              {expanded[cat._id] && hasChildren && (
+                <div className="ml-6 border-l border-gray-200 pl-4 mt-2">
                   {renderCategories(cat.children, level + 1)}
                 </div>
               )}
@@ -126,22 +137,51 @@ const CategoryList = ({ categories, onUpdated, onEdit }) => {
     );
   };
 
-  // Top-level categories logging
-  console.log("🚀 Initial categories received:", categories);
+  // Show loading state
+  if (categoriesLoading) {
+    return (
+      <div className="bg-white p-6 rounded-2xl shadow-md">
+        <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          Category Management
+        </h2>
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600">Loading categories...</span>
+        </div>
+      </div>
+    );
+  }
 
-return (
-  <div className="bg-white p-6 rounded-2xl shadow-md">
-    <h2 className="text-xl font-semibold mb-4 text-gray-800">
-      Category Management
-    </h2>
-    {!categories || categories.length === 0 ? (
-      <p className="text-gray-500">No categories found.</p>
-    ) : (
-      renderCategories(categories || [])
-    )}
-  </div>
-);
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-md">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">
+        Category Management
+      </h2>
+      
+      {/* Categories summary */}
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-800">
+          Total categories loaded: <strong>{categories?.length || 0}</strong>
+        </p>
+      </div>
 
+      {!categories || categories.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">📁</span>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            No categories found
+          </h3>
+          <p className="text-gray-600">
+            Create your first category to get started.
+          </p>
+        </div>
+      ) : (
+        renderCategories(categories)
+      )}
+    </div>
+  );
 };
 
 export default CategoryList;
