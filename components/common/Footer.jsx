@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/30 mt-20 text-[#0215A6]">
+    <footer className="border-t  pt-5 bg-gradient-to-b from-blue-100/30 to-blue-100/50 text-[#0215A6]">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}

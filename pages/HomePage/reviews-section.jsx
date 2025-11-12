@@ -1,7 +1,11 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function ReviewsSection() {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef(null);
+  const [animatedReviews, setAnimatedReviews] = useState([]);
+
   const reviews = [
     {
       name: "Sarah Johnson",
@@ -33,13 +37,45 @@ function ReviewsSection() {
     },
   ];
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        setAnimatedReviews(reviews);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
+
   // Star icon component
-  const StarIcon = ({ filled = true, className = "" }) => (
+  const StarIcon = ({ filled = true, className = "", delay = 0 }) => (
     <svg
-      className={`w-5 h-5 ${
-        filled ? "text-yellow-400 fill-current" : "text-gray-300"
+      className={`w-5 h-5 transition-all duration-500 ${
+        filled 
+          ? "text-yellow-400 fill-current transform hover:scale-125" 
+          : "text-gray-300"
       } ${className}`}
       viewBox="0 0 20 20"
+      style={{
+        animationDelay: `${delay}ms`,
+        animation: isVisible ? 'starPop 0.6s ease-out forwards' : 'none'
+      }}
     >
       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
     </svg>
@@ -48,7 +84,7 @@ function ReviewsSection() {
   // Quote icon component
   const QuoteIcon = ({ className = "" }) => (
     <svg
-      className={`w-8 h-8 text-[#0215A6]/20 ${className}`}
+      className={`w-8 h-8 text-[#0215A6]/20 transition-transform duration-300 group-hover:scale-110 ${className}`}
       fill="currentColor"
       viewBox="0 0 24 24"
     >
@@ -57,17 +93,23 @@ function ReviewsSection() {
   );
 
   return (
-    <section className="max-w-7xl mx-auto  relative overflow-hidden py-10 mt-10">
+    <section ref={sectionRef} className="max-w-7xl mx-auto relative overflow-hidden py-10 ">
+      {/* Background decorative elements */}
+      
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-10">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#0215A6] to-[#0215A6] bg-clip-text text-transparent">
+        <div className="text-center mb-5">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0215A6]/10 border border-[#0215A6]/20 mb-6">
+            <div className="w-2 h-2 bg-[#0215A6] rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-[#0215A6]">Real Customer Stories</span>
+          </div>
+          
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#0215A6] to-[#667eea] bg-clip-text text-transparent">
             Why Shoppers Trust Us
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
             Join over{" "}
             <span className="font-bold text-[#0215A6]">1 million+</span>{" "}
-            satisfied shoppers who find the best products with our expert
-            guidance
+            satisfied shoppers who find the best products with our expert guidance
           </p>
         </div>
 
@@ -75,21 +117,32 @@ function ReviewsSection() {
           {reviews.map((review, idx) => (
             <div
               key={idx}
-              className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 overflow-hidden"
+              className={`group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform ${
+                isVisible 
+                  ? 'translate-y-0 opacity-100' 
+                  : 'translate-y-10 opacity-0'
+              } hover:-translate-y-3 border border-gray-100 overflow-hidden`}
+              style={{
+                transitionDelay: `${idx * 200}ms`,
+              }}
             >
               {/* Gradient top border */}
-              <div className="h-1 bg-gradient-to-r from-[#0215A6] to-[#0215A6]"></div>
+              <div className="h-1 bg-gradient-to-r from-[#0215A6] via-[#667eea] to-[#0215A6]"></div>
 
               <div className="p-6">
                 {/* Quote icon */}
-                <div className="mb-4">
+                <div className="mb-4 transform group-hover:scale-110 transition-transform duration-300">
                   <QuoteIcon />
                 </div>
 
                 {/* Star rating */}
-                <div className="flex mb-4">
+                <div className="flex mb-4 space-x-1">
                   {[...Array(5)].map((_, i) => (
-                    <StarIcon key={i} filled={i < review.rating} />
+                    <StarIcon 
+                      key={i} 
+                      filled={i < review.rating} 
+                      delay={i * 100 + idx * 200}
+                    />
                   ))}
                 </div>
 
@@ -105,24 +158,24 @@ function ReviewsSection() {
                 </p>
 
                 {/* Reviewer info */}
-                <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-4 pt-4 border-t border-gray-100 group-hover:border-[#0215A6]/20 transition-colors duration-300">
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#0215A6] to-[#0215A6] flex items-center justify-center text-white font-semibold text-sm relative">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#0215A6] to-[#667eea] flex items-center justify-center text-white font-semibold text-sm relative transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
                       {review.name
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                     </div>
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-gray-900 text-sm">
+                    <p className="font-bold text-gray-900 text-sm group-hover:text-[#0215A6] transition-colors duration-300">
                       {review.name}
                     </p>
                     <p className="text-gray-500 text-xs">{review.role}</p>
                     <div className="flex items-center mt-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                      <span className="text-xs text-gray-400">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                      <span className="text-xs text-gray-400 group-hover:text-gray-600 transition-colors duration-300">
                         Verified Buyer
                       </span>
                     </div>
@@ -131,30 +184,35 @@ function ReviewsSection() {
               </div>
 
               {/* Hover effect background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0215A6]/10 to-[#0215A6]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0215A6]/5 to-[#667eea]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+              
+              {/* Shine effect on hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </div>
           ))}
         </div>
 
         {/* Trust badges */}
-        <div className="text-center mt-12 pt-8 border-t border-gray-200">
-          <p className="text-gray-600 text-sm mb-6">
+        <div className={`text-center mt-16 pt-8 border-t border-gray-200 transition-all duration-700 ${
+          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}>
+          <p className="text-gray-600 text-sm mb-6 font-medium">
             Trusted by shoppers worldwide
           </p>
-          <div className="flex justify-center items-center gap-8 opacity-60">
-            <div className="flex items-center gap-2">
+          <div className="flex justify-center items-center gap-8 flex-wrap">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 font-medium">
                 100% Unbiased Reviews
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
               <div className="w-3 h-3 bg-[#0215A6] rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600">Expert Verified</span>
+              <span className="text-sm text-gray-600 font-medium">Expert Verified</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
               <div className="w-3 h-3 bg-[#0215A6] rounded-full animate-pulse"></div>
-              <span className="text-sm text-gray-600">Real User Feedback</span>
+              <span className="text-sm text-gray-600 font-medium">Real User Feedback</span>
             </div>
           </div>
         </div>
@@ -175,6 +233,20 @@ function ReviewsSection() {
             transform: translate(0px, 0px) scale(1);
           }
         }
+        @keyframes starPop {
+          0% {
+            transform: scale(0);
+            opacity: 0;
+          }
+          70% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
         .animate-blob {
           animation: blob 7s infinite;
         }
@@ -188,4 +260,5 @@ function ReviewsSection() {
     </section>
   );
 }
+
 export default ReviewsSection;

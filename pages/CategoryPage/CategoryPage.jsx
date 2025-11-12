@@ -68,6 +68,7 @@ function CategoryPageContent() {
                       : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
                     : "/placeholder-image.jpg";
 
+                    console.log("image path",imageSrc)
                   return (
                     <div
                       key={sub._id}
