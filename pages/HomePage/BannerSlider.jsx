@@ -3,10 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function BannerSlider() {
-  const images = [
-    "/BannerImg/1.jpg",
-    "/BannerImg/2.jpg"
-  ];
+  const images = ["/BannerImg/1.jpg", "/BannerImg/2.jpg"];
 
   const [index, setIndex] = useState(0);
 
@@ -18,7 +15,7 @@ export default function BannerSlider() {
   }, []);
 
   return (
-    <div className="relative max-w-7xl mx-auto sm:h-[400px] h-[200px] rounded-xl overflow-hidden ">
+    <div className="relative max-w-7xl mx-auto sm:h-[400px] h-[200px] rounded-xl overflow-hidden mt-4">
       {images.map((src, i) => (
         <div
           key={i}

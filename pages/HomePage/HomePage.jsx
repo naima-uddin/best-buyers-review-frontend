@@ -7,8 +7,8 @@ import TrustSection from "./trust-section";
 const HomePage = () => {
   return (
     <>
-      <CategoryGrid />
       <BannerSlider />
+      <CategoryGrid />
       <ReviewsSection />
       <TrustSection />
     </>

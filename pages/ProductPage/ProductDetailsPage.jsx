@@ -13,9 +13,11 @@ import {
   RotateCcw,
   Award,
   Crown,
-  Users
+  Users,
 } from "lucide-react";
 import Accordion from "@/ui/Accordion";
+import RelatedProducts from "./RelatedProducts";
+import ProductInfoTabs from "./ProductInfoTabs";
 
 function ProductDetailsContent() {
   const params = useParams();
@@ -31,8 +33,10 @@ function ProductDetailsContent() {
     async function fetchProductDetails() {
       try {
         setLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.bestbuyersview.com/api';
-        
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://api.bestbuyersview.com/api";
+
         // Fetch ALL products first to find the specific one
         const res = await fetch(
           `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}`
@@ -41,15 +45,16 @@ function ProductDetailsContent() {
 
         if (data.success && data.data) {
           // Find the specific product by ID
-          const foundProduct = data.data.products?.find(p => p._id === productId);
-          
+          const foundProduct = data.data.products?.find(
+            (p) => p._id === productId
+          );
+
           if (foundProduct) {
             setProduct(foundProduct);
-            
+
             // Get related products (excluding current product)
-            const filteredRelated = data.data.products?.filter(
-              p => p._id !== productId
-            ) || [];
+            const filteredRelated =
+              data.data.products?.filter((p) => p._id !== productId) || [];
             setRelatedProducts(filteredRelated.slice(0, 6));
           } else {
             setProduct(null);
@@ -72,7 +77,7 @@ function ProductDetailsContent() {
 
   const nextImage = () => {
     if (product?.images?.length) {
-      setSelectedImageIndex(prev =>
+      setSelectedImageIndex((prev) =>
         prev === product.images.length - 1 ? 0 : prev + 1
       );
     }
@@ -80,7 +85,7 @@ function ProductDetailsContent() {
 
   const prevImage = () => {
     if (product?.images?.length) {
-      setSelectedImageIndex(prev =>
+      setSelectedImageIndex((prev) =>
         prev === 0 ? product.images.length - 1 : prev - 1
       );
     }
@@ -115,7 +120,7 @@ function ProductDetailsContent() {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             Product not found
           </h2>
-          <Link 
+          <Link
             href={`/category/${mainCategory}/${subCategory}`}
             className="text-blue-600 hover:text-blue-700"
           >
@@ -126,7 +131,9 @@ function ProductDetailsContent() {
     );
   }
 
-  const mainImage = product.images?.find(img => img.variant === "MAIN")?.url || product.images?.[0]?.url;
+  const mainImage =
+    product.images?.find((img) => img.variant === "MAIN")?.url ||
+    product.images?.[0]?.url;
   const currentImage = product.images?.[selectedImageIndex]?.url || mainImage;
 
   return (
@@ -142,7 +149,7 @@ function ProductDetailsContent() {
             </li>
             <li>/</li>
             <li>
-              <Link 
+              <Link
                 href={`/category/${mainCategory}`}
                 className="hover:text-blue-600 transition-colors"
               >
@@ -151,7 +158,7 @@ function ProductDetailsContent() {
             </li>
             <li>/</li>
             <li>
-              <Link 
+              <Link
                 href={`/category/${mainCategory}/${subCategory}`}
                 className="hover:text-blue-600 transition-colors"
               >
@@ -244,15 +251,24 @@ function ProductDetailsContent() {
                   </div>
                 ))}
                 {/* Fallback if no specifications */}
-                {(!product.specifications || product.specifications.length === 0) && (
+                {(!product.specifications ||
+                  product.specifications.length === 0) && (
                   <>
                     <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                      <dt className="text-xs font-medium text-gray-600">Brand</dt>
-                      <dd className="text-sm font-medium text-gray-900">{product.brand}</dd>
+                      <dt className="text-xs font-medium text-gray-600">
+                        Brand
+                      </dt>
+                      <dd className="text-sm font-medium text-gray-900">
+                        {product.brand}
+                      </dd>
                     </div>
                     <div className="flex justify-between items-center py-1 border-b border-gray-100">
-                      <dt className="text-xs font-medium text-gray-600">Category</dt>
-                      <dd className="text-sm font-medium text-gray-900">{product.subCategory?.name}</dd>
+                      <dt className="text-xs font-medium text-gray-600">
+                        Category
+                      </dt>
+                      <dd className="text-sm font-medium text-gray-900">
+                        {product.subCategory?.name}
+                      </dd>
                     </div>
                   </>
                 )}
@@ -263,7 +279,8 @@ function ProductDetailsContent() {
             <div className="mb-4 mt-8">
               <div className="bg-gray-800 text-white rounded-md p-2 mb-2 text-center">
                 <p className="text-xs font-medium mb-1">
-                  Reviewed by {product.customRating?.reviewCount || 29} people this week!
+                  Reviewed by {product.customRating?.reviewCount || 29} people
+                  this week!
                 </p>
                 <div className="flex items-center justify-center">
                   {getStarRating(product.customRating?.rating || 4.5)}
@@ -354,7 +371,7 @@ function ProductDetailsContent() {
                   </div>
                 </div>
               </div>
-              
+
               <h1 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
                 {product.title}
               </h1>
@@ -387,142 +404,151 @@ function ProductDetailsContent() {
                 Key Features
               </h3>
               <div className="grid grid-cols-1 gap-2">
-                {product.features?.feature?.slice(0, 5).map((feature, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md"
-                  >
-                    <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 text-sm">{feature}</span>
-                  </div>
-                ))}
+                {product.features?.feature
+                  ?.slice(0, 5)
+                  .map((feature, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md"
+                    >
+                      <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700 text-sm">{feature}</span>
+                    </div>
+                  ))}
                 {/* Fallback features */}
-                {(!product.features?.feature || product.features.feature.length === 0) && (
+                {(!product.features?.feature ||
+                  product.features.feature.length === 0) && (
                   <>
                     <div className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700 text-sm">High-quality materials and construction</span>
+                      <span className="text-gray-700 text-sm">
+                        High-quality materials and construction
+                      </span>
                     </div>
                     <div className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700 text-sm">Excellent performance and reliability</span>
+                      <span className="text-gray-700 text-sm">
+                        Excellent performance and reliability
+                      </span>
                     </div>
                   </>
                 )}
               </div>
             </div>
-
-            {/* Full Description */}
-            {product.isFullReview && product.introduction && (
-              <div className="mb-5">
-                <h3 className="text-lg font-bold text-gray-900 mb-3">
-                  Detailed Review
-                </h3>
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-gray-700 leading-relaxed">
-                    {product.introduction}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-{/* Customer Reviews Section */}
-{product.customReviews && product.customReviews.length > 0 && (
-  <div className="mt-8 bg-white rounded-xl shadow-md p-6">
-    <div className="flex items-center mb-5">
-      <Users className="h-6 w-6 text-blue-500 mr-2" />
-      <h2 className="text-2xl font-bold text-gray-900">
-        Customer Reviews
-      </h2>
-    </div>
+        <ProductInfoTabs product={product} />
 
-    <div className="space-y-5">
-      {product.customReviews.map((review, index) => (
-        <div
-          key={review._id || index}
-          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center">
-              <div className="flex mr-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-4 w-4 ${
-                      i < (review.rating || 5)
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="font-semibold text-gray-900">
-                {review.title || "Great Product"}
-              </span>
-            </div>
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-              {review.date || "Recently"}
-            </span>
-          </div>
-
-          <p className="text-gray-600 mb-3 text-sm leading-relaxed bg-gray-50 p-3 rounded-lg">
-            {review.reviewText || review.text}
-          </p>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium text-sm mr-2">
-                {(review.username || "User").charAt(0).toUpperCase()}
-              </div>
-              <span className="text-sm font-medium text-gray-700">
-                {review.username || "Customer"}
-              </span>
-            </div>
-
-            {review.verified && (
-              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
-                <Check className="h-3 w-3 mr-1" />
-                Verified Purchase
-              </span>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-
-{/* Common Questions Section */}
-{product.commonQuestions && product.commonQuestions.length > 0 && (
-  <div className="mt-8 bg-white rounded-xl shadow-md p-6">
-    <div className="flex items-center mb-6">
-      <svg className="h-6 w-6 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <h2 className="text-2xl font-bold text-gray-900">
-        Frequently Asked Questions
-      </h2>
-    </div>
-
-    <div className="space-y-2">
-      {product.commonQuestions.map((faq, index) => (
-        <Accordion
-          key={faq._id}
-          question={faq.question}
-          answer={faq.answer}
+        <RelatedProducts
+          mainCategory={mainCategory}
+          subCategory={subCategory}
+          currentProductId={productId}
         />
-      ))}
+
+        {/* Customer Reviews Section */}
+        {product.customReviews && product.customReviews.length > 0 && (
+          <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center mb-5">
+              <Users className="h-6 w-6 text-blue-500 mr-2" />
+              <h2 className="text-2xl font-bold text-gray-900">
+                Customer Reviews
+              </h2>
+            </div>
+
+            <div className="space-y-5">
+              {product.customReviews.map((review, index) => (
+                <div
+                  key={review._id || index}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center">
+                      <div className="flex mr-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < (review.rating || 5)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-semibold text-gray-900">
+                        {review.title || "Great Product"}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      {review.date || "Recently"}
+                    </span>
+                  </div>
+
+                  <p className="text-gray-600 mb-3 text-sm leading-relaxed bg-gray-50 p-3 rounded-lg">
+                    {review.reviewText || review.text}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium text-sm mr-2">
+                        {(review.username || "User").charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">
+                        {review.username || "Customer"}
+                      </span>
+                    </div>
+
+                    {review.verified && (
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
+                        <Check className="h-3 w-3 mr-1" />
+                        Verified Purchase
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Common Questions Section */}
+        {product.commonQuestions && product.commonQuestions.length > 0 && (
+          <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center mb-6">
+              <svg
+                className="h-6 w-6 text-blue-500 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Frequently Asked Questions
+              </h2>
+            </div>
+
+            <div className="space-y-2">
+              {product.commonQuestions.map((faq, index) => (
+                <Accordion
+                  key={faq._id}
+                  question={faq.question}
+                  answer={faq.answer}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-)}
-
-
-</div>
-</div>
-)}
+  );
+}
 
 export default function ProductDetails() {
   return <ProductDetailsContent />;

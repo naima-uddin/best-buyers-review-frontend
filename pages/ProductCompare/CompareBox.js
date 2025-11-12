@@ -1,8 +1,8 @@
 // components/CompareBox.js
 "use client";
-import Image from 'next/image';
-import { X } from 'lucide-react';
-import { useCompare } from '@/context/CompareContext';
+import Image from "next/image";
+import { X } from "lucide-react";
+import { useCompare } from "@/context/CompareContext";
 
 export default function CompareBox() {
   const { compareItems, removeFromCompare, clearCompare } = useCompare();
@@ -25,7 +25,9 @@ export default function CompareBox() {
             </button>
             {compareItems.length >= 2 && (
               <button
-                onClick={() => document.getElementById('compare_modal').showModal()}
+                onClick={() =>
+                  document.getElementById("compare_modal").showModal()
+                }
                 className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Compare Now
@@ -33,39 +35,50 @@ export default function CompareBox() {
             )}
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {compareItems.map((product) => (
-            <div key={product._id} className="border border-gray-300 rounded-lg p-4 relative">
+            <div
+              key={product._id}
+              className="border border-gray-300 rounded-lg p-4 relative"
+            >
               <button
                 onClick={() => removeFromCompare(product._id)}
                 className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
               >
                 <X size={16} />
               </button>
-              
+
               <div className="relative w-full h-20 mb-3">
                 <Image
-                  src={product.images?.find(img => img.variant === "MAIN")?.url || product.images?.[0]?.url || "/placeholder-image.jpg"}
+                  src={
+                    product.images?.find((img) => img.variant === "MAIN")
+                      ?.url ||
+                    product.images?.[0]?.url ||
+                    "/placeholder-image.jpg"
+                  }
                   alt={product.title}
                   fill
                   className="object-contain"
                 />
               </div>
-              
+
               <h4 className="font-semibold text-sm mb-2 line-clamp-2">
                 {product.title}
               </h4>
-              
+
               <div className="text-lg text-center font-bold text-blue-600 -mt-6">
                 Save {product.discount?.percentage || 36}%
               </div>
             </div>
           ))}
-          
+
           {/* Empty slots */}
           {Array.from({ length: 3 - compareItems.length }).map((_, index) => (
-            <div key={`empty-${index}`} className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[100px]">
+            <div
+              key={`empty-${index}`}
+              className="border-2 border-dashed border-gray-300 rounded-lg p-4 flex items-center justify-center min-h-[100px]"
+            >
               <div className="text-center text-gray-500">
                 <div className="text-2xl mb-2">+</div>
                 <div className="text-sm">Add Product</div>

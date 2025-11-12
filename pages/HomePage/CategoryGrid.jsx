@@ -70,7 +70,7 @@ const CategoryGrid = () => {
   const hasMoreCategories = categories.length > visibleCount;
 
   return (
-    <div className="mb-2">
+    <div className="my-2">
       <div className="max-w-7xl mx-auto  py-2">
         {/* Category Grid */}
         <div className="flex flex-wrap justify-center gap-6">
@@ -85,7 +85,7 @@ const CategoryGrid = () => {
               }
             >
               {/* Circular Image */}
-              <div className="w-9 h-9 md:w-14 md:h-14 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
                 {category.image ? (
                   <Image
                     src={getCategoryImage(category)}
