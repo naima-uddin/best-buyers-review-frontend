@@ -559,7 +559,7 @@ export default function ProductsPage() {
                               <button
                                 onClick={() =>
                                   router.push(
-                                    `/dashboard/products/${product.asin}`
+                                    `/dashboard/products/${product._id}`
                                   )
                                 }
                                 className="p-2.5 text-green-600 hover:bg-green-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-green-200"
@@ -570,7 +570,7 @@ export default function ProductsPage() {
                               <button
                                 onClick={() =>
                                   router.push(
-                                    `/dashboard/products/${product.asin}/edit`
+                                    `/dashboard/products/${product?._id}/edit`
                                   )
                                 }
                                 className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-blue-200"

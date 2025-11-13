@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import {
   LayoutDashboard,
   Package,
@@ -16,6 +17,7 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState("admin");
+  const [clickedPath, setClickedPath] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -72,11 +74,30 @@ export default function DashboardLayout({ children }) {
   );
 
   const isActive = (path) => {
-    if (path === "/dashboard") {
-      return pathname === path;
+    // Normalize pathnames by removing trailing slashes
+    const currentPath = clickedPath || pathname || '';
+    const normalizedPathname = currentPath.replace(/\/$/, '');
+    const normalizedPath = path.replace(/\/$/, '');
+
+    if (normalizedPath === "/dashboard") {
+      // Dashboard is active only on exact match
+      return normalizedPathname === normalizedPath;
     }
-    return pathname?.startsWith(path);
+    // Other routes are active if pathname starts with the path
+    return normalizedPathname.startsWith(normalizedPath);
   };
+
+  const handleNavClick = (path) => {
+    setClickedPath(path);
+    setIsSidebarOpen(false);
+  };
+
+  // Reset clickedPath when pathname changes (navigation complete)
+  useEffect(() => {
+    if (clickedPath && pathname === clickedPath) {
+      setClickedPath(null);
+    }
+  }, [pathname, clickedPath]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,12 +129,10 @@ export default function DashboardLayout({ children }) {
               const active = isActive(item.path);
 
               return (
-                <button
+                <Link
                   key={item.path}
-                  onClick={() => {
-                    router.push(item.path);
-                    setIsSidebarOpen(false);
-                  }}
+                  href={item.path}
+                  onClick={() => handleNavClick(item.path)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                     active
                       ? "bg-blue-50 text-blue-600"
@@ -122,7 +141,7 @@ export default function DashboardLayout({ children }) {
                 >
                   <Icon size={20} />
                   <span className="font-medium">{item.name}</span>
-                </button>
+                </Link>
               );
             })}
           </nav>
