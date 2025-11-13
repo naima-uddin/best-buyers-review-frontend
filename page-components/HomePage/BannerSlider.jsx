@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function BannerSlider() {
-  const images = ["/BannerImg/1.jpg", "/BannerImg/2.jpg"];
+  const images = ["/bannerImg/1.jpg", "/bannerImg/2.jpg"];
 
   const [index, setIndex] = useState(0);
 
