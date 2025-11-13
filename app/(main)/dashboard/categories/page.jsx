@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useUserRole } from "../context/UserRoleContext";
 import {
   Plus,
   Search,
@@ -31,6 +32,7 @@ export const dynamic = "force-dynamic";
 
 export default function CategoriesPage() {
   const router = useRouter();
+  const { userRole } = useUserRole();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -239,13 +241,15 @@ export default function CategoriesPage() {
               >
                 <Edit size={18} />
               </button>
-              <button
-                onClick={() => handleDelete(category._id, category.name)}
-                className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
-                title="Delete category"
-              >
-                <Trash2 size={18} />
-              </button>
+              {userRole === "admin" && (
+                <button
+                  onClick={() => handleDelete(category._id, category.name)}
+                  className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
+                  title="Delete category"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
             </div>
           </TableCell>
         </TableRow>
@@ -350,7 +354,7 @@ export default function CategoriesPage() {
                   </button>
                 )}
               </div>
-              {!searchQuery && categories.length > 0 && (
+              {/* {!searchQuery && categories.length > 0 && (
                 <div className="flex gap-2">
                   <Button
                     onClick={handleExpandAll}
@@ -367,7 +371,7 @@ export default function CategoriesPage() {
                     Collapse All
                   </Button>
                 </div>
-              )}
+              )} */}
             </div>
           </CardContent>
         </Card>
@@ -541,15 +545,17 @@ export default function CategoriesPage() {
                                 >
                                   <Edit size={18} />
                                 </button>
-                                <button
-                                  onClick={() =>
-                                    handleDelete(category._id, category.name)
-                                  }
-                                  className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
-                                  title="Delete category"
-                                >
-                                  <Trash2 size={18} />
-                                </button>
+                                {userRole === "admin" && (
+                                  <button
+                                    onClick={() =>
+                                      handleDelete(category._id, category.name)
+                                    }
+                                    className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
+                                    title="Delete category"
+                                  >
+                                    <Trash2 size={18} />
+                                  </button>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>

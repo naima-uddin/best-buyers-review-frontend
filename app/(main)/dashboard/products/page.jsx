@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUserRole } from "../context/UserRoleContext";
 import {
   Plus,
   Search,
@@ -27,6 +28,7 @@ import { Button } from "@/ui/Button";
 
 export default function ProductsPage() {
   const router = useRouter();
+  const { userRole } = useUserRole();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -578,15 +580,17 @@ export default function ProductsPage() {
                               >
                                 <Edit size={18} />
                               </button>
-                              <button
-                                onClick={() =>
-                                  handleDelete(product.asin, product.title)
-                                }
-                                className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
-                                title="Delete product"
-                              >
-                                <Trash2 size={18} />
-                              </button>
+                              {userRole === "admin" && (
+                                <button
+                                  onClick={() =>
+                                    handleDelete(product.asin, product.title)
+                                  }
+                                  className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
+                                  title="Delete product"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>

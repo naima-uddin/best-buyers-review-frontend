@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Search, Edit, Trash2, Users, X, Mail, Shield } from "lucide-react";
+import { useUserRole } from "../../app/(main)/dashboard/context/UserRoleContext";
 import {
   Table,
   TableBody,
@@ -14,6 +15,7 @@ import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 
 export default function UserManagement() {
+  const { userRole } = useUserRole();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -405,13 +407,15 @@ export default function UserManagement() {
                             >
                               <Edit size={18} />
                             </button>
-                            <button
-                              onClick={() => handleDelete(user)}
-                              className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
-                              title="Delete user"
-                            >
-                              <Trash2 size={18} />
-                            </button>
+                            {userRole === "admin" && (
+                              <button
+                                onClick={() => handleDelete(user)}
+                                className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
+                                title="Delete user"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

@@ -33,7 +33,7 @@ export default function Sidebar({
       </button>
 
       <div className="pb-6 px-6 pt-2 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+        <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
         <p className="text-sm text-gray-600 mt-1">Role: {userRole}</p>
       </div>
 

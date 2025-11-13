@@ -11,6 +11,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { UserRoleProvider } from "./context/UserRoleContext";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
@@ -47,37 +48,29 @@ export default function DashboardLayout({ children }) {
       name: "Dashboard",
       icon: LayoutDashboard,
       path: "/dashboard",
-      roles: ["admin", "editor"],
     },
     {
       name: "Products",
       icon: Package,
       path: "/dashboard/products",
-      roles: ["admin", "editor"],
     },
     {
       name: "Categories",
       icon: FolderTree,
       path: "/dashboard/categories",
-      roles: ["admin"],
     },
     {
       name: "Users",
       icon: Users,
       path: "/dashboard/users",
-      roles: ["admin"],
     },
   ];
 
-  const filteredNavItems = navItems.filter((item) =>
-    item.roles.includes(userRole)
-  );
-
   const isActive = (path) => {
     // Normalize pathnames by removing trailing slashes
-    const currentPath = clickedPath || pathname || '';
-    const normalizedPathname = currentPath.replace(/\/$/, '');
-    const normalizedPath = path.replace(/\/$/, '');
+    const currentPath = clickedPath || pathname || "";
+    const normalizedPathname = currentPath.replace(/\/$/, "");
+    const normalizedPath = path.replace(/\/$/, "");
 
     if (normalizedPath === "/dashboard") {
       // Dashboard is active only on exact match
@@ -100,81 +93,83 @@ export default function DashboardLayout({ children }) {
   }, [pathname, clickedPath]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
-      >
-        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+    <UserRoleProvider value={{ userRole }}>
+      <div className="min-h-screen bg-gray-50">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
+        >
+          {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 z-40 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 w-64`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-blue-600">PickHub</h1>
-            <p className="text-sm text-gray-500 mt-1">Admin Dashboard</p>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {filteredNavItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-
-              return (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  onClick={() => handleNavClick(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    active
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* User Info & Logout */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="mb-3 px-4 py-2 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500">Logged in as</p>
-              <p className="text-sm font-medium text-gray-900 capitalize">
-                {userRole}
-              </p>
+        {/* Sidebar */}
+        <aside
+          className={`fixed top-0 left-0 h-full bg-white border-r border-gray-200 shadow-sm transition-transform duration-300 z-40 ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0 w-64`}
+        >
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="p-6 border-b border-gray-200">
+              <h1 className="text-2xl font-bold text-blue-600">PickHub</h1>
+              <p className="text-sm text-gray-500 mt-1">Dashboard</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <LogOut size={20} />
-              <span className="font-medium">Logout</span>
-            </button>
+
+            {/* Navigation */}
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={() => handleNavClick(item.path)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      active
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Icon size={20} />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* User Info & Logout */}
+            <div className="p-4 border-t border-gray-200">
+              <div className="mb-3 px-4 py-2 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-500">Logged in as</p>
+                <p className="text-sm font-medium text-gray-900 capitalize">
+                  {userRole}
+                </p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <LogOut size={20} />
+                <span className="font-medium">Logout</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div
-          onClick={() => setIsSidebarOpen(false)}
-          className="lg:hidden fixed inset-0 bg-black/50 z-30"
-        />
-      )}
+        {/* Mobile Overlay */}
+        {isSidebarOpen && (
+          <div
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          />
+        )}
 
-      {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen">{children}</main>
-    </div>
+        {/* Main Content */}
+        <main className="lg:ml-64 min-h-screen">{children}</main>
+      </div>
+    </UserRoleProvider>
   );
 }
