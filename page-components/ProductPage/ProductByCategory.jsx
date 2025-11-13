@@ -5,8 +5,8 @@ import Image from "next/image";
 import ProductPageSidebar from "./ProductPageSidebar";
 import Link from "next/link";
 import { useCompare } from "@/context/CompareContext";
-import CompareBox from "../ProductCompare/CompareBox";
-import CompareModal from "../ProductCompare/CompareModal";
+import CompareBox from "@/components/CompareBox";
+import CompareModal from "@/components/CompareModal";
 import CouponPopup from "./CouponPopup";
 
 function ProductByCategoryContent() {

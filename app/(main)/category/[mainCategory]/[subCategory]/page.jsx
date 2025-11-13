@@ -1,5 +1,5 @@
 "use client";
-import ProductByCategory from "@/pages/ProductPage/ProductByCategory";
+import ProductByCategory from "@/page-components/ProductPage/ProductByCategory";
 import React from "react";
 
 // Force dynamic rendering for this page
