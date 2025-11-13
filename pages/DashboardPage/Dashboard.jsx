@@ -13,7 +13,13 @@ import CategoryFilters from "../DashboardPage/category/CategoryFilters";
 // ✅ Shorter Flatten Function
 const flattenCategories = (nodes) =>
   nodes.flatMap((n) => [
-    { _id: n._id, name: n.name, parent: n.parent, level: n.level, children: n.children || [] },
+    {
+      _id: n._id,
+      name: n.name,
+      parent: n.parent,
+      level: n.level,
+      children: n.children || [],
+    },
     ...(n.children ? flattenCategories(n.children) : []),
   ]);
 
@@ -26,7 +32,7 @@ export default function Dashboard() {
   const [userRole, setUserRole] = useState("admin");
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
-  
+
   // ✅ CATEGORIES STATE - Load once and share across components
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -39,25 +45,24 @@ export default function Dashboard() {
       try {
         setCategoriesLoading(true);
         console.log("🔄 Loading categories...");
-        
+
         const token = localStorage.getItem("token");
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-        
-        if (!res.ok) throw new Error('Failed to fetch categories');
-        
+
+        if (!res.ok) throw new Error("Failed to fetch categories");
+
         const data = await res.json();
         console.log("✅ Categories loaded:", data.length);
-        
+
         // Store both hierarchical and flattened versions
         setCategories(data || []);
-        
       } catch (error) {
         console.error("❌ Category fetch failed:", error);
         setCategories([]);
@@ -148,8 +153,8 @@ export default function Dashboard() {
       // Convert empty strings to null for ObjectId fields
       const cleanObjectIdFields = (obj) => {
         const cleaned = { ...obj };
-        ['mainCategory', 'subCategory', 'subSubCategory'].forEach(field => {
-          if (cleaned[field] === '') {
+        ["mainCategory", "subCategory", "subSubCategory"].forEach((field) => {
+          if (cleaned[field] === "") {
             cleaned[field] = null;
           }
         });
@@ -172,12 +177,28 @@ export default function Dashboard() {
         isCoupon: cleanedProduct.isCoupon || false,
 
         // Pricing
-        price: cleanedProduct.price || { amount: 0, currency: "USD", displayAmount: "$0.00" },
-        listPrice: cleanedProduct.listPrice || { amount: 0, currency: "USD", displayAmount: "$0.00" },
-        discount: cleanedProduct.discount || { amount: 0, currency: "USD", displayAmount: "0%", percentage: 0 },
+        price: cleanedProduct.price || {
+          amount: 0,
+          currency: "USD",
+          displayAmount: "$0.00",
+        },
+        listPrice: cleanedProduct.listPrice || {
+          amount: 0,
+          currency: "USD",
+          displayAmount: "$0.00",
+        },
+        discount: cleanedProduct.discount || {
+          amount: 0,
+          currency: "USD",
+          displayAmount: "0%",
+          percentage: 0,
+        },
 
         // Custom Rating
-        customRating: cleanedProduct.customRating || { rating: 0, reviewCount: 0 },
+        customRating: cleanedProduct.customRating || {
+          rating: 0,
+          reviewCount: 0,
+        },
 
         // Images
         images: cleanedProduct.images || [],
@@ -200,7 +221,10 @@ export default function Dashboard() {
 
         // Factors
         factorsToConsider: cleanedProduct.factorsToConsider || [],
-        mostImportantFactors: cleanedProduct.mostImportantFactors || { heading: "", text: "" },
+        mostImportantFactors: cleanedProduct.mostImportantFactors || {
+          heading: "",
+          text: "",
+        },
 
         // Common Questions
         commonQuestions: cleanedProduct.commonQuestions || [],
@@ -210,7 +234,10 @@ export default function Dashboard() {
 
         // Status
         availability: cleanedProduct.availability || "In Stock",
-        isActive: cleanedProduct.isActive !== undefined ? cleanedProduct.isActive : true,
+        isActive:
+          cleanedProduct.isActive !== undefined
+            ? cleanedProduct.isActive
+            : true,
       };
 
       console.log("🚀 FINAL UPDATE DATA:", updateData);
@@ -262,14 +289,11 @@ export default function Dashboard() {
     try {
       setCategoriesLoading(true);
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/categories`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       setCategories(data || []);
     } catch (error) {
@@ -284,8 +308,8 @@ export default function Dashboard() {
     switch (activeSection) {
       case "add-product":
         return (
-          <ProductForm 
-            onSubmit={fetchProducts} 
+          <ProductForm
+            onSubmit={fetchProducts}
             onCancel={handleBackToList}
             categories={categories} // Pass categories
             categoriesLoading={categoriesLoading}
@@ -355,7 +379,7 @@ export default function Dashboard() {
 
       case "categories":
         return (
-          <Categories 
+          <Categories
             categories={categories} // Pass categories
             categoriesLoading={categoriesLoading}
             onRefresh={refreshCategories} // Pass refresh function

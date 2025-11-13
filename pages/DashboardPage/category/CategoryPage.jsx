@@ -1,33 +1,26 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import api from "@/lib/api/axios";
+import React, { useState } from "react";
 import CategoryList from "./CategoryList";
 import CategoryForm from "./CategoryForm";
 import { Plus, ArrowLeft } from "lucide-react";
 
-export default function CategoryManagement() {
-  const [categories, setCategories] = useState([]);
+export default function CategoryManagement({
+  categories,
+  categoriesLoading,
+  onRefresh,
+}) {
   const [view, setView] = useState("list"); // "list" | "create" | "edit"
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const fetchCategories = async () => {
-    try {
-      const res = await api.get("/categories");
-      setCategories(res.data);
-    } catch (err) {
-      console.error("❌ Error fetching categories:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const handleCreatedOrUpdated = () => {
-    fetchCategories();
+  const handleCreatedOrUpdated = async () => {
+    await onRefresh(); // 🔁 use parent’s refresh function from Dashboard
     setView("list");
     setSelectedCategory(null);
   };
+
+  if (categoriesLoading) {
+    return <p className="text-blue-600">Loading categories...</p>;
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -59,7 +52,7 @@ export default function CategoryManagement() {
       {view === "list" && (
         <CategoryList
           categories={categories}
-          onUpdated={fetchCategories}
+          onUpdated={onRefresh}
           onEdit={(cat) => {
             setSelectedCategory(cat);
             setView("edit");
@@ -68,7 +61,10 @@ export default function CategoryManagement() {
       )}
 
       {view === "create" && (
-        <CategoryForm onCreated={handleCreatedOrUpdated} categories={categories} />
+        <CategoryForm
+          onCreated={handleCreatedOrUpdated}
+          categories={categories}
+        />
       )}
 
       {view === "edit" && selectedCategory && (

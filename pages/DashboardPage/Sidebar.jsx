@@ -11,6 +11,7 @@ export default function Sidebar({
     { id: "view-products", label: "View Products", icon: "👁️" },
     { id: "add-product", label: "Add Product", icon: "➕" },
     { id: "categories", label: "Categories", icon: "📁" },
+    { id: "blog", label: "Blog", icon: "📝" },
   ];
 
   // Add user management for admin only
