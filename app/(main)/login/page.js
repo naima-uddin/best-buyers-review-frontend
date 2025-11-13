@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Login from "@/pages/LoginPage/Login";
+import Login from "@/page-components/LoginPage/Login";
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';

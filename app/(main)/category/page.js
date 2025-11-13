@@ -1,5 +1,5 @@
 "use client";
-import CategoryPage from '@/pages/CategoryPage/CategoryPage'
+import CategoryPage from '@/page-components/CategoryPage/CategoryPage'
 import React from 'react'
 
 // Force dynamic rendering for this page

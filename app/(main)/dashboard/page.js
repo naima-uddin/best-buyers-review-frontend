@@ -1,5 +1,5 @@
 "use client";
-import Dashboard from '@/pages/DashboardPage/Dashboard'
+import Dashboard from '@/page-components/DashboardPage/Dashboard'
 import React from 'react'
 
 // Force dynamic rendering for this page
