@@ -9,6 +9,15 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // You can add search functionality here
+      console.log("Searching for:", searchQuery);
+      // Example: router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   return (
     <nav className="bg-white/95 backdrop-blur-md py-4 border-b border-gray-200/60 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -39,7 +48,7 @@ const Navbar = () => {
 
         {/* Center: Search bar */}
         <div className="hidden lg:flex flex-1 justify-center mx-8">
-          <form className="w-full max-w-2xl">
+          <form onSubmit={handleSearch} className="w-full max-w-2xl">
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#0313ff] to-[#F27005] rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
               <div className="relative flex w-full rounded-full overflow-hidden shadow-lg">
