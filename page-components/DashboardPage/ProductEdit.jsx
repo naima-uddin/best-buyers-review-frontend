@@ -1964,20 +1964,6 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
                     placeholder="Review Content"
                   />
                 </div>
-                <input
-                  type="text"
-                  value={review.title}
-                  readOnly
-                  className="w-full p-2 border border-gray-300 rounded bg-gray-50"
-                  placeholder="Review Title"
-                />
-                <textarea
-                  value={review.content}
-                  readOnly
-                  rows={3}
-                  className="w-full p-2 border border-gray-300 rounded bg-gray-50"
-                  placeholder="Review Content"
-                />
                 <button
                   type="button"
                   onClick={() => removeReview(index)}
