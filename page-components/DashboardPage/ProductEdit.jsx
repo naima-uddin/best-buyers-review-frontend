@@ -574,6 +574,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     }));
   };
 
+  const updateReview = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      customReviews: prev.customReviews.map((review, i) =>
+        i === index ? { ...review, [field]: value } : review
+      ),
+    }));
+  };
+
   // CategoryEditItem component for editing categories
   function CategoryEditItem({ type, name, onEdit, onDelete }) {
     const [isEditing, setIsEditing] = useState(false);
@@ -1900,22 +1909,59 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
             {formData.customReviews.map((review, index) => (
               <div
                 key={review._tempId || index}
-                className="p-4 border border-gray-200 rounded-lg space-y-3"
+                className="p-4 border border-gray-200 rounded-lg space-y-3 bg-white"
               >
                 <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      value={review.author}
+                      onChange={(e) => updateReview(index, 'author', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Author"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Rating
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="5"
+                      value={review.rating}
+                      onChange={(e) => updateReview(index, 'rating', e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Rating (0-5)"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Review Title
+                  </label>
                   <input
                     type="text"
-                    value={review.author}
-                    readOnly
-                    className="p-2 border border-gray-300 rounded bg-gray-50"
-                    placeholder="Author"
+                    value={review.title}
+                    onChange={(e) => updateReview(index, 'title', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Review Title"
                   />
-                  <input
-                    type="number"
-                    value={review.rating}
-                    readOnly
-                    className="p-2 border border-gray-300 rounded bg-gray-50"
-                    placeholder="Rating"
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Review Content
+                  </label>
+                  <textarea
+                    value={review.content}
+                    onChange={(e) => updateReview(index, 'content', e.target.value)}
+                    rows={3}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Review Content"
                   />
                 </div>
                 <input
@@ -1935,66 +1981,90 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
                 <button
                   type="button"
                   onClick={() => removeReview(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                  className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
                 >
                   <Trash2 size={16} />
+                  Remove Review
                 </button>
               </div>
             ))}
 
             {/* Add Review Form */}
-            <div className="p-4 border border-gray-200 rounded-lg space-y-3">
+            <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg space-y-3 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                Add New Review
+              </h3>
               <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Author *
+                  </label>
+                  <input
+                    type="text"
+                    value={newReview.author}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({
+                        ...prev,
+                        author: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Author name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Rating *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={newReview.rating}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({
+                        ...prev,
+                        rating: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.0 - 5.0"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">
+                  Review Title
+                </label>
                 <input
                   type="text"
-                  value={newReview.author}
+                  value={newReview.title}
                   onChange={(e) =>
-                    setNewReview((prev) => ({
-                      ...prev,
-                      author: e.target.value,
-                    }))
+                    setNewReview((prev) => ({ ...prev, title: e.target.value }))
                   }
-                  className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Author"
-                />
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="5"
-                  value={newReview.rating}
-                  onChange={(e) =>
-                    setNewReview((prev) => ({
-                      ...prev,
-                      rating: e.target.value,
-                    }))
-                  }
-                  className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Rating (0-5)"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Review title (optional)"
                 />
               </div>
-              <input
-                type="text"
-                value={newReview.title}
-                onChange={(e) =>
-                  setNewReview((prev) => ({ ...prev, title: e.target.value }))
-                }
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Review Title"
-              />
-              <textarea
-                value={newReview.content}
-                onChange={(e) =>
-                  setNewReview((prev) => ({ ...prev, content: e.target.value }))
-                }
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Review Content"
-              />
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">
+                  Review Content *
+                </label>
+                <textarea
+                  value={newReview.content}
+                  onChange={(e) =>
+                    setNewReview((prev) => ({ ...prev, content: e.target.value }))
+                  }
+                  rows={3}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Write the review content..."
+                />
+              </div>
               <button
                 type="button"
                 onClick={addReview}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Plus size={16} />
                 Add Review
