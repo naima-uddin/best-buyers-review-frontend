@@ -70,20 +70,20 @@ function TrustSection() {
   };
 
   return (
-    <section ref={sectionRef} className="py-10 bg-gradient-to-b from-slate-20 to-blue-100/30 relative overflow-hidden">
+    <section ref={sectionRef} className="py-10 relative overflow-hidden">
       {/* Background decorative elements */}
-    
-      
+
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center ">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0215A6]/10 border border-[#0215A6]/20 mb-6">
-            <div className="w-2 h-2 bg-[#0215A6] rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-[#0215A6]">Trust & Reliability</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 border border-white/30 mb-6">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-white">Trust & Reliability</span>
           </div>
-          
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-2">
+
+          <p className="text-lg text-white/95 max-w-2xl mx-auto leading-relaxed mb-2">
             Our commitment to providing honest, comprehensive product reviews
-            has made us the <span className="font-semibold text-[#0215A6]">go-to resource</span> for smart shoppers worldwide
+            has made us the <span className="font-semibold text-white">go-to resource</span> for smart shoppers worldwide
           </p>
         </div>
 
@@ -117,18 +117,18 @@ function TrustSection() {
         </div>
 
         {/* Trust indicators */}
-        <div className="text-center mt-12 pt-8 border-t border-[#0215A6]/10">
-          <p className="text-sm text-muted-foreground flex items-center justify-center gap-4 flex-wrap">
+        <div className="text-center mt-12 pt-8 border-t border-white/20">
+          <p className="text-sm text-white/90 flex items-center justify-center gap-4 flex-wrap">
             <span className="flex items-center gap-1">
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              <CheckCircle2 className="h-4 w-4 text-green-300" />
               Verified Reviews
             </span>
             <span className="flex items-center gap-1">
-              <TrendingUp className="h-4 w-4 text-blue-500" />
+              <TrendingUp className="h-4 w-4 text-blue-300" />
               Real-time Updates
             </span>
             <span className="flex items-center gap-1">
-              <Users className="h-4 w-4 text-purple-500" />
+              <Users className="h-4 w-4 text-purple-300" />
               Community Driven
             </span>
           </p>
