@@ -1,11 +1,13 @@
 "use client";
 import api from "@/lib/api/axios";
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, X, ChevronDown } from "lucide-react";
 
 const CategoryForm = ({ onCreated, categories, editCategory }) => {
   const [name, setName] = useState("");
   const [parent, setParent] = useState("");
+  const [parentSearch, setParentSearch] = useState("");
+  const [showParentDropdown, setShowParentDropdown] = useState(false);
   const [image, setImage] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,11 +18,60 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     if (editCategory) {
       setName(editCategory.name || "");
       setParent(editCategory.parent || "");
+
+      // Set parent search text if parent exists
+      if (editCategory.parent) {
+        const flatCats = flattenCategories(categories || []);
+        const parentCat = flatCats.find(c => c._id === editCategory.parent);
+        if (parentCat) {
+          setParentSearch(parentCat.name.replace(/^—*\s*/, ""));
+        }
+      } else {
+        setParentSearch("");
+      }
+
       setImage(null);
       setSubCategories([]);
       setErrors({});
     }
-  }, [editCategory]);
+  }, [editCategory, categories]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".parent-category-dropdown")) {
+        setShowParentDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // --- Flatten categories for dropdown ---
+  const flattenCategories = (cats = [], depth = 0) =>
+    cats.flatMap((c) => [
+      { _id: c._id, name: "—".repeat(depth) + " " + c.name },
+      ...flattenCategories(c.children || [], depth + 1),
+    ]);
+
+  // --- Parent category handlers ---
+  const selectParentCategory = (category) => {
+    setParent(category._id);
+    setParentSearch(category.name.replace(/^—*\s*/, ""));
+    setShowParentDropdown(false);
+  };
+
+  const clearParentCategory = () => {
+    setParent("");
+    setParentSearch("");
+  };
+
+  // Filter parent categories based on search
+  const allOptions = flattenCategories(categories || []);
+  const filteredParentOptions = allOptions.filter((cat) =>
+    cat.name.toLowerCase().includes(parentSearch.toLowerCase())
+  );
 
   // --- Improved Validation function ---
   const validateDuplicates = () => {
@@ -203,15 +254,6 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
     }
   };
 
-  // --- Flatten categories for dropdown ---
-  const flattenCategories = (cats = [], depth = 0) =>
-    cats.flatMap((c) => [
-      { _id: c._id, name: "—".repeat(depth) + " " + c.name },
-      ...flattenCategories(c.children || [], depth + 1),
-    ]);
-
-  const allOptions = flattenCategories(categories || []);
-
   return (
     <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
       <h2 className="text-2xl font-semibold mb-6 text-gray-800">
@@ -233,23 +275,70 @@ const CategoryForm = ({ onCreated, categories, editCategory }) => {
             required
           />
 
-          <label className="block text-gray-700 font-medium">
+          <label className="block text-gray-700 font-medium mb-2">
             Parent Category (optional)
           </label>
-          <select
-            value={parent}
-            onChange={(e) => setParent(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            <option value="">Select parent category</option>
-            {allOptions.map((opt) => (
-              <option key={opt._id} value={opt._id}>
-                {opt.name}
-              </option>
-            ))}
-          </select>
+          <div className="relative parent-category-dropdown">
+            <input
+              type="text"
+              placeholder="Search parent category..."
+              value={parentSearch}
+              onChange={(e) => setParentSearch(e.target.value)}
+              onFocus={() => setShowParentDropdown(true)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-20 focus:ring-2 focus:ring-blue-500 outline-none"
+            />
+            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+              {parent && (
+                <button
+                  type="button"
+                  onClick={clearParentCategory}
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Clear selection"
+                >
+                  <X size={16} className="text-gray-500" />
+                </button>
+              )}
+              <ChevronDown size={20} className="text-gray-400" />
+            </div>
 
-          <label className="block text-gray-700 font-medium">
+            {/* Dropdown */}
+            {showParentDropdown && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {filteredParentOptions.length > 0 ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearParentCategory();
+                        setShowParentDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors border-b border-gray-100 text-gray-500 italic"
+                    >
+                      None (Top Level)
+                    </button>
+                    {filteredParentOptions.map((category) => (
+                      <button
+                        key={category._id}
+                        type="button"
+                        onClick={() => selectParentCategory(category)}
+                        className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                      >
+                        <span className="font-medium text-gray-900">
+                          {category.name}
+                        </span>
+                      </button>
+                    ))}
+                  </>
+                ) : (
+                  <div className="px-4 py-3 text-sm text-gray-500">
+                    No categories found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <label className="block text-gray-700 font-medium mt-4">
             Category Image
           </label>
           <input

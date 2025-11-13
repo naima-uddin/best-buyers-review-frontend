@@ -7,8 +7,8 @@ import {
   Edit,
   Trash2,
   FolderTree,
-  ChevronLeft,
-  ChevronRight,
+  Layers,
+  X,
 } from "lucide-react";
 import {
   Table,
@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/ui/Table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/Card";
+import { Card, CardContent } from "@/ui/Card";
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
 
@@ -140,22 +140,26 @@ export default function CategoriesPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Search categories..."
+                placeholder="Search categories by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  title="Clear search"
+                >
+                  <X size={16} className="text-gray-500" />
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Categories Table */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              All Categories ({filteredCategories.length})
-            </CardTitle>
-          </CardHeader>
           <CardContent>
             {loading ? (
               <div className="flex justify-center items-center py-12">
@@ -168,50 +172,108 @@ export default function CategoriesPage() {
                   No categories found
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Get started by creating a new category.
+                  {searchQuery
+                    ? "Try a different search term."
+                    : "Get started by creating a new category."}
                 </p>
-                <div className="mt-6">
-                  <Button
-                    onClick={() => router.push("/dashboard/categories/create")}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto"
-                  >
-                    <Plus size={16} />
-                    Add Category
-                  </Button>
-                </div>
+                {!searchQuery && (
+                  <div className="mt-6">
+                    <Button
+                      onClick={() => router.push("/dashboard/categories/create")}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto"
+                    >
+                      <Plus size={16} />
+                      Add Category
+                    </Button>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-16">#</TableHead>
-                      <TableHead className="min-w-[300px]">Name</TableHead>
-                      <TableHead>Level</TableHead>
-                      <TableHead>Parent Category</TableHead>
-                      <TableHead>Children</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                    <TableRow className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b-2 border-purple-100">
+                      <TableHead className="w-16 font-bold text-gray-700">
+                        #
+                      </TableHead>
+                      <TableHead className="min-w-[400px] font-bold text-gray-700">
+                        Category
+                      </TableHead>
+                      <TableHead className="font-bold text-gray-700">
+                        Level
+                      </TableHead>
+                      <TableHead className="font-bold text-gray-700">
+                        Parent Category
+                      </TableHead>
+                      <TableHead className="font-bold text-gray-700 text-center">
+                        Children
+                      </TableHead>
+                      <TableHead className="text-right font-bold text-gray-700">
+                        Actions
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredCategories.map((category, index) => (
-                      <TableRow key={category._id}>
-                        <TableCell className="font-medium text-gray-500">
-                          {index + 1}
+                      <TableRow
+                        key={category._id}
+                        className="hover:bg-purple-50/50 transition-colors"
+                      >
+                        <TableCell className="font-semibold text-gray-600">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-purple-100 text-purple-700 text-sm">
+                            {index + 1}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div
-                            className="flex items-center gap-2"
+                            className="flex items-start gap-4"
                             style={{
-                              paddingLeft: `${category.level * 24}px`,
+                              paddingLeft: `${category.level * 16}px`,
                             }}
                           >
-                            {category.level > 0 && (
-                              <span className="text-gray-400">└─</span>
-                            )}
-                            <span className="font-medium text-gray-900">
-                              {category.name}
-                            </span>
+                            {/* Category Image */}
+                            <div className="h-16 w-16 rounded-xl overflow-hidden bg-gradient-to-br from-purple-100 to-purple-200 flex-shrink-0 shadow-sm border border-purple-200 flex items-center justify-center">
+                              {category.image ? (
+                                <img
+                                  src={category.image}
+                                  alt={category.name}
+                                  className="h-full w-full object-cover hover:scale-110 transition-transform duration-200"
+                                  onError={(e) => {
+                                    e.target.style.display = "none";
+                                    e.target.nextSibling.style.display = "flex";
+                                  }}
+                                />
+                              ) : null}
+                              <div
+                                className={`${
+                                  category.image ? "hidden" : "flex"
+                                } items-center justify-center h-full w-full`}
+                              >
+                                <Layers className="h-8 w-8 text-purple-400" />
+                              </div>
+                            </div>
+
+                            {/* Category Name with Hierarchy Indicator */}
+                            <div className="min-w-0 flex-1 py-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                {category.level > 0 && (
+                                  <span className="text-gray-400 text-sm">
+                                    └─
+                                  </span>
+                                )}
+                                <p
+                                  className="font-semibold text-gray-900 line-clamp-2 leading-snug hover:text-purple-600 transition-colors cursor-default"
+                                  title={category.name}
+                                >
+                                  {category.name}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-0.5 rounded">
+                                  ID: {category._id?.slice(-8) || "N/A"}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -223,19 +285,25 @@ export default function CategoriesPage() {
                                 ? "secondary"
                                 : "outline"
                             }
+                            className="font-medium"
                           >
                             Level {category.level + 1}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="text-gray-700">
+                          <span className="font-medium text-gray-800 px-2 py-1 bg-gray-50 rounded">
                             {category.parentName || "—"}
                           </span>
                         </TableCell>
                         <TableCell>
-                          <span className="text-gray-700">
-                            {category.children?.length || 0}
-                          </span>
+                          <div className="flex justify-center">
+                            <div className="flex items-center gap-1.5 bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100">
+                              <FolderTree className="h-4 w-4 text-indigo-600" />
+                              <span className="font-bold text-gray-900">
+                                {category.children?.length || 0}
+                              </span>
+                            </div>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center justify-end gap-2">
@@ -245,19 +313,19 @@ export default function CategoriesPage() {
                                   `/dashboard/categories/${category._id}/edit`
                                 )
                               }
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-blue-200"
                               title="Edit category"
                             >
-                              <Edit size={16} />
+                              <Edit size={18} />
                             </button>
                             <button
                               onClick={() =>
                                 handleDelete(category._id, category.name)
                               }
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:shadow-md hover:scale-105 border border-transparent hover:border-red-200"
                               title="Delete category"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </TableCell>

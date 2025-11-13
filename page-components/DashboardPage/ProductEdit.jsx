@@ -855,23 +855,11 @@ export default function ProductEdit({
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Update Product
-            </h1>
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <span className="font-mono bg-gray-100 px-3 py-1 rounded-lg">
-                ASIN: {product.asin}
-              </span>
-            </div>
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <span className="font-mono bg-gray-100 px-3 py-1 rounded-lg">
+              ASIN: {product.asin}
+            </span>
           </div>
-          <button
-            onClick={onCancel}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-          >
-            <ArrowLeft size={16} />
-            Back to Products
-          </button>
         </div>
       </div>
 
