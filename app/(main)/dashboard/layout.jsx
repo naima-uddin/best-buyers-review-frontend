@@ -92,6 +92,7 @@ export default function DashboardLayout({ children }) {
     }
   }, [pathname, clickedPath]);
 
+  console.log("user role", userRole);
   return (
     <UserRoleProvider value={{ userRole }}>
       <div className="min-h-screen bg-gray-50">
@@ -118,24 +119,30 @@ export default function DashboardLayout({ children }) {
 
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-              {navItems.map((item) => {
+              {navItems.map((item, index) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
 
                 return (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    onClick={() => handleNavClick(item.path)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      active
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Icon size={20} />
-                    <span className="font-medium">{item.name}</span>
-                  </Link>
+                  <>
+                    {userRole !== "admin" && index === 3 ? (
+                      ""
+                    ) : (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        onClick={() => handleNavClick(item.path)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                          active
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        <Icon size={20} />
+                        <span className="font-medium">{item.name}</span>
+                      </Link>
+                    )}
+                  </>
                 );
               })}
             </nav>

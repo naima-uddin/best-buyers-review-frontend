@@ -1,16 +1,20 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useCategories } from "@/context/CategoryContext";
-import { useRouter, useSearchParams } from "next/navigation"; // ✅ add useSearchParams
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-export default function RelatedSidebar({ mainCategory, currentSubCategory }) {
+export default function ProductPageSidebar({
+  mainCategory,
+  currentSubCategory,
+  showOnlyRelatedCategories = false,
+}) {
   const { categories } = useCategories();
   const router = useRouter();
-const searchParams = useSearchParams(); // ✅ capture query params
+  const searchParams = useSearchParams();
 
-const mainName = searchParams.get("mainName");
-const subName = searchParams.get("subName");
+  const mainName = searchParams.get("mainName");
+  const subName = searchParams.get("subName");
 
   const [visibleCount, setVisibleCount] = useState(7);
 
@@ -26,11 +30,45 @@ const subName = searchParams.get("subName");
 
   const handleSubCategoryClick = (sub) => {
     router.push(
-     `/category/${mainCategory}/${sub._id}?mainName=${encodeURIComponent(mainName)}&subName=${encodeURIComponent(sub.name)}`
+      `/category/${mainCategory}/${sub._id}?mainName=${encodeURIComponent(
+        mainName
+      )}&subName=${encodeURIComponent(sub.name)}`
     );
   };
 
+  // If showOnlyRelatedCategories is true, only render the related categories section
+  if (showOnlyRelatedCategories) {
+    return (
+      <div className="space-y-1">
+        {subcategories.slice(0, visibleCount).map((sub) => (
+          <button
+            key={sub._id}
+            onClick={() => handleSubCategoryClick(sub)}
+            className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+              sub._id === currentSubCategory
+                ? "bg-blue-700 text-white font-semibold"
+                : "hover:bg-gray-100 text-gray-700"
+            }`}
+          >
+            {sub.name}
+          </button>
+        ))}
+        {/* Show more / less button */}
+        {hasMore && (
+          <button
+            onClick={() =>
+              setVisibleCount(visibleCount === 7 ? subcategories.length : 7)
+            }
+            className="text-blue-600 mt-3 text-sm hover:underline"
+          >
+            {visibleCount === 7 ? "Show more" : "Show less"}
+          </button>
+        )}
+      </div>
+    );
+  }
 
+  // Full sidebar for desktop
   return (
     <aside className="w-full md:w-72 lg:w-80 border-l border-gray-200 pl-6 mt-10 md:mt-0">
       <div className="sticky top-20 space-y-6">
@@ -58,9 +96,7 @@ const subName = searchParams.get("subName");
           {hasMore && (
             <button
               onClick={() =>
-                setVisibleCount(
-                  visibleCount === 7 ? subcategories.length : 7
-                )
+                setVisibleCount(visibleCount === 7 ? subcategories.length : 7)
               }
               className="text-blue-600 mt-3 text-sm hover:underline"
             >

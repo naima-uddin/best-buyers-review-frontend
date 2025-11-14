@@ -14,7 +14,6 @@ export default function RelatedProducts({
   const [currentIndex, setCurrentIndex] = useState(0);
   const sliderRef = useRef(null);
   const totalToShow = 8;
-  const visibleCards = 6;
 
   useEffect(() => {
     if (!mainCategory || !subCategory) return;
@@ -83,7 +82,6 @@ export default function RelatedProducts({
       </h2>
 
       <div className="relative group">
-        {/* Scrollable Row */}
         <div
           ref={sliderRef}
           className="flex overflow-hidden scroll-smooth transition-all"
@@ -98,7 +96,7 @@ export default function RelatedProducts({
             return (
               <div
                 key={`${product._id}-${index}`}
-                className="min-w-[16.66%] p-3"
+                className="p-3 min-w-[50%] sm:min-w-[33.33%] md:min-w-[25%] lg:min-w-[16.66%]"
               >
                 <Link
                   href={`/category/${mainCategory}/${subCategory}/${product._id}`}
@@ -128,15 +126,13 @@ export default function RelatedProducts({
           })}
         </div>
 
-        {/* Prev Button */}
         <button
           onClick={handlePrev}
-          className="absolute top-1/2 -translate-y-1/2 left-0 bg-white border rounded-full shadow-md p-2 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition"
+          className="absolute top-1/2 -translate-y-1/2 left-0 bg-white border rounded-full shadow-md p-2 hover:bg-gray-100 opacity-100 sm:opacity-0 group-hover:opacity-100 transition"
         >
           <ChevronLeft className="h-5 w-5 text-gray-700" />
         </button>
 
-        {/* Next Button */}
         <button
           onClick={handleNext}
           className="absolute top-1/2 -translate-y-1/2 right-0 bg-white border rounded-full shadow-md p-2 hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition"
