@@ -47,7 +47,7 @@ const CategoryList = ({ categories, onUpdated, onEdit, categoriesLoading }) => {
         {cats.map((cat) => {
           // Safely check for children
           const hasChildren = cat.children && cat.children.length > 0;
-          
+
           return (
             <li key={cat._id}>
               <div
@@ -76,14 +76,16 @@ const CategoryList = ({ categories, onUpdated, onEdit, categoriesLoading }) => {
                   {cat.image && level <= 2 && (
                     <div className="w-10 h-10 flex-shrink-0">
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_API_URL || ''}${cat.image}`}
+                        src={`${process.env.NEXT_PUBLIC_IMAGE_API_URL || ""}${
+                          cat.image
+                        }`}
                         alt={cat.name}
                         width={40}
                         height={40}
                         className="w-10 h-10 object-cover rounded-md border"
                         onError={(e) => {
                           console.error("Image failed to load:", cat.image);
-                          e.target.style.display = 'none';
+                          e.target.style.display = "none";
                         }}
                       />
                     </div>
@@ -157,7 +159,7 @@ const CategoryList = ({ categories, onUpdated, onEdit, categoriesLoading }) => {
       <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Category Management
       </h2>
-      
+
       {/* Categories summary */}
       <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">

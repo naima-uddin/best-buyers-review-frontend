@@ -27,6 +27,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Always reserve space for scrollbar to prevent layout shift */
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 .auto-keyword-link {
   color: #1a0dab !important;
   text-decoration: underline !important;

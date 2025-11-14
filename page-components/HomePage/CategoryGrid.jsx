@@ -70,10 +70,20 @@ const CategoryGrid = () => {
   const hasMoreCategories = categories.length > visibleCount;
 
   return (
-    <div className="my-3">
-      <div className="max-w-7xl mx-auto  py-2">
+    <div className="my-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            Shop by Category
+          </h2>
+          <p className="text-gray-600 text-sm md:text-base">
+            Explore our wide range of products
+          </p>
+        </div>
+
         {/* Category Grid */}
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
           {displayCategories.map((category, index) => (
             <div
               key={index}
@@ -84,15 +94,18 @@ const CategoryGrid = () => {
                 )
               }
             >
-              {/* Circular Image */}
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
+              {/* Circular Image with modern design */}
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center mb-3 shadow-md border-2 border-white group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                {/* Decorative ring */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+
                 {category.image ? (
                   <Image
                     src={getCategoryImage(category)}
                     alt={category.name}
                     width={70}
                     height={70}
-                    className="object-contain rounded-full p-2"
+                    className="object-contain rounded-full p-2 relative z-10"
                     onError={(e) => {
                       e.target.style.display = "none";
                       e.target.nextSibling.style.display = "flex";
@@ -102,19 +115,16 @@ const CategoryGrid = () => {
 
                 {/* Fallback Initial */}
                 <div
-                  className={`w-full h-full rounded-full items-center justify-center text-white font-bold text-sm ${
+                  className={`w-full h-full rounded-full items-center justify-center text-white font-bold text-lg ${
                     category.image ? "hidden" : "flex"
-                  }`}
-                  style={{
-                    backgroundColor: "#078c8c",
-                  }}
+                  } bg-gradient-to-br from-blue-500 to-purple-500`}
                 >
                   {category.name.charAt(0).toUpperCase()}
                 </div>
               </div>
 
               {/* Category Name */}
-              <span className="text-[13px] md:text-sm text-[#001eff] font-medium leading-tight group-hover:text-[#FFBC03] transition-colors max-w-[80px] break-words">
+              <span className="text-sm md:text-base text-gray-700 font-semibold leading-tight group-hover:text-purple-600 transition-colors max-w-[90px] break-words">
                 {category.name}
               </span>
             </div>
@@ -126,12 +136,13 @@ const CategoryGrid = () => {
               className="flex flex-col items-center text-center cursor-pointer group"
               onClick={toggleShowAll}
             >
-              <div className="w-10 h-10 md:w-16 md:h-16 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 hover:bg-gray-200">
-                <span className="text-lg md:text-xl font-bold text-gray-600">
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center mb-3 shadow-md border-2 border-white group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400 to-amber-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                <span className="text-xl md:text-2xl font-bold text-orange-600 relative z-10">
                   +{categories.length - visibleCount}
                 </span>
               </div>
-              <span className="text-[13px] md:text-sm text-gray-700 font-medium leading-tight group-hover:text-blue-600 transition-colors">
+              <span className="text-sm md:text-base text-gray-700 font-semibold leading-tight group-hover:text-orange-600 transition-colors">
                 More →
               </span>
             </div>
@@ -143,12 +154,13 @@ const CategoryGrid = () => {
               className="flex flex-col items-center text-center cursor-pointer group"
               onClick={toggleShowAll}
             >
-              <div className="w-10 h-10 md:w-16 md:h-16 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200 hover:bg-gray-200">
-                <span className="text-lg md:text-xl font-bold text-gray-600">
+              <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-gray-50 to-slate-50 flex items-center justify-center mb-3 shadow-md border-2 border-white group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-400 to-slate-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                <span className="text-xl md:text-2xl font-bold text-gray-600 relative z-10">
                   −
                 </span>
               </div>
-              <span className="text-[13px] md:text-sm text-gray-700 font-medium leading-tight group-hover:text-blue-600 transition-colors">
+              <span className="text-sm md:text-base text-gray-700 font-semibold leading-tight group-hover:text-gray-600 transition-colors">
                 Show Less
               </span>
             </div>

@@ -11,7 +11,14 @@ import {
   ChevronDown,
 } from "lucide-react";
 
-export default function ProductEdit({ product, onSave, onCancel, onEdit, categories, categoriesLoading }) {
+export default function ProductEdit({
+  product,
+  onSave,
+  onCancel,
+  onEdit,
+  categories,
+  categoriesLoading,
+}) {
   const [userRole, setUserRole] = useState("admin");
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -40,7 +47,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     mainImage: "",
     affiliateUrl: "",
     isFeatured: false,
-    isCoupon:false,
+    isCoupon: false,
     isFullReview: false,
 
     // Pricing
@@ -190,24 +197,26 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
         // Features & Content
         features: (product.features?.feature || []).map((f, idx) => ({
           value: f,
-          _tempId: `feature-${idx}`
+          _tempId: `feature-${idx}`,
         })),
         colors: (product.colors || []).map((c, idx) => ({
           value: c,
-          _tempId: `color-${idx}`
+          _tempId: `color-${idx}`,
         })),
         styles: (product.styles || []).map((s, idx) => ({
           value: s,
-          _tempId: `style-${idx}`
+          _tempId: `style-${idx}`,
         })),
-        specifications: (product.specifications || []).map(({ key, value }, idx) => ({
-          key,
-          value,
-          _tempId: `spec-${idx}` // Temp ID for React rendering
-        })),
+        specifications: (product.specifications || []).map(
+          ({ key, value }, idx) => ({
+            key,
+            value,
+            _tempId: `spec-${idx}`, // Temp ID for React rendering
+          })
+        ),
         customReviews: (product.customReviews || []).map((r, idx) => ({
           ...r,
-          _tempId: `review-${idx}`
+          _tempId: `review-${idx}`,
         })),
 
         // SEO
@@ -223,7 +232,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
         // Factors
         factorsToConsider: (product.factorsToConsider || []).map((f, idx) => ({
           value: f,
-          _tempId: `factor-${idx}`
+          _tempId: `factor-${idx}`,
         })),
         mostImportantFactorsHeading:
           product.mostImportantFactors?.heading || "",
@@ -232,7 +241,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
         // Common Questions
         commonQuestions: (product.commonQuestions || []).map((q, idx) => ({
           ...q,
-          _tempId: `question-${idx}`
+          _tempId: `question-${idx}`,
         })),
 
         // Conclusion
@@ -327,10 +336,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     if (newFeature.trim()) {
       setFormData((prev) => ({
         ...prev,
-        features: [...prev.features, {
-          value: newFeature.trim(),
-          _tempId: Date.now() + Math.random()
-        }],
+        features: [
+          ...prev.features,
+          {
+            value: newFeature.trim(),
+            _tempId: Date.now() + Math.random(),
+          },
+        ],
       }));
       setNewFeature("");
     }
@@ -356,10 +368,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     if (newColor.trim()) {
       setFormData((prev) => ({
         ...prev,
-        colors: [...prev.colors, {
-          value: newColor.trim(),
-          _tempId: Date.now() + Math.random()
-        }],
+        colors: [
+          ...prev.colors,
+          {
+            value: newColor.trim(),
+            _tempId: Date.now() + Math.random(),
+          },
+        ],
       }));
       setNewColor("");
     }
@@ -368,9 +383,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
   const updateColor = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      colors: prev.colors.map((c, i) =>
-        i === index ? { ...c, value } : c
-      ),
+      colors: prev.colors.map((c, i) => (i === index ? { ...c, value } : c)),
     }));
   };
 
@@ -385,10 +398,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     if (newStyle.trim()) {
       setFormData((prev) => ({
         ...prev,
-        styles: [...prev.styles, {
-          value: newStyle.trim(),
-          _tempId: Date.now() + Math.random()
-        }],
+        styles: [
+          ...prev.styles,
+          {
+            value: newStyle.trim(),
+            _tempId: Date.now() + Math.random(),
+          },
+        ],
       }));
       setNewStyle("");
     }
@@ -397,9 +413,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
   const updateStyle = (index, value) => {
     setFormData((prev) => ({
       ...prev,
-      styles: prev.styles.map((s, i) =>
-        i === index ? { ...s, value } : s
-      ),
+      styles: prev.styles.map((s, i) => (i === index ? { ...s, value } : s)),
     }));
   };
 
@@ -420,7 +434,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     console.log("🔵 Add button clicked!");
     console.log("🔵 newSpecKey:", newSpecKey);
     console.log("🔵 newSpecValue:", newSpecValue);
-    console.log("🔵 Current specifications count BEFORE add:", formData.specifications.length);
+    console.log(
+      "🔵 Current specifications count BEFORE add:",
+      formData.specifications.length
+    );
 
     if (newSpecKey.trim() && newSpecValue.trim()) {
       const newSpec = {
@@ -433,7 +450,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
         const updatedSpecs = [...prev.specifications, newSpec];
         console.log("✅ Adding specification:", newSpec);
         console.log("📋 Updated specifications array:", updatedSpecs);
-        console.log("📋 Total specifications count AFTER add:", updatedSpecs.length);
+        console.log(
+          "📋 Total specifications count AFTER add:",
+          updatedSpecs.length
+        );
 
         // Force a re-render by creating a completely new object
         return {
@@ -445,7 +465,9 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
       setNewSpecKey("");
       setNewSpecValue("");
-      console.log("✅ Specification added successfully! Count should update above.");
+      console.log(
+        "✅ Specification added successfully! Count should update above."
+      );
     } else {
       console.warn("⚠️ Cannot add specification: Key or Value is empty");
       alert("Please fill in both Key and Value fields");
@@ -486,10 +508,13 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     if (newFactor.trim()) {
       setFormData((prev) => ({
         ...prev,
-        factorsToConsider: [...prev.factorsToConsider, {
-          value: newFactor.trim(),
-          _tempId: Date.now() + Math.random()
-        }],
+        factorsToConsider: [
+          ...prev.factorsToConsider,
+          {
+            value: newFactor.trim(),
+            _tempId: Date.now() + Math.random(),
+          },
+        ],
       }));
       setNewFactor("");
     }
@@ -520,7 +545,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
           {
             question: newQuestion.trim(),
             answer: "",
-            _tempId: Date.now() + Math.random()
+            _tempId: Date.now() + Math.random(),
           },
         ],
       }));
@@ -554,7 +579,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
             ...newReview,
             rating: parseFloat(newReview.rating) || 0,
             date: new Date(),
-            _tempId: Date.now() + Math.random()
+            _tempId: Date.now() + Math.random(),
           },
         ],
       }));
@@ -571,6 +596,15 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
     setFormData((prev) => ({
       ...prev,
       customReviews: prev.customReviews.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateReview = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      customReviews: prev.customReviews.map((review, i) =>
+        i === index ? { ...review, [field]: value } : review
+      ),
     }));
   };
 
@@ -650,7 +684,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
     setIsUpdating(true);
     console.log("🔄 FORM DATA specifications:", formData.specifications);
-    console.log("🔄 FORM DATA specifications count:", formData.specifications?.length);
+    console.log(
+      "🔄 FORM DATA specifications count:",
+      formData.specifications?.length
+    );
     console.log("🔄 FORM DATA anchorTags:", formData.anchorTags);
     console.log("🔄 FORM DATA all fields:", formData);
 
@@ -739,18 +776,23 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
       images: images,
 
       // Features & Content - Strip _tempId before sending
-      features: { feature: formData.features.map(f => f.value || f) },
-      colors: formData.colors.map(c => c.value || c),
-      styles: formData.styles.map(s => s.value || s),
+      features: { feature: formData.features.map((f) => f.value || f) },
+      colors: formData.colors.map((c) => c.value || c),
+      styles: formData.styles.map((s) => s.value || s),
       // Strip _id and _tempId fields before sending to backend
-      specifications: formData.specifications.map(({ key, value }) => ({ key, value })),
-      customReviews: formData.customReviews.map(({ author, rating, title, content, date }) => ({
-        author,
-        rating,
-        title,
-        content,
-        date
+      specifications: formData.specifications.map(({ key, value }) => ({
+        key,
+        value,
       })),
+      customReviews: formData.customReviews.map(
+        ({ author, rating, title, content, date }) => ({
+          author,
+          rating,
+          title,
+          content,
+          date,
+        })
+      ),
 
       // SEO
       seo: {
@@ -768,7 +810,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
       description: formData.introduction, // Fallback
 
       // Factors - Strip _tempId
-      factorsToConsider: formData.factorsToConsider.map(f => f.value || f),
+      factorsToConsider: formData.factorsToConsider.map((f) => f.value || f),
       mostImportantFactors: {
         heading: formData.mostImportantFactorsHeading,
         text: formData.mostImportantFactorsText,
@@ -777,7 +819,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
       // Common Questions - Strip _tempId
       commonQuestions: formData.commonQuestions.map(({ question, answer }) => ({
         question,
-        answer
+        answer,
       })),
 
       // Conclusion
@@ -789,7 +831,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
     console.log("🚀 FINAL DATA being sent to backend:", updatedProduct);
     console.log("🚀 Specifications being sent:", updatedProduct.specifications);
-    console.log("🚀 Specifications count:", updatedProduct.specifications?.length);
+    console.log(
+      "🚀 Specifications count:",
+      updatedProduct.specifications?.length
+    );
     console.log("🚀 Does it have anchorTags?", updatedProduct.anchorTags);
 
     try {
@@ -810,23 +855,11 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              Update Product
-            </h1>
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <span className="font-mono bg-gray-100 px-3 py-1 rounded-lg">
-                ASIN: {product.asin}
-              </span>
-            </div>
+          <div className="flex items-center space-x-4 text-sm text-gray-600">
+            <span className="font-mono bg-gray-100 px-3 py-1 rounded-lg">
+              ASIN: {product.asin}
+            </span>
           </div>
-          <button
-            onClick={onCancel}
-            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-          >
-            <ArrowLeft size={16} />
-            Back to Products
-          </button>
         </div>
       </div>
 
@@ -1244,7 +1277,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
           <div className="space-y-3">
             {formData.features.map((feature, index) => (
-              <div key={feature._tempId || index} className="flex items-center space-x-3">
+              <div
+                key={feature._tempId || index}
+                className="flex items-center space-x-3"
+              >
                 <input
                   type="text"
                   value={feature.value || feature}
@@ -1290,7 +1326,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
             <div className="space-y-3">
               {formData.colors.map((color, index) => (
-                <div key={color._tempId || index} className="flex items-center space-x-3">
+                <div
+                  key={color._tempId || index}
+                  className="flex items-center space-x-3"
+                >
                   <input
                     type="text"
                     value={color.value || color}
@@ -1334,7 +1373,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
             <div className="space-y-3">
               {formData.styles.map((style, index) => (
-                <div key={style._tempId || index} className="flex items-center space-x-3">
+                <div
+                  key={style._tempId || index}
+                  className="flex items-center space-x-3"
+                >
                   <input
                     type="text"
                     value={style.value || style}
@@ -1381,18 +1423,25 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
           <div className="space-y-4">
             {formData.specifications.map((spec, index) => (
-              <div key={spec._tempId || index} className="flex items-center space-x-3">
+              <div
+                key={spec._tempId || index}
+                className="flex items-center space-x-3"
+              >
                 <input
                   type="text"
                   value={spec.key}
-                  onChange={(e) => updateSpecification(index, 'key', e.target.value)}
+                  onChange={(e) =>
+                    updateSpecification(index, "key", e.target.value)
+                  }
                   placeholder="Key"
                   className="w-1/3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <input
                   type="text"
                   value={spec.value}
-                  onChange={(e) => updateSpecification(index, 'value', e.target.value)}
+                  onChange={(e) =>
+                    updateSpecification(index, "value", e.target.value)
+                  }
                   placeholder="Value"
                   className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -1412,7 +1461,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
                 value={newSpecKey}
                 onChange={(e) => setNewSpecKey(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     addSpecification(e);
                   }
@@ -1425,7 +1474,7 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
                 value={newSpecValue}
                 onChange={(e) => setNewSpecValue(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === "Enter") {
                     e.preventDefault();
                     addSpecification(e);
                   }
@@ -1446,9 +1495,12 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
               </button>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              Click "Add" to add specification. The count will update immediately. You can add as many as you need.
+              Click "Add" to add specification. The count will update
+              immediately. You can add as many as you need.
               <br />
-              <strong className="text-orange-600">Important:</strong> After adding specifications, wait for the count to update above before clicking "Update Product".
+              <strong className="text-orange-600">Important:</strong> After
+              adding specifications, wait for the count to update above before
+              clicking "Update Product".
             </p>
           </div>
         </div>
@@ -1720,7 +1772,10 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
 
           <div className="space-y-4">
             {formData.factorsToConsider.map((factor, index) => (
-              <div key={factor._tempId || index} className="flex items-center space-x-3">
+              <div
+                key={factor._tempId || index}
+                className="flex items-center space-x-3"
+              >
                 <input
                   type="text"
                   value={factor.value || factor}
@@ -1900,101 +1955,159 @@ export default function ProductEdit({ product, onSave, onCancel, onEdit, categor
             {formData.customReviews.map((review, index) => (
               <div
                 key={review._tempId || index}
-                className="p-4 border border-gray-200 rounded-lg space-y-3"
+                className="p-4 border border-gray-200 rounded-lg space-y-3 bg-white"
               >
                 <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      value={review.author}
+                      onChange={(e) =>
+                        updateReview(index, "author", e.target.value)
+                      }
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Author"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Rating
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="5"
+                      value={review.rating}
+                      onChange={(e) =>
+                        updateReview(index, "rating", e.target.value)
+                      }
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Rating (0-5)"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Review Title
+                  </label>
                   <input
                     type="text"
-                    value={review.author}
-                    readOnly
-                    className="p-2 border border-gray-300 rounded bg-gray-50"
-                    placeholder="Author"
-                  />
-                  <input
-                    type="number"
-                    value={review.rating}
-                    readOnly
-                    className="p-2 border border-gray-300 rounded bg-gray-50"
-                    placeholder="Rating"
+                    value={review.title}
+                    onChange={(e) =>
+                      updateReview(index, "title", e.target.value)
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Review Title"
                   />
                 </div>
-                <input
-                  type="text"
-                  value={review.title}
-                  readOnly
-                  className="w-full p-2 border border-gray-300 rounded bg-gray-50"
-                  placeholder="Review Title"
-                />
-                <textarea
-                  value={review.content}
-                  readOnly
-                  rows={3}
-                  className="w-full p-2 border border-gray-300 rounded bg-gray-50"
-                  placeholder="Review Content"
-                />
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Review Content
+                  </label>
+                  <textarea
+                    value={review.content}
+                    onChange={(e) =>
+                      updateReview(index, "content", e.target.value)
+                    }
+                    rows={3}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Review Content"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={() => removeReview(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                  className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-2"
                 >
                   <Trash2 size={16} />
+                  Remove Review
                 </button>
               </div>
             ))}
 
             {/* Add Review Form */}
-            <div className="p-4 border border-gray-200 rounded-lg space-y-3">
+            <div className="p-4 border-2 border-dashed border-gray-300 rounded-lg space-y-3 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">
+                Add New Review
+              </h3>
               <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Author *
+                  </label>
+                  <input
+                    type="text"
+                    value={newReview.author}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({
+                        ...prev,
+                        author: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Author name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-1">
+                    Rating *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="5"
+                    value={newReview.rating}
+                    onChange={(e) =>
+                      setNewReview((prev) => ({
+                        ...prev,
+                        rating: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.0 - 5.0"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">
+                  Review Title
+                </label>
                 <input
                   type="text"
-                  value={newReview.author}
+                  value={newReview.title}
                   onChange={(e) =>
-                    setNewReview((prev) => ({
-                      ...prev,
-                      author: e.target.value,
-                    }))
+                    setNewReview((prev) => ({ ...prev, title: e.target.value }))
                   }
-                  className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Author"
-                />
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="5"
-                  value={newReview.rating}
-                  onChange={(e) =>
-                    setNewReview((prev) => ({
-                      ...prev,
-                      rating: e.target.value,
-                    }))
-                  }
-                  className="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Rating (0-5)"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Review title (optional)"
                 />
               </div>
-              <input
-                type="text"
-                value={newReview.title}
-                onChange={(e) =>
-                  setNewReview((prev) => ({ ...prev, title: e.target.value }))
-                }
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Review Title"
-              />
-              <textarea
-                value={newReview.content}
-                onChange={(e) =>
-                  setNewReview((prev) => ({ ...prev, content: e.target.value }))
-                }
-                rows={3}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Review Content"
-              />
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">
+                  Review Content *
+                </label>
+                <textarea
+                  value={newReview.content}
+                  onChange={(e) =>
+                    setNewReview((prev) => ({
+                      ...prev,
+                      content: e.target.value,
+                    }))
+                  }
+                  rows={3}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Write the review content..."
+                />
+              </div>
               <button
                 type="button"
                 onClick={addReview}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors flex items-center gap-2"
+                className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
                 <Plus size={16} />
                 Add Review
