@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [userRole, setUserRole] = useState("admin");
+  const [userRole, setUserRole] = useState("moderator");
   const [clickedPath, setClickedPath] = useState(null);
 
   useEffect(() => {
@@ -92,6 +92,7 @@ export default function DashboardLayout({ children }) {
     }
   }, [pathname, clickedPath]);
 
+  console.log("user role", userRole);
   return (
     <UserRoleProvider value={{ userRole }}>
       <div className="min-h-screen bg-gray-50">
@@ -118,9 +119,12 @@ export default function DashboardLayout({ children }) {
 
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-              {navItems.map((item) => {
+              {navItems.map((item, index) => {
                 const Icon = item.icon;
                 const active = isActive(item.path);
+
+                // Hide the Users item for non-admins
+                if (userRole !== "admin" && index === 3) return null;
 
                 return (
                   <Link

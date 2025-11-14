@@ -8,6 +8,7 @@ import { useCompare } from "@/context/CompareContext";
 import CompareBox from "@/components/CompareBox";
 import CompareModal from "@/components/CompareModal";
 import CouponPopup from "./CouponPopup";
+import BackButton from "@/ui/BackButton";
 
 function ProductByCategoryContent() {
   const params = useParams();
@@ -172,7 +173,7 @@ function ProductByCategoryContent() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 md:py-10">
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -193,7 +194,9 @@ function ProductByCategoryContent() {
           <div className="flex-1">
             <div className="flex flex-col justify-center items-center h-64 md:h-96 text-gray-500">
               <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-4 border-blue-600 mb-4"></div>
-              <p className="text-sm sm:text-base md:text-lg font-medium">Loading products...</p>
+              <p className="text-sm sm:text-base md:text-lg font-medium">
+                Loading products...
+              </p>
             </div>
           </div>
 
@@ -213,6 +216,7 @@ function ProductByCategoryContent() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
       {/* Header */}
       <div className="text-center mb-6 md:mb-8">
+        <BackButton className="-mb-2" />
         <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Best {subName} ({mainName})
         </h1>
@@ -230,7 +234,9 @@ function ProductByCategoryContent() {
       {/* Sorting option */}
       <div className="flex justify-between items-center mb-4 md:mb-6 px-2 sm:px-0">
         <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">Sort by:</span>
+          <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
+            Sort by:
+          </span>
           <select
             value={sortParam}
             onChange={handleSortChange}
@@ -245,6 +251,18 @@ function ProductByCategoryContent() {
         </div>
         <div className="text-xs sm:text-sm text-gray-600">
           {products.length} Products
+        </div>
+      </div>
+
+      {/* Mobile Related Categories - Only visible on small/medium devices */}
+      <div className="block lg:hidden mb-6">
+        <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
+          <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
+          <ProductPageSidebar
+            mainCategory={mainCategory}
+            currentSubCategory={subCategory}
+            showOnlyRelatedCategories={true}
+          />
         </div>
       </div>
 
@@ -372,7 +390,7 @@ function ProductByCategoryContent() {
                                       className="flex items-start"
                                     >
                                       <span className="text-gray-800 text-xs sm:text-sm leading-relaxed">
-                                        • {truncateFeature(feature, 60)}
+                                        • {truncateFeature(feature, 47)}
                                       </span>
                                     </div>
                                   ))
@@ -422,7 +440,7 @@ function ProductByCategoryContent() {
                           <div className="flex flex-col items-center md:items-end justify-between w-full md:w-44 lg:w-48 mt-3 md:mt-0 border-t md:border-t-0 pt-3 md:pt-0">
                             <div className="text-center md:text-right w-full">
                               {/* Save Percentage Box */}
-                              <div className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                              <div className="text-lg sm:text-xl md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb- text-center">
                                 Save {product.discount?.percentage || 36}%
                               </div>
 
@@ -449,11 +467,11 @@ function ProductByCategoryContent() {
                               </div>
 
                               {/* Compare Checkbox */}
-                              <div className="flex items-center justify-center md:justify-end mt-2 sm:mt-4">
+                              <div className="flex items-center justify-center mt-4 sm:mt-6">
                                 <input
                                   type="checkbox"
                                   id={`compare-${product._id}`}
-                                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                  className="w-3 h-3 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                                   onChange={(e) =>
                                     handleCompareCheckbox(
                                       product,

@@ -1,5 +1,6 @@
 "use client";
 import { useCategories } from "@/context/CategoryContext";
+import BackButton from "@/ui/BackButton";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, Suspense } from "react";
@@ -34,6 +35,7 @@ function CategoryPageContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
+      <BackButton className="-mb-4" />
       {/* Header Section */}
       <div className="text-center mb-10">
         <h1 className="text-3xl font-semibold mb-2">Categories</h1>
@@ -68,7 +70,7 @@ function CategoryPageContent() {
                       : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
                     : "/placeholder-image.jpg";
 
-                    console.log("image path",imageSrc)
+                  console.log("image path", imageSrc);
                   return (
                     <div
                       key={sub._id}
@@ -113,7 +115,13 @@ function CategoryPageContent() {
 
 export default function CategoryPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-screen text-gray-500">
+          Loading...
+        </div>
+      }
+    >
       <CategoryPageContent />
     </Suspense>
   );

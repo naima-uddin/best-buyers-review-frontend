@@ -18,6 +18,7 @@ import {
 import Accordion from "@/ui/Accordion";
 import RelatedProducts from "./RelatedProducts";
 import ProductInfoTabs from "./ProductInfoTabs";
+import BackButton from "@/ui/BackButton";
 
 function ProductDetailsContent() {
   const params = useParams();
@@ -139,6 +140,7 @@ function ProductDetailsContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <BackButton className="mb-2" />
         {/* Breadcrumb */}
         <nav className="mb-4">
           <ol className="flex items-center space-x-2 text-sm text-gray-500">

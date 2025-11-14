@@ -32,11 +32,11 @@ const CategoryGrid = () => {
     const calculateVisibleCount = () => {
       const width = window.innerWidth;
       if (width < 768) {
-        return 5; // 4 + "More"
+        return 4; // 4 + "More"
       } else if (width >= 768 && width < 1024) {
-        return 9;
+        return 6;
       } else {
-        return 12;
+        return 8;
       }
     };
 
@@ -73,7 +73,7 @@ const CategoryGrid = () => {
     <div className="my-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Shop by Category
           </h2>
