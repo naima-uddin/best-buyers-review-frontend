@@ -30,7 +30,8 @@ export default function CompareModal() {
       {compareItems.length > 0 && (
         <div className="fixed bottom-4 right-2 sm:right-4 bg-white shadow-2xl rounded-xl p-2 sm:p-3 md:p-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 z-[999] border border-gray-200">
           <span className="font-semibold text-gray-800 text-xs sm:text-sm">
-            {compareItems.length} item{compareItems.length > 1 && "s"} selected
+            {compareItems.length} item{compareItems.length > 1 ? "s" : ""}{" "}
+            selected
           </span>
           <div className="flex gap-2">
             <button
@@ -103,14 +104,15 @@ export default function CompareModal() {
                               Save {product.discount?.percentage || 0}%
                             </div>
 
-
                             <a
                               href={product.affiliateUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-1.5 sm:py-2 px-2 sm:px-4 rounded-lg transition-all shadow-md hover:shadow-lg text-xs sm:text-sm flex justify-center items-center gap-1 sm:gap-2"
                             >
-                              <span className="flex items-center">Check Price</span>
+                              <span className="flex items-center">
+                                Check Price
+                              </span>
                               <Image
                                 src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                                 alt="Amazon"
@@ -132,7 +134,10 @@ export default function CompareModal() {
                         Rating
                       </td>
                       {compareItems.map((p) => (
-                        <td key={p._id} className="p-2 sm:p-3 md:p-4 text-center border-r">
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 text-center border-r"
+                        >
                           {getStarRating(p.customRating?.rating || 0)}
                           <div className="text-xs sm:text-sm text-gray-600 mt-1">
                             {p.customRating?.rating?.toFixed(1) || "—"} (
@@ -148,7 +153,10 @@ export default function CompareModal() {
                         Price
                       </td>
                       {compareItems.map((p) => (
-                        <td key={p._id} className="p-2 sm:p-3 md:p-4 text-center border-r">
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 text-center border-r"
+                        >
                           <div className="text-sm sm:text-base md:text-lg font-bold text-gray-800">
                             {p.price?.displayAmount || "$0.00"}
                           </div>
@@ -165,10 +173,15 @@ export default function CompareModal() {
                         Key Features
                       </td>
                       {compareItems.map((p) => (
-                        <td key={p._id} className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm">
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm"
+                        >
                           <ul className="list-disc list-inside text-gray-700 space-y-1">
                             {p.features?.feature?.slice(0, 2).map((f, i) => (
-                              <li key={i} className="leading-relaxed">{f}</li>
+                              <li key={i} className="leading-relaxed">
+                                {f}
+                              </li>
                             ))}
                           </ul>
                         </td>
@@ -181,7 +194,10 @@ export default function CompareModal() {
                         Specifications
                       </td>
                       {compareItems.map((p) => (
-                        <td key={p._id} className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm">
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm"
+                        >
                           <ul className="text-gray-700 space-y-1">
                             {p.specifications?.slice(0, 3).map((spec, i) => (
                               <li key={i} className="leading-relaxed">
@@ -199,14 +215,17 @@ export default function CompareModal() {
                         Latest Review
                       </td>
                       {compareItems.map((p) => (
-                        <td key={p._id} className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm">
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm"
+                        >
                           {p.customReviews && p.customReviews.length > 0 ? (
                             <div className="text-gray-700">
                               <div className="font-semibold mb-1">
                                 {p.customReviews[0].author}
                               </div>
                               <div className="italic text-gray-600 leading-relaxed">
-                                "{p.customReviews[0].content}"
+                                &ldquo;{p.customReviews[0].content}&rdquo;
                               </div>
                             </div>
                           ) : (

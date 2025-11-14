@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [userRole, setUserRole] = useState("admin");
+  const [userRole, setUserRole] = useState("moderator");
   const [clickedPath, setClickedPath] = useState(null);
 
   useEffect(() => {
@@ -123,26 +123,23 @@ export default function DashboardLayout({ children }) {
                 const Icon = item.icon;
                 const active = isActive(item.path);
 
+                // Hide the Users item for non-admins
+                if (userRole !== "admin" && index === 3) return null;
+
                 return (
-                  <>
-                    {userRole !== "admin" && index === 3 ? (
-                      ""
-                    ) : (
-                      <Link
-                        key={item.path}
-                        href={item.path}
-                        onClick={() => handleNavClick(item.path)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                          active
-                            ? "bg-blue-50 text-blue-600"
-                            : "text-gray-700 hover:bg-gray-50"
-                        }`}
-                      >
-                        <Icon size={20} />
-                        <span className="font-medium">{item.name}</span>
-                      </Link>
-                    )}
-                  </>
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    onClick={() => handleNavClick(item.path)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      active
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Icon size={20} />
+                    <span className="font-medium">{item.name}</span>
+                  </Link>
                 );
               })}
             </nav>
