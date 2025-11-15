@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   X,
+  Notebook,
 } from "lucide-react";
 
 export default function DashboardSidebar({ userRole }) {
@@ -47,6 +48,11 @@ export default function DashboardSidebar({ userRole }) {
       name: "Users",
       icon: Users,
       path: "/dashboard/users",
+    },
+    {
+      name: "Blogs",
+      icon: Notebook,
+      path: "/dashboard/blog",
     },
   ];
 
@@ -91,7 +97,7 @@ export default function DashboardSidebar({ userRole }) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-blue-600">PickHub</h1>
+            <h1 className="text-2xl font-bold text-blue-600">Best Buyers View</h1>
             <p className="text-sm text-gray-500 mt-1">Dashboard</p>
           </div>
 
