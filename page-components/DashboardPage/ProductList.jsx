@@ -52,33 +52,6 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
   const truncateTitle = (title, maxLength = 50) =>
     title?.length > maxLength ? title.substring(0, maxLength) + "..." : title || "No Title";
 
-  // ✅ FIXED: Better category display function
-  const getCategoryDisplay = (product) => {
-    // Check if categories are populated as objects
-    if (product.mainCategory?.name) {
-      return {
-        main: product.mainCategory.name,
-        sub: product.subCategory?.name || "",
-        subSub: product.subSubCategory?.name || ""
-      };
-    }
-    
-    // If categories are just IDs (not populated), show a generic message
-    if (product.mainCategory || product.subCategory || product.subSubCategory) {
-      return {
-        main: "Category assigned",
-        sub: "",
-        subSub: ""
-      };
-    }
-    
-    return {
-      main: "Uncategorized",
-      sub: "",
-      subSub: ""
-    };
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center py-16">
@@ -88,17 +61,6 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
   }
 
   const safeProducts = Array.isArray(products) ? products : [];
-
-  // Debug: Check the first product's category structure
-  useEffect(() => {
-    if (safeProducts.length > 0) {
-      console.log("🔍 First product category structure:", {
-        mainCategory: safeProducts[0]?.mainCategory,
-        subCategory: safeProducts[0]?.subCategory,
-        subSubCategory: safeProducts[0]?.subSubCategory
-      });
-    }
-  }, [safeProducts]);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -161,7 +123,6 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
                   const currentPrice = getCurrentPrice(product);
                   const listPrice = getListPrice(product);
                   const discount = calculateDiscount(currentPrice, listPrice);
-                  const category = getCategoryDisplay(product);
 
                   return (
                     <tr
@@ -211,21 +172,18 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
                         </div>
                       </td>
 
-                      {/* ✅ FIXED: Category Display */}
+                      {/* Category */}
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {category.main}
+                          {product.mainCategory?.name ||
+                            product.subCategory?.name||
+                            "Uncategorized"}
                         </div>
-                        {category.sub && (
+                        {product.subCategory?.name && (
                           <div className="text-xs text-gray-500">
-                            {category.sub}
-                            {category.subSub && ` → ${category.subSub}`}
+                            {product.subCategory?.name}
                           </div>
                         )}
-                        {/* Debug info - remove in production */}
-                        <div className="text-xs text-gray-400 mt-1">
-                          {!product.mainCategory?.name && product.mainCategory && "ID only"}
-                        </div>
                       </td>
 
                       {/* Price */}
