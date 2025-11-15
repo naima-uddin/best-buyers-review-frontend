@@ -1,4 +1,3 @@
-// Dashboard.jsx - UPDATED
 "use client";
 import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
@@ -10,6 +9,7 @@ import UserManagement from "./UserManagement";
 import Categories from "./category/CategoryPage";
 import CategoryFilters from "../DashboardPage/category/CategoryFilters";
 
+<<<<<<< Updated upstream:page-components/DashboardPage/Dashboard.jsx
 // ✅ Shorter Flatten Function
 const flattenCategories = (nodes) =>
   nodes.flatMap((n) => [
@@ -23,6 +23,8 @@ const flattenCategories = (nodes) =>
     ...(n.children ? flattenCategories(n.children) : []),
   ]);
 
+=======
+>>>>>>> Stashed changes:pages/DashboardPage/Dashboard.jsx
 export default function Dashboard() {
   const [activeSection, setActiveSection] = useState("view-products");
   const [products, setProducts] = useState([]);
@@ -60,8 +62,12 @@ export default function Dashboard() {
 
         const data = await res.json();
         console.log("✅ Categories loaded:", data.length);
+<<<<<<< Updated upstream:page-components/DashboardPage/Dashboard.jsx
 
         // Store both hierarchical and flattened versions
+=======
+        
+>>>>>>> Stashed changes:pages/DashboardPage/Dashboard.jsx
         setCategories(data || []);
       } catch (error) {
         console.error("❌ Category fetch failed:", error);
@@ -72,7 +78,7 @@ export default function Dashboard() {
     };
 
     fetchCategories();
-  }, []); // Empty dependency array - runs only once on mount
+  }, []);
 
   // ✅ Fetch products
   const fetchProducts = async (pageNum = 1) => {
@@ -303,6 +309,7 @@ export default function Dashboard() {
     }
   };
 
+<<<<<<< Updated upstream:page-components/DashboardPage/Dashboard.jsx
   // ✅ Clean Section Rendering - PASS CATEGORIES TO ALL COMPONENTS
   const renderSection = () => {
     switch (activeSection) {
@@ -315,68 +322,77 @@ export default function Dashboard() {
             categoriesLoading={categoriesLoading}
           />
         );
+=======
+  // ✅ FIXED: Create separate components for each section to avoid hook order issues
+  const ViewProductsSection = () => (
+    <div>
+      <CategoryFilters
+        categories={categories}
+        categoriesLoading={categoriesLoading}
+        selectedMain={selectedMain}
+        setSelectedMain={setSelectedMain}
+        selectedSub={selectedSub}
+        setSelectedSub={setSelectedSub}
+        setPage={setPage}
+      />
+      <ProductList
+        products={products}
+        loading={loading}
+        onRefresh={fetchProducts}
+        onEdit={handleEdit}
+        onView={handleView}
+        onDelete={handleDelete}
+      />
+>>>>>>> Stashed changes:pages/DashboardPage/Dashboard.jsx
 
-      case "view-products":
-        return (
-          <>
-            <CategoryFilters
-              categories={categories}
-              categoriesLoading={categoriesLoading}
-              selectedMain={selectedMain}
-              setSelectedMain={setSelectedMain}
-              selectedSub={selectedSub}
-              setSelectedSub={setSelectedSub}
-              setPage={setPage}
-            />
-            <ProductList
-              products={products}
-              loading={loading}
-              onRefresh={fetchProducts}
-              onEdit={handleEdit}
-              onView={handleView}
-              onDelete={handleDelete}
-            />
+      <div className="flex justify-center items-center space-x-2 mt-6">
+        <button
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
+        >
+          Prev
+        </button>
 
-            <div className="flex justify-center items-center space-x-2 mt-6">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
-              >
-                Prev
-              </button>
+        <span className="text-gray-700 text-sm">
+          Page {page} of {pages}
+        </span>
 
-              <span className="text-gray-700 text-sm">
-                Page {page} of {pages}
-              </span>
+        <button
+          onClick={() => setPage((p) => Math.min(pages, p + 1))}
+          disabled={page === pages}
+          className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
 
-              <button
-                onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                disabled={page === pages}
-                className="px-4 py-2 bg-[#2738F5] text-white rounded-lg disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </>
-        );
+  const AddProductSection = () => (
+    <ProductForm 
+      onSubmit={fetchProducts} 
+      onCancel={handleBackToList}
+      categories={categories}
+      categoriesLoading={categoriesLoading}
+    />
+  );
 
-      case "edit-product":
-        return (
-          <ProductEdit
-            product={editingProduct}
-            onSave={handleSaveEdit}
-            onCancel={handleBackToList}
-            categories={categories} // Pass categories
-            categoriesLoading={categoriesLoading}
-          />
-        );
+  const EditProductSection = () => (
+    <ProductEdit
+      product={editingProduct}
+      onSave={handleSaveEdit}
+      onCancel={handleBackToList}
+      categories={categories}
+      categoriesLoading={categoriesLoading}
+    />
+  );
 
-      case "view-product":
-        return (
-          <ProductView product={viewingProduct} onClose={handleBackToList} />
-        );
+  const ViewProductSection = () => (
+    <ProductView product={viewingProduct} onClose={handleBackToList} />
+  );
 
+<<<<<<< Updated upstream:page-components/DashboardPage/Dashboard.jsx
       case "categories":
         return (
           <Categories
@@ -385,13 +401,30 @@ export default function Dashboard() {
             onRefresh={refreshCategories} // Pass refresh function
           />
         );
+=======
+  const CategoriesSection = () => (
+    <Categories 
+      categories={categories}
+      categoriesLoading={categoriesLoading}
+      onRefresh={refreshCategories}
+    />
+  );
+>>>>>>> Stashed changes:pages/DashboardPage/Dashboard.jsx
 
-      case "user-management":
-        return <UserManagement />;
+  const UserManagementSection = () => (
+    <UserManagement />
+  );
 
-      default:
-        return null;
-    }
+  // ✅ FIXED: Simple conditional rendering without switch statement
+  const renderContent = () => {
+    if (activeSection === "add-product") return <AddProductSection />;
+    if (activeSection === "edit-product") return <EditProductSection />;
+    if (activeSection === "view-product") return <ViewProductSection />;
+    if (activeSection === "categories") return <CategoriesSection />;
+    if (activeSection === "user-management") return <UserManagementSection />;
+    
+    // Default: view-products
+    return <ViewProductsSection />;
   };
 
   return (
@@ -412,7 +445,7 @@ export default function Dashboard() {
             <p className="text-sm text-blue-700">Loading categories...</p>
           </div>
         )}
-        {renderSection()}
+        {renderContent()}
       </div>
     </div>
   );
