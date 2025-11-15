@@ -4,118 +4,235 @@ import React, { useState, useEffect } from "react";
 export default function BlogForm({ onSubmit, editingData }) {
   const [formData, setFormData] = useState({
     title: "",
-    authorName: "",
-    shortDescription: "",
-    content: "",
-    coverImage: "",
-    category: "",
+    description: "",
+    excerpt: "",
+    featuredImageUrl: "",
+    featuredImagePublicId: "",
+    categories: "",
     tags: "",
-    images: "",
-    seo: { metaTitle: "", metaDescription: "", keywords: "" }
+    authorName: "",
+    authorAvatar: "",
+    authorBio: "",
+    sponsorName: "",
+    sponsorLink: "",
+    sponsorLogo: "",
+    seoTitle: "",
+    seoDescription: "",
+    seoKeywords: "",
+    seoCanonicalUrl: "",
+    isFeatured: false,
+    published: false,
   });
 
-  const [steps, setSteps] = useState([{ title: "", description: "", image: "" }]);
+  const [contentBlocks, setContentBlocks] = useState([
+    { type: "paragraph", data: { text: [{ value: "" }], items: [] } },
+  ]);
+
+  const [contentImages, setContentImages] = useState([""]);
 
   useEffect(() => {
     if (editingData) {
       setFormData({
         title: editingData.title,
-        authorName: editingData.authorName,
-        shortDescription: editingData.shortDescription,
-        content: editingData.content,
-        coverImage: editingData.coverImage,
-        category: editingData.category,
+        description: editingData.description,
+        excerpt: editingData.excerpt,
+        featuredImageUrl: editingData.featuredImage?.url || "",
+        featuredImagePublicId: editingData.featuredImage?.public_id || "",
+        categories: editingData.categories.join(", "),
         tags: editingData.tags.join(", "),
-        images: editingData.images.join(", "),
-        seo: {
-          metaTitle: editingData.seo.metaTitle,
-          metaDescription: editingData.seo.metaDescription,
-          keywords: editingData.seo.keywords.join(", ")
-        }
+        authorName: editingData.author?.name || "",
+        authorAvatar: editingData.author?.avatar || "",
+        authorBio: editingData.author?.bio || "",
+        sponsorName: editingData.sponsor?.name || "",
+        sponsorLink: editingData.sponsor?.link || "",
+        sponsorLogo: editingData.sponsor?.logo || "",
+        seoTitle: editingData.seo?.title || "",
+        seoDescription: editingData.seo?.description || "",
+        seoKeywords: editingData.seo?.keywords.join(", "),
+        seoCanonicalUrl: editingData.seo?.canonicalUrl || "",
+        isFeatured: editingData.isFeatured || false,
+        published: editingData.published || false,
       });
-      setSteps(editingData.steps);
+
+      setContentBlocks(editingData.content || []);
+      setContentImages(editingData.contentImages || []);
     }
   }, [editingData]);
 
-  const handleChange = (e) =>
+  function handleBasicChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
-  const handleSEOChange = (e) =>
-    setFormData({ ...formData, seo: { ...formData.seo, [e.target.name]: e.target.value } });
+  function toggleCheckbox(name) {
+    setFormData({ ...formData, [name]: !formData[name] });
+  }
 
-  const handleStepChange = (i, e) => {
-    const updated = [...steps];
-    updated[i][e.target.name] = e.target.value;
-    setSteps(updated);
-  };
+  function handleContentBlockChange(index, field, value) {
+    const updated = [...contentBlocks];
+    updated[index].data.text[0].value = value;
+    setContentBlocks(updated);
+  }
 
-  const addStep = () =>
-    setSteps([...steps, { title: "", description: "", image: "" }]);
+  function addContentBlock() {
+    setContentBlocks([
+      ...contentBlocks,
+      { type: "paragraph", data: { text: [{ value: "" }], items: [] } },
+    ]);
+  }
 
-  const removeStep = (i) =>
-    setSteps(steps.filter((_, index) => index !== i));
+  function removeContentBlock(index) {
+    setContentBlocks(contentBlocks.filter((_, i) => i !== index));
+  }
+
+  function handleContentImageChange(index, val) {
+    const updated = [...contentImages];
+    updated[index] = val;
+    setContentImages(updated);
+  }
+
+  function addContentImage() {
+    setContentImages([...contentImages, ""]);
+  }
+
+  function removeContentImage(index) {
+    setContentImages(contentImages.filter((_, i) => i !== index));
+  }
 
   const submitHandler = (e) => {
     e.preventDefault();
 
-    const finalData = {
-      ...formData,
-      tags: formData.tags.split(",").map((t) => t.trim()),
-      images: formData.images.split(",").map((i) => i.trim()),
-      seo: {
-        metaTitle: formData.seo.metaTitle,
-        metaDescription: formData.seo.metaDescription,
-        keywords: formData.seo.keywords.split(",").map((k) => k.trim()),
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      excerpt: formData.excerpt,
+      featuredImage: {
+        url: formData.featuredImageUrl,
+        public_id: formData.featuredImagePublicId,
       },
-      steps,
+      content: contentBlocks,
+      categories: formData.categories.split(",").map((c) => c.trim()),
+      tags: formData.tags.split(",").map((t) => t.trim()),
+      author: {
+        name: formData.authorName,
+        avatar: formData.authorAvatar,
+        bio: formData.authorBio,
+      },
+      sponsor: {
+        name: formData.sponsorName,
+        link: formData.sponsorLink,
+        logo: formData.sponsorLogo,
+      },
+      seo: {
+        title: formData.seoTitle,
+        description: formData.seoDescription,
+        keywords: formData.seoKeywords.split(",").map((k) => k.trim()),
+        canonicalUrl: formData.seoCanonicalUrl,
+      },
+      contentImages: contentImages.map((i) => ({
+        url: i,
+        public_id: "",
+      })),
+      isFeatured: formData.isFeatured,
+      published: formData.published,
     };
 
-    onSubmit(finalData);
+    onSubmit(payload);
   };
 
   return (
-    <form onSubmit={submitHandler} className="bg-white border rounded p-5 mt-5 space-y-4">
+    <form onSubmit={submitHandler} className="p-5 border rounded bg-white space-y-5">
 
-      <input placeholder="Blog Title" className="input" name="title" value={formData.title} onChange={handleChange} required />
+      {/* Basic Fields */}
+      <input className="input" placeholder="Blog Title" name="title" value={formData.title} onChange={handleBasicChange} required />
+      <textarea className="input" placeholder="Description" name="description" value={formData.description} onChange={handleBasicChange} required />
+      <textarea className="input" placeholder="Excerpt" name="excerpt" value={formData.excerpt} onChange={handleBasicChange} maxLength={200} />
 
-      <input placeholder="Author Name" className="input" name="authorName" value={formData.authorName} onChange={handleChange} required />
-
-      <input placeholder="Short Description" className="input" name="shortDescription" value={formData.shortDescription} onChange={handleChange} required />
-
-      <textarea placeholder="Full Content" className="input" name="content" value={formData.content} onChange={handleChange} required />
-
-      <input placeholder="Cover Image URL" className="input" name="coverImage" value={formData.coverImage} onChange={handleChange} />
-
-      <input placeholder="Category" className="input" name="category" value={formData.category} onChange={handleChange} required />
-
-      <input placeholder="Tags (comma separated)" className="input" name="tags" value={formData.tags} onChange={handleChange} />
-
-      <input placeholder="Extra Images (comma separated)" className="input" name="images" value={formData.images} onChange={handleChange} />
-
-      {/* SEO Section */}
-      <div className="p-3 border rounded">
-        <h3 className="font-semibold mb-2">SEO</h3>
-        <input placeholder="Meta Title" className="input" name="metaTitle" value={formData.seo.metaTitle} onChange={handleSEOChange} />
-        <input placeholder="Meta Description" className="input" name="metaDescription" value={formData.seo.metaDescription} onChange={handleSEOChange} />
-        <input placeholder="Keywords (comma separated)" className="input" name="keywords" value={formData.seo.keywords} onChange={handleSEOChange} />
+      {/* Author */}
+      <div className="border p-3 rounded">
+        <h3 className="font-semibold mb-2">Author</h3>
+        <input className="input" name="authorName" placeholder="Author Name" value={formData.authorName} onChange={handleBasicChange} required />
+        <input className="input" name="authorAvatar" placeholder="Author Avatar URL" value={formData.authorAvatar} onChange={handleBasicChange} />
+        <textarea className="input" name="authorBio" placeholder="Author Bio" value={formData.authorBio} onChange={handleBasicChange} />
       </div>
 
-      {/* Steps */}
-      <div className="p-3 border rounded">
-        <h3 className="font-semibold mb-2">Steps</h3>
-        {steps.map((step, index) => (
-          <div key={index} className="mb-3 p-2 border rounded">
-            <input name="title" placeholder="Step Title" className="input" value={step.title} onChange={(e) => handleStepChange(index, e)} />
-            <input name="description" placeholder="Step Description" className="input" value={step.description} onChange={(e) => handleStepChange(index, e)} />
-            <input name="image" placeholder="Step Image URL" className="input" value={step.image} onChange={(e) => handleStepChange(index, e)} />
-            {steps.length > 1 && (
-              <button type="button" className="text-red-600" onClick={() => removeStep(index)}>
-                Remove Step
+      {/* Categories & Tags */}
+      <input className="input" name="categories" placeholder="Categories (comma separated)" value={formData.categories} onChange={handleBasicChange} />
+      <input className="input" name="tags" placeholder="Tags (comma separated)" value={formData.tags} onChange={handleBasicChange} />
+
+      {/* Featured Image */}
+      <input className="input" name="featuredImageUrl" placeholder="Featured Image URL" value={formData.featuredImageUrl} onChange={handleBasicChange} />
+
+      {/* Content Blocks */}
+      <div className="border p-3 rounded">
+        <h3 className="font-semibold mb-2">Content Blocks</h3>
+        {contentBlocks.map((block, index) => (
+          <div key={index} className="p-2 border mb-2 rounded">
+            <textarea
+              className="input"
+              placeholder="Paragraph Content"
+              value={block.data.text[0].value}
+              onChange={(e) => handleContentBlockChange(index, "text", e.target.value)}
+            />
+            {contentBlocks.length > 1 && (
+              <button type="button" className="text-red-500 mt-1" onClick={() => removeContentBlock(index)}>
+                Remove
               </button>
             )}
           </div>
         ))}
-        <button type="button" className="bg-gray-700 text-white px-3 py-1 rounded" onClick={addStep}>+ Add Step</button>
+        <button type="button" className="bg-gray-700 text-white px-3 py-1 rounded" onClick={addContentBlock}>
+          + Add Content Block
+        </button>
+      </div>
+
+      {/* Content Images */}
+      <div className="border p-3 rounded">
+        <h3 className="font-semibold mb-2">Content Images</h3>
+        {contentImages.map((image, index) => (
+          <div key={index} className="p-2 border mb-2 rounded">
+            <input
+              className="input"
+              placeholder="Image URL"
+              value={image}
+              onChange={(e) => handleContentImageChange(index, e.target.value)}
+            />
+            {contentImages.length > 1 && (
+              <button type="button" className="text-red-500 mt-1" onClick={() => removeContentImage(index)}>
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+        <button type="button" className="bg-gray-700 text-white px-3 py-1 rounded" onClick={addContentImage}>
+          + Add Image
+        </button>
+      </div>
+
+      {/* SEO */}
+      <div className="border p-3 rounded">
+        <h3 className="font-semibold mb-2">SEO Data</h3>
+        <input className="input" name="seoTitle" placeholder="SEO Title" value={formData.seoTitle} onChange={handleBasicChange} />
+        <input className="input" name="seoDescription" placeholder="SEO Description" value={formData.seoDescription} onChange={handleBasicChange} />
+        <input className="input" name="seoKeywords" placeholder="Keywords (comma separated)" value={formData.seoKeywords} onChange={handleBasicChange} />
+        <input className="input" name="seoCanonicalUrl" placeholder="Canonical URL" value={formData.seoCanonicalUrl} onChange={handleBasicChange} />
+      </div>
+
+      {/* Sponsor */}
+      <div className="border p-3 rounded">
+        <h3 className="font-semibold mb-2">Sponsor</h3>
+        <input className="input" name="sponsorName" placeholder="Sponsor Name" value={formData.sponsorName} onChange={handleBasicChange} />
+        <input className="input" name="sponsorLink" placeholder="Sponsor Link" value={formData.sponsorLink} onChange={handleBasicChange} />
+        <input className="input" name="sponsorLogo" placeholder="Sponsor Logo URL" value={formData.sponsorLogo} onChange={handleBasicChange} />
+      </div>
+
+      {/* Settings */}
+      <div className="p-3 border rounded flex gap-5">
+        <label className="flex gap-2">
+          <input type="checkbox" checked={formData.isFeatured} onChange={() => toggleCheckbox("isFeatured")} /> Featured
+        </label>
+        <label className="flex gap-2">
+          <input type="checkbox" checked={formData.published} onChange={() => toggleCheckbox("published")} /> Publish Now
+        </label>
       </div>
 
       <button type="submit" className="bg-green-600 text-white w-full py-2 rounded">

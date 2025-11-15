@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function BannerSlider() {
-  const images = ["/bannerImg/1.jpg", "/bannerImg/2.jpg"];
+  const images = ["/bannerImg/1.jpg", "/bannerImg/2.jpg", "/bannerImg/3.jpg", "/bannerImg/4.jpg","/bannerImg/5.jpg","/bannerImg/6.jpg"];
 
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);

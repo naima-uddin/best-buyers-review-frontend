@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import api from "@/lib/api/axios";
 
 export default function BlogList() {
   const [blogs, setBlogs] = useState([]);
 
   const fetchBlogs = async () => {
-    const res = await fetch("http://localhost:5000/api/blog");
-    const data = await res.json();
+    const res = await api.get("/blog");
+    const data = await res.data;
     if (data.success) setBlogs(data.data);
   };
 
@@ -18,11 +19,9 @@ export default function BlogList() {
   const handleDelete = async (id) => {
     if (!confirm("Are you sure to delete this blog?")) return;
 
-    const res = await fetch(`http://localhost:5000/api/blog/${id}`, {
-      method: "DELETE",
-    });
+    const res = await api.delete(`/blog/${id}`);
 
-    const data = await res.json();
+    const data = await res.data;
     if (data.success) {
       alert("Blog Deleted");
       fetchBlogs();
@@ -30,7 +29,7 @@ export default function BlogList() {
       alert("Delete Failed");
     }
   };
-
+console.log("blog data is:", blogs)
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">All Blogs</h2>
@@ -50,13 +49,13 @@ export default function BlogList() {
               <td className="border p-2">{blog.title}</td>
               <td className="border p-2">{blog.authorName}</td>
               <td className="border p-2 space-x-2">
-                <Link href={`/admin/blog/edit/${blog._id}`}>
+                <Link href={`/admin/blog/edit/${blog.slug}`}>
                   <button className="bg-blue-600 text-white px-3 py-1 rounded">
                     Edit
                   </button>
                 </Link>
 
-                <Link href={`/blog/${blog._id}`}>
+                <Link href={`/blog/${blog.slug}`}>
                   <button className="bg-green-600 text-white px-3 py-1 rounded">
                     View
                   </button>
