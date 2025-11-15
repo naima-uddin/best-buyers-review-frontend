@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "PickHub",
-  description: "PickHub: Discover, Compare & Pick the Best",
+  title: "Best Buyers View",
+  description: "Best Buyers View: Discover, Compare & Pick the Best",
 };
 
 export default function RootLayout({ children }) {
