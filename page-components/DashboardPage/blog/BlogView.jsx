@@ -1,12 +1,15 @@
 import api from "@/lib/api/axios";
 
 export default async function BlogView({ params }) {
-  const res = await api.get(`/blog/${params.slug}`);
+  const { slug } = params;
+
+  const res = await api.get(`/blog/${slug}`);
   const blog = res.data.data;
 
   if (!blog) {
     return <h1 className="text-center mt-10 text-red-600">Blog Not Found</h1>;
   }
+  console.log("blog page is :",blog);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

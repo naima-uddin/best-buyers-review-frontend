@@ -70,10 +70,10 @@ const CategoryGrid = () => {
   const hasMoreCategories = categories.length > visibleCount;
 
   return (
-    <div className="my-8 px-4">
+    <div className="my-0 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
-        <div className="text-center mb-4">
+        <div className="text-center mb-1">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Shop by Category
           </h2>

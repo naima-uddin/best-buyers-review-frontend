@@ -32,12 +32,12 @@ const HomePage = () => {
       </section>
 
       {/* Trust Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-purple-600 py-16 md:py-20 my-12 md:my-16">
+      <section className="relative">
         <TrustSection />
       </section>
 
       {/* Connect Section */}
-      <section className="relative py-12 md:py-16 px-4 mb-8">
+      <section className="">
         <ConnectSection />
       </section>
     </div>

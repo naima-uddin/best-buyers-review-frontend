@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import React from "react";
 
 export default function BlogTable({ blogs, onEdit, onDelete }) {
@@ -38,13 +39,12 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
                     Edit
                   </button>
 
-                  <a
+                  <Link
                     href={`/blog/${blog.slug}`}
-                    target="_blank"
                     className="bg-green-600 text-white px-3 py-1 rounded"
                   >
                     View
-                  </a>
+                  </Link>
 
                   <button
                     onClick={() => onDelete(blog.slug)}
