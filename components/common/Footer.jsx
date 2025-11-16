@@ -4,10 +4,10 @@ import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer className="border-t pt-8 bg-gradient-to-b from-blue-100/30 to-blue-100/50 text-[#0215A6]">
+    <footer className="border-t pt-2 bg-gradient-to-b from-blue-100/30 to-blue-100/50 text-[#0215A6]">
       <div className="max-w-7xl mx-auto px-4 py-10">
         {/* TOP SECTION */}
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-10">
+        <div className="flex flex-col md:flex-col md:items-center md:justify-center gap-4 mb-10">
           <Link href="/" className="group mx-auto md:mx-0">
             <Image
               src="/logo.png"
@@ -32,7 +32,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/categories"
+                  href="/category"
                   className="hover:text-[#0215A6] text-muted-foreground"
                 >
                   Categories
@@ -46,14 +46,7 @@ export function Footer() {
                   Blog
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="hover:text-[#0215A6] text-muted-foreground"
-                >
-                  About Us
-                </Link>
-              </li>
+              
               <li>
                 <Link
                   href="/contact"
@@ -87,20 +80,13 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/disclosure"
+                  href="/AdvertiserDisclosure"
                   className="hover:text-[#0215A6] text-muted-foreground"
                 >
                   Advertiser Disclosure
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/rankings"
-                  className="hover:text-[#0215A6] text-muted-foreground"
-                >
-                  About Our Rankings
-                </Link>
-              </li>
+              
             </ul>
           </div>
 
@@ -143,7 +129,7 @@ export function Footer() {
 
         {/* BOTTOM SECTION */}
         <div className="border-t mt-10 pt-6 text-center text-sm text-muted-foreground space-y-2">
-          <p>© 2025 BuyersGuide.org. All rights reserved.</p>
+          <p>© 2025 Best Buyers View All rights reserved.</p>
           <p>As an Amazon Associate we earn from qualifying purchases.</p>
         </div>
       </div>

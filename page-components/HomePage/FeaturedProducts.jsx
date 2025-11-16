@@ -124,11 +124,11 @@ export default function FeaturedProducts() {
             >
               <span>View on</span>
               <Image
-                src="/amazon-logo.jpg"
+                src="/white-amazon-logo-1.png"
                 alt="Amazon"
                 width={40}
-                height={40}
-                className="object-contain"
+                height={50}
+                className="object-contain mt-1.5"
               />
             </a>
           </div>
