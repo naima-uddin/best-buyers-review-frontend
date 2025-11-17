@@ -4,7 +4,7 @@ import api from "@/lib/api/axios";
 import BlogTable from "./BlogTable";
 import BlogForm from "./BlogForm";
 
-export default function BlogAdminPage({ categories = [], categoriesLoading = false }) {
+export default function BlogAdminPage() {
   const [blogs, setBlogs] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
@@ -27,11 +27,11 @@ export default function BlogAdminPage({ categories = [], categoriesLoading = fal
         await api.post("/blog", data);
         alert("Blog created!");
       }
+
       setShowForm(false);
       setEditingBlog(null);
       loadBlogs();
-    } catch (err) {
-      console.log(err);
+    } catch {
       alert("Error occurred!");
     }
   };
@@ -53,18 +53,22 @@ export default function BlogAdminPage({ categories = [], categoriesLoading = fal
 
   return (
     <div className="p-6">
-      <button className="mb-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setShowForm(!showForm)}>
+      <button
+        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded"
+        onClick={() => {
+          setEditingBlog(null);
+          setShowForm(!showForm);
+        }}
+      >
         {showForm ? "Close Form" : "Add New Blog"}
       </button>
 
       {!showForm ? (
         <BlogTable blogs={blogs} onEdit={handleEdit} onDelete={handleDelete} />
       ) : (
-        <BlogForm 
-          onSubmit={handleSubmit} 
+        <BlogForm
+          onSubmit={handleSubmit}
           editingData={editingBlog}
-          categories={categories}
-          categoriesLoading={categoriesLoading}
         />
       )}
     </div>

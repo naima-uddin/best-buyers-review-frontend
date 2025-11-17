@@ -14,7 +14,8 @@ export function BlogDataProvider({ children }) {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`);
         const data = await res.json();
-        const blogsData = data.data || [];
+        const blogsData = data.blogs || [];
+
         
         setBlogs(blogsData);
         const featured = blogsData.find(blog => blog.isFeatured) || blogsData[0];

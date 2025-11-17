@@ -9,7 +9,6 @@ import ProductEdit from "./ProductEdit";
 import UserManagement from "./UserManagement";
 import Categories from "./category/CategoryPage";
 import CategoryFilters from "../DashboardPage/category/CategoryFilters";
-import BlogAdminPage from "./blog/BlogAdminPage";
 
 // ✅ Shorter Flatten Function
 const flattenCategories = (nodes) =>
@@ -386,14 +385,7 @@ export default function Dashboard() {
             onRefresh={refreshCategories} // Pass refresh function
           />
         );
-      case "add-blog":
-      return (
-        <BlogAdminPage
-          categories={categories} // Pass categories only
-          categoriesLoading={categoriesLoading}
-        />
-      );
-
+      
       case "user-management":
         return <UserManagement />;
 
