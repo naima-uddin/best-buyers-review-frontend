@@ -11,6 +11,7 @@ import CouponPopup from "./CouponPopup";
 import BackButton from "@/ui/BackButton";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
+import Breadcrumbs from "@/ui/Breadcrumbs";
 
 function ProductByCategoryContent() {
   const params = useParams();
@@ -217,6 +218,9 @@ function ProductByCategoryContent() {
   return (
     <>
     <Navbar />
+    <div className="max-w-7xl mx-auto px-4 ">
+            <Breadcrumbs />
+          </div>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
       {/* Header */}
       <div className="text-center mb-6 md:mb-8">

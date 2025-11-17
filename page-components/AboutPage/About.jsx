@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Breadcrumbs from "@/ui/Breadcrumbs";
 
 const Highlight = ({ children }) => (
   <span className="relative whitespace-nowrap">
@@ -58,6 +59,9 @@ export default function AboutUs() {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-white via-blue-50/20 to-purple-50/10 text-gray-800 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 ">
+              <Breadcrumbs />
+            </div>
       <div className="max-w-7xl mx-auto px-6 space-y-20">
         {/* Hero Section */}
         <section className="relative text-center">
