@@ -23,16 +23,17 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: Logo */}
         <Link href="/" className="flex items-center group">
-          <div className="relative">
+          <div className="relative w-[120px] h-[70px]"> 
             <Image
               src="/logo.png"
-              width={120}
-              height={170}
               alt="Logo"
-              className="transition-transform duration-300 group-hover:scale-105"
+              fill
+              className="object-contain transition-transform duration-300 group-hover:scale-105"
+              priority
             />
           </div>
         </Link>
+
 
         {/* Mobile Menu Button */}
         <button

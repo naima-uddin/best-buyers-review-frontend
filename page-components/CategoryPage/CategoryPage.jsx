@@ -1,4 +1,6 @@
 "use client";
+import { Footer } from "@/components/common/Footer";
+import Navbar from "@/components/common/Navbar";
 import { useCategories } from "@/context/CategoryContext";
 import BackButton from "@/ui/BackButton";
 import Image from "next/image";
@@ -34,6 +36,8 @@ function CategoryPageContent() {
   }
 
   return (
+    <>
+    <Navbar />
     <div className="max-w-7xl mx-auto px-4 py-10">
       <BackButton className="-mb-4" />
       {/* Header Section */}
@@ -110,6 +114,8 @@ function CategoryPageContent() {
         ))}
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
 

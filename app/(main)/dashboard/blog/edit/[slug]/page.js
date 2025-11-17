@@ -1,11 +1,11 @@
 
-import RedirectEdit from "@/page-components/DashboardPage/blog/BlogEdit";
+import EditBlogForm from "@/page-components/DashboardPage/blog/EditBlogForm";
 import React from "react";
 
 export default function page() {
   return (
     <>
-      <RedirectEdit />
+      <EditBlogForm />
     </>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import api from "@/lib/api/axios";
 
-export default function CreateBlog({onSubmit, onCancel}) {
+export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
   const categoriesList = [
     "Food", "Tools", "Sports", "Pets", "Outdoor", "Office", "Money", "Health",
     "Gifts", "Home", "Garden", "Tech", "Fitness", "Fashion", "Beauty", "Baby"
@@ -15,7 +16,7 @@ export default function CreateBlog({onSubmit, onCancel}) {
     author: { name: "", avatar: "", bio: "" },
     categories: [],
     tags: [],
-    seo: { title: "", description: "", keywords: "", canonicalUrl: "" },
+    seo: { title: "", description: "", keywords: [], canonicalUrl: "" },
     isFeatured: false,
     published: false
   });
@@ -26,6 +27,57 @@ export default function CreateBlog({onSubmit, onCancel}) {
 
   const [tagInput, setTagInput] = useState("");
   const [contentBlocks, setContentBlocks] = useState([]);
+
+  // Populate form with editing data
+  useEffect(() => {
+    if (editingData) {
+      setForm({
+        title: editingData.title || "",
+        slug: editingData.slug || "",
+        description: editingData.description || "",
+        excerpt: editingData.excerpt || "",
+        author: {
+          name: editingData.author?.name || "",
+          avatar: editingData.author?.avatar || "",
+          bio: editingData.author?.bio || ""
+        },
+        categories: editingData.categories?.map(cat => cat.name) || [],
+        tags: editingData.tags || [],
+        seo: {
+          title: editingData.seo?.title || "",
+          description: editingData.seo?.description || "",
+          keywords: Array.isArray(editingData.seo?.keywords) 
+            ? editingData.seo.keywords.join(', ') 
+            : editingData.seo?.keywords || "",
+          canonicalUrl: editingData.seo?.canonicalUrl || ""
+        },
+        isFeatured: editingData.isFeatured || false,
+        published: editingData.published || false
+      });
+
+      // Set featured image preview
+      if (editingData.featuredImage?.url) {
+        if (editingData.featuredImage.url.startsWith('data:')) {
+          setFeaturedPreview(editingData.featuredImage.url);
+        } else {
+          setFeaturedImageUrl(editingData.featuredImage.url);
+          setFeaturedPreview(editingData.featuredImage.url);
+        }
+      }
+
+      // Set content blocks
+      if (editingData.content && Array.isArray(editingData.content)) {
+        setContentBlocks(editingData.content.map(block => ({
+          ...block,
+          data: {
+            ...block.data,
+            // Ensure text array structure
+            text: Array.isArray(block.data.text) ? block.data.text : [{ type: "text", value: "" }]
+          }
+        })));
+      }
+    }
+  }, [editingData]);
 
   // ----------- Input Handlers --------------
   const handleInput = (e) => {
@@ -48,12 +100,15 @@ export default function CreateBlog({onSubmit, onCancel}) {
     const { name, value } = e.target;
     setForm(prev => ({
       ...prev,
-      seo: { ...prev.seo, [name]: value }
+      seo: { 
+        ...prev.seo, 
+        [name]: name === 'keywords' ? value : value 
+      }
     }));
   };
 
   const handleCategorySelect = (e) => {
-    const selectedOptions = [...e.target.selectedOptions].map(o => o.value);
+    const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
     setForm(prev => ({ ...prev, categories: selectedOptions }));
   };
 
@@ -66,9 +121,10 @@ export default function CreateBlog({onSubmit, onCancel}) {
   };
 
   const handleFeaturedImageUrl = (e) => {
-    setFeaturedImageUrl(e.target.value);
+    const url = e.target.value;
+    setFeaturedImageUrl(url);
     setFeaturedImage(null);
-    setFeaturedPreview(e.target.value);
+    setFeaturedPreview(url);
   };
 
   // ----------- Tags --------------
@@ -86,7 +142,12 @@ export default function CreateBlog({onSubmit, onCancel}) {
   const addContentBlock = (type) => {
     const newBlock = {
       type,
-      data: { text: [{ value: "" }], url: "", items: [], alt: "", file: null }
+      data: { 
+        text: [{ type: "text", value: "" }], 
+        url: "", 
+        items: [],
+        alt: ""
+      }
     };
     setContentBlocks(prev => [...prev, newBlock]);
   };
@@ -97,19 +158,30 @@ export default function CreateBlog({onSubmit, onCancel}) {
     setContentBlocks(updated);
   };
 
-  const updateBlockText = (index, value) => {
+  const updateBlockText = (index, textIndex, value) => {
     const updated = [...contentBlocks];
     if (!updated[index].data.text) {
       updated[index].data.text = [{ type: "text", value: "" }];
     }
-    updated[index].data.text[0].value = value;
+    updated[index].data.text[textIndex].value = value;
     setContentBlocks(updated);
   };
 
-  const handleBlockImageUpload = (index, file) => {
+  const removeContentBlock = (index) => {
     const updated = [...contentBlocks];
-    updated[index].data.file = file;
-    updated[index].data.url = URL.createObjectURL(file);
+    updated.splice(index, 1);
+    setContentBlocks(updated);
+  };
+
+  const moveContentBlock = (index, direction) => {
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === contentBlocks.length - 1)
+    ) return;
+
+    const updated = [...contentBlocks];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
     setContentBlocks(updated);
   };
 
@@ -117,6 +189,7 @@ export default function CreateBlog({onSubmit, onCancel}) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Convert images to base64 before sending
     const processImageFile = (file) => {
       return new Promise((resolve) => {
         if (!file) resolve(null);
@@ -127,11 +200,13 @@ export default function CreateBlog({onSubmit, onCancel}) {
     };
 
     try {
+      // Process featured image
       let featuredImageBase64 = null;
       if (featuredImage) {
         featuredImageBase64 = await processImageFile(featuredImage);
       }
 
+      // Process content block images
       const processedContentBlocks = await Promise.all(
         contentBlocks.map(async (block) => {
           if (block.type === "image" && block.data.file) {
@@ -148,6 +223,7 @@ export default function CreateBlog({onSubmit, onCancel}) {
         })
       );
 
+      // Prepare the blog data object
       const blogData = {
         title: form.title,
         slug: form.slug,
@@ -161,13 +237,16 @@ export default function CreateBlog({onSubmit, onCancel}) {
         tags: form.tags,
         seo: {
           ...form.seo,
-          keywords: form.seo.keywords.split(',').map(k => k.trim()).filter(k => k)
+          keywords: typeof form.seo.keywords === 'string' 
+            ? form.seo.keywords.split(',').map(k => k.trim()).filter(k => k)
+            : form.seo.keywords
         },
         published: form.published,
         isFeatured: form.isFeatured,
         content: processedContentBlocks
       };
 
+      // Add featured image data
       if (featuredImageBase64) {
         blogData.featuredImage = {
           url: featuredImageBase64,
@@ -178,67 +257,84 @@ export default function CreateBlog({onSubmit, onCancel}) {
           url: featuredImageUrl,
           alt: form.title || ""
         };
+      } else if (editingData.featuredImage?.url && !featuredImage && !featuredImageUrl) {
+        // Keep existing featured image if not changed
+        blogData.featuredImage = editingData.featuredImage;
       }
 
-      // Use the onSubmit prop instead of calling API directly
+      console.log("Submitting blog data:", blogData);
+
+      // Submit the form
       await onSubmit(blogData);
-      
+
     } catch (err) {
-      console.log("BLOG CREATE ERROR:", err.response?.data || err.message);
-      alert("Error creating blog.");
+      console.log("BLOG UPDATE ERROR:", err.response?.data || err.message);
+      alert("Error updating blog.");
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <button
-      type="button"
-      onClick={onCancel}
-      className="absolute top-4 right-4 text-gray-600 hover:text-red-600 text-xl font-bold"
-      title="Cancel & Go Back"
-    >
-      ✕
-    </button>
-
-      <h1 className="text-2xl font-bold mb-4">Create New Blog</h1>
+    <div className="max-w-4xl mx-auto p-6 space-y-6 bg-white rounded-lg shadow-lg">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Edit Blog</h1>
+        <button
+          onClick={onCancel}
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+        >
+          Cancel
+        </button>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-
         {/* Title */}
-        <input 
-          name="title" 
-          value={form.title}
-          placeholder="Enter your blog post title here" 
-          className="w-full border p-2 rounded" 
-          onChange={handleInput} 
-        />
+        <div>
+          <label className="block text-sm font-medium mb-2">Title</label>
+          <input 
+            name="title" 
+            value={form.title}
+            placeholder="Enter your blog post title here" 
+            className="w-full border p-2 rounded" 
+            onChange={handleInput} 
+            required
+          />
+        </div>
 
         {/* Slug */}
-        <input 
-          name="slug" 
-          value={form.slug}
-          placeholder="Custom URL name (e.g., best-laptop-2024)" 
-          className="w-full border p-2 rounded" 
-          onChange={handleInput} 
-        />
+        <div>
+          <label className="block text-sm font-medium mb-2">Slug</label>
+          <input 
+            name="slug" 
+            value={form.slug}
+            placeholder="Custom URL name (e.g., best-laptop-2024)" 
+            className="w-full border p-2 rounded" 
+            onChange={handleInput} 
+            required
+          />
+        </div>
 
         {/* Description */}
-        <textarea 
-          name="description" 
-          value={form.description}
-          placeholder="Brief summary of your blog post" 
-          className="w-full border p-2 rounded" 
-          onChange={handleInput} 
-        />
+        <div>
+          <label className="block text-sm font-medium mb-2">Description</label>
+          <textarea 
+            name="description" 
+            value={form.description}
+            placeholder="Brief summary of your blog post" 
+            className="w-full border p-2 rounded" 
+            onChange={handleInput} 
+          />
+        </div>
 
         {/* Excerpt */}
-        <textarea 
-          name="excerpt" 
-          value={form.excerpt}
-          placeholder="Short preview text for blog listings" 
-          className="w-full border p-2 rounded" 
-          onChange={handleInput} 
-        />
+        <div>
+          <label className="block text-sm font-medium mb-2">Excerpt</label>
+          <textarea 
+            name="excerpt" 
+            value={form.excerpt}
+            placeholder="Short preview text for blog listings" 
+            className="w-full border p-2 rounded" 
+            onChange={handleInput} 
+          />
+        </div>
 
         {/* Categories */}
         <div className="border p-3 rounded">
@@ -253,6 +349,9 @@ export default function CreateBlog({onSubmit, onCancel}) {
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
+          <div className="mt-2">
+            <strong>Selected:</strong> {form.categories.join(', ')}
+          </div>
         </div>
 
         {/* Tags */}
@@ -262,15 +361,24 @@ export default function CreateBlog({onSubmit, onCancel}) {
             <input 
               className="border p-2 flex-1" 
               value={tagInput} 
-              onChange={(e)=>setTagInput(e.target.value)} 
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="Add new tag"
             />
-            <button type="button" onClick={addTag} className="bg-blue-500 text-white px-3 rounded">Add</button>
+            <button type="button" onClick={addTag} className="bg-blue-500 text-white px-3 rounded">
+              Add
+            </button>
           </div>
           <div className="flex gap-2 flex-wrap">
             {form.tags.map(tag => (
               <span key={tag} className="bg-gray-200 px-2 py-1 rounded flex items-center gap-2">
                 {tag}
-                <button type="button" onClick={() => removeTag(tag)} className="text-red-500 font-bold">x</button>
+                <button 
+                  type="button" 
+                  onClick={() => removeTag(tag)} 
+                  className="text-red-500 font-bold"
+                >
+                  ×
+                </button>
               </span>
             ))}
           </div>
@@ -339,6 +447,7 @@ export default function CreateBlog({onSubmit, onCancel}) {
         <div className="border p-3 rounded space-y-2">
           <h2 className="font-semibold">Featured Image</h2>
           <p className="text-sm opacity-70">Upload OR enter URL</p>
+
           <input type="file" accept="image/*" onChange={handleFeaturedImageUpload} />
           <input 
             type="text" 
@@ -347,30 +456,69 @@ export default function CreateBlog({onSubmit, onCancel}) {
             value={featuredImageUrl} 
             onChange={handleFeaturedImageUrl} 
           />
-          {featuredPreview && (<img src={featuredPreview} className="w-40 h-40 object-cover rounded border mt-2" />)}
+
+          {featuredPreview && (
+            <div className="mt-2">
+              <img src={featuredPreview} className="w-40 h-40 object-cover rounded border" />
+              <p className="text-sm text-gray-600 mt-1">Current preview</p>
+            </div>
+          )}
         </div>
 
         {/* Content Blocks */}
         <div className="border p-3 rounded space-y-2">
           <h2 className="font-semibold">Content Blocks</h2>
-          <div className="flex gap-2 flex-wrap">
+
+          <div className="flex gap-2 flex-wrap mb-4">
             {["paragraph", "heading", "quote", "link", "list", "image"].map(type => (
-              <button key={type} type="button" className="bg-gray-200 px-2 py-1 rounded" onClick={() => addContentBlock(type)}>
+              <button 
+                key={type} 
+                type="button" 
+                className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300" 
+                onClick={() => addContentBlock(type)}
+              >
                 + {type}
               </button>
             ))}
           </div>
 
           {contentBlocks.map((block, index) => (
-            <div key={index} className="border rounded p-3 mt-2">
-              <h3 className="font-medium">Block: {block.type}</h3>
+            <div key={index} className="border rounded p-3 mt-2 relative">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium">Block: {block.type}</h3>
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => moveContentBlock(index, 'up')}
+                    className="text-blue-500 text-sm"
+                    disabled={index === 0}
+                  >
+                    ↑
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => moveContentBlock(index, 'down')}
+                    className="text-blue-500 text-sm"
+                    disabled={index === contentBlocks.length - 1}
+                  >
+                    ↓
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => removeContentBlock(index)}
+                    className="text-red-500 text-sm"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
 
               {block.type !== "list" && block.type !== "image" && (
                 <textarea 
                   placeholder="Type your content here..." 
                   className="w-full border p-2 rounded mt-2"
                   value={block.data.text?.[0]?.value || ""}
-                  onChange={(e) => updateBlockText(index, e.target.value)} 
+                  onChange={(e) => updateBlockText(index, 0, e.target.value)} 
                 />
               )}
 
@@ -394,14 +542,28 @@ export default function CreateBlog({onSubmit, onCancel}) {
 
               {block.type === "image" && (
                 <div className="mt-2 space-y-2">
-                  <input type="file" accept="image/*" onChange={(e)=>handleBlockImageUpload(index, e.target.files[0])} />
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const updated = [...contentBlocks];
+                        updated[index].data.file = file;
+                        updated[index].data.url = URL.createObjectURL(file);
+                        setContentBlocks(updated);
+                      }
+                    }} 
+                  />
                   <input 
                     placeholder="Or paste image URL" 
                     className="w-full border p-2 rounded"
                     value={block.data.url || ""}
-                    onChange={(e)=>updateBlockData(index,"url",e.target.value)} 
+                    onChange={(e) => updateBlockData(index, "url", e.target.value)} 
                   />
-                  {block.data.url && <img src={block.data.url} className="w-32 h-32 object-cover rounded border mt-2" />}
+                  {block.data.url && (
+                    <img src={block.data.url} className="w-32 h-32 object-cover rounded border" />
+                  )}
                 </div>
               )}
             </div>
@@ -414,7 +576,7 @@ export default function CreateBlog({onSubmit, onCancel}) {
             <input 
               type="checkbox" 
               checked={form.published}
-              onChange={(e)=>setForm(prev => ({...prev, published: e.target.checked}))} 
+              onChange={(e) => setForm(prev => ({...prev, published: e.target.checked}))} 
             /> 
             Publish
           </label>
@@ -422,15 +584,28 @@ export default function CreateBlog({onSubmit, onCancel}) {
             <input 
               type="checkbox" 
               checked={form.isFeatured}
-              onChange={(e)=>setForm(prev => ({...prev, isFeatured: e.target.checked}))} 
+              onChange={(e) => setForm(prev => ({...prev, isFeatured: e.target.checked}))} 
             /> 
             Feature This Blog
           </label>
         </div>
 
         {/* Submit */}
-        <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">Create Blog</button>
-
+        <div className="flex gap-3">
+          <button 
+            type="submit" 
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Update Blog
+          </button>
+          <button 
+            type="button"
+            onClick={onCancel}
+            className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

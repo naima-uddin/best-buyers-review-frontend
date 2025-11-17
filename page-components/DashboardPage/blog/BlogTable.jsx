@@ -39,11 +39,10 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
                     Edit
                   </button>
 
-                  <Link
-                    href={`/blog/${blog.slug}`}
-                    className="bg-green-600 text-white px-3 py-1 rounded"
-                  >
-                    View
+                  <Link href={`/blog/${blog.slug}`} target="_blank">
+                    <button className="bg-green-600 text-white px-3 py-1 rounded">
+                      View
+                    </button>
                   </Link>
 
                   <button

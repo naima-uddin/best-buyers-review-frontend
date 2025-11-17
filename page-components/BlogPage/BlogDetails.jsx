@@ -10,6 +10,9 @@ export default function BlogDetails({ slug }) {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [readingProgress, setReadingProgress] = useState(0);
+  const [showTableOfContents, setShowTableOfContents] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +27,8 @@ export default function BlogDetails({ slug }) {
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`);
           const data = await res.json();
           setBlog(data.data);
+          // Simulate initial likes count
+          setLikes(Math.floor(Math.random() * 50) + 10);
         } catch (err) {
           console.log("Error loading blog =>", err);
           router.push("/blog");
@@ -42,82 +47,164 @@ export default function BlogDetails({ slug }) {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const progress = (scrollTop / documentHeight) * 100;
       setReadingProgress(Math.min(100, Math.max(0, progress)));
+      
+      // Show table of contents after scrolling past hero
+      setShowTableOfContents(scrollTop > 400);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
-        {/* Reading Progress Bar */}
-        <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
-          <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-150" 
-               style={{ width: `${readingProgress}%` }} />
-        </div>
+  const handleLike = () => {
+    if (!hasLiked) {
+      setLikes(likes + 1);
+      setHasLiked(true);
+    } else {
+      setLikes(likes - 1);
+      setHasLiked(false);
+    }
+  };
 
-        <div className="max-w-6xl mx-auto px-6 py-16">
-          <div className="animate-pulse space-y-8">
-            {/* Back Button Skeleton */}
-            <div className="h-6 bg-gray-200 rounded w-24 mb-12"></div>
-            
-            {/* Header Skeleton */}
-            <div className="space-y-6">
-              <div className="h-4 bg-gray-200 rounded w-32"></div>
-              <div className="h-12 bg-gray-200 rounded w-3/4"></div>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-24"></div>
-                  <div className="h-3 bg-gray-200 rounded w-16"></div>
-                </div>
+  // Generate table of contents from headings
+  const tableOfContents = blog?.content?.filter(block => 
+    block.type === "heading" && block.data?.text?.[0]?.value
+  ).map((block, index) => ({
+    id: `heading-${index}`,
+    text: block.data.text[0].value,
+    level: 2 // Assuming h2 for simplicity
+  })) || [];
+
+  // Function to render different content block types
+  const renderContentBlock = (block, index) => {
+    const headingId = `heading-${index}`;
+    
+    switch (block.type) {
+      case "paragraph":
+        const paragraphText = block.data?.text?.[0]?.value || "";
+        if (paragraphText.trim()) {
+          return (
+            <p key={index} className="text-gray-700 leading-relaxed text-lg mb-8">
+              {paragraphText}
+            </p>
+          );
+        }
+        return null;
+
+      case "heading":
+        const headingText = block.data?.text?.[0]?.value || "";
+        if (headingText.trim()) {
+          return (
+            <h2 
+              id={headingId}
+              key={index} 
+              className="text-3xl font-bold text-gray-900 mt-16 mb-8 leading-tight scroll-mt-24 border-l-4 border-blue-500 pl-6 py-2 bg-blue-50/30 rounded-r-lg"
+            >
+              {headingText}
+            </h2>
+          );
+        }
+        return null;
+
+      case "quote":
+        const quoteText = block.data?.text?.[0]?.value || "";
+        if (quoteText.trim()) {
+          return (
+            <blockquote key={index} className="relative my-12 p-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-l-4 border-blue-500">
+              <div className="text-6xl text-blue-500 absolute -top-2 left-4">"</div>
+              <p className="text-xl text-gray-700 leading-relaxed italic relative z-10">
+                {quoteText}
+              </p>
+              <div className="text-6xl text-blue-500 absolute -bottom-8 right-4">"</div>
+            </blockquote>
+          );
+        }
+        return null;
+
+      case "link":
+        const linkText = block.data?.text?.[0]?.value || block.data?.url || "";
+        const linkUrl = block.data?.url || "#";
+        if (linkText.trim()) {
+          return (
+            <div key={index} className="my-8">
+              <a 
+                href={linkUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-6 py-4 bg-blue-50 text-blue-700 rounded-2xl font-medium hover:bg-blue-100 transition-all duration-300 group border border-blue-200"
+              >
+                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span className="font-semibold">{linkText}</span>
+              </a>
+            </div>
+          );
+        }
+        return null;
+
+      case "list":
+        const listItems = block.data?.items || [];
+        if (listItems.length > 0) {
+          return (
+            <div key={index} className="my-8">
+              <ul className="space-y-4">
+                {listItems.map((item, itemIndex) => (
+                  item.trim() && (
+                    <li key={itemIndex} className="flex items-start gap-4 text-gray-700 text-lg bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span>{item}</span>
+                    </li>
+                  )
+                ))}
+              </ul>
+            </div>
+          );
+        }
+        return null;
+
+      case "image":
+        const imageUrl = block.data?.url;
+        const imageAlt = block.data?.alt || blog?.title || "Blog image";
+        if (imageUrl) {
+          return (
+            <div key={index} className="my-12">
+              <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl group">
+                <img
+                  src={imageUrl}
+                  alt={imageAlt}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
+              {block.data?.alt && (
+                <p className="text-center text-gray-500 text-sm mt-4 italic bg-gray-50 py-2 rounded-lg">
+                  {block.data.alt}
+                </p>
+              )}
             </div>
+          );
+        }
+        return null;
 
-            {/* Featured Image Skeleton */}
-            <div className="h-96 bg-gray-200 rounded-2xl"></div>
+      default:
+        return null;
+    }
+  };
 
-            {/* Content Skeleton */}
-            <div className="space-y-4">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                  <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  if (loading) {
+    return <BlogDetailsSkeleton readingProgress={readingProgress} />;
   }
 
   if (!blog) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-6">
-          <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Post Not Found</h1>
-          <p className="text-gray-600 mb-8">The blog post you're looking for doesn't exist or has been moved.</p>
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Blog
-          </Link>
-        </div>
-      </div>
-    );
+    return <NotFoundState />;
   }
+
+  const readingTime = Math.ceil((blog.content?.length || 0) / 5);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
@@ -129,7 +216,34 @@ export default function BlogDetails({ slug }) {
         />
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      {/* Table of Contents Sidebar */}
+      {showTableOfContents && tableOfContents.length > 0 && (
+        <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden xl:block">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-200/50 max-w-xs">
+            <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Contents</h4>
+            <nav className="space-y-2">
+              {tableOfContents.map((item, index) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="block text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200 py-1 border-l-2 border-transparent hover:border-blue-500 hover:pl-2 pl-1"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById(item.id)?.scrollIntoView({ 
+                      behavior: 'smooth',
+                      block: 'start'
+                    });
+                  }}
+                >
+                  {item.text}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto px-6 py-16">
         {/* Back Button */}
         <div className="mb-12">
           <Link
@@ -141,7 +255,7 @@ export default function BlogDetails({ slug }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </div>
-            <span className="group-hover:translate-x-1 transition-transform">All Articles</span>
+            <span className="group-hover:translate-x-1 transition-transform">Back to Blog</span>
           </Link>
         </div>
 
@@ -164,41 +278,69 @@ export default function BlogDetails({ slug }) {
                       key={index}
                       className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white/90 text-sm font-semibold rounded-2xl border border-white/30"
                     >
-                      {category}
+                      {category.name || category}
                     </span>
                   ))}
                 </div>
               )}
               
               {/* Title */}
-              <h1 className="text-5xl font-bold mb-8 leading-tight tracking-tight">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
                 {blog.title}
               </h1>
               
               {/* Meta Information */}
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl border border-white/30 flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-lg">
-                      {blog.author?.name?.charAt(0) || 'B'}
-                    </span>
-                  </div>
+                  {blog.author?.avatar ? (
+                    <div className="w-14 h-14 rounded-2xl border-2 border-white/30 overflow-hidden shadow-lg">
+                      <img 
+                        src={blog.author.avatar} 
+                        alt={blog.author.name} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-white/30 flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold text-lg">
+                        {blog.author?.name?.charAt(0) || 'B'}
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <p className="font-semibold text-white/95 text-lg">{blog.author?.name || 'Best Buyers View'}</p>
-                    <p className="text-white/70 flex items-center gap-2">
+                    <p className="text-white/70 flex items-center gap-3 text-sm">
                       <span>{new Date(blog.datePublished || blog.createdAt).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'long', 
                         day: 'numeric' 
                       })}</span>
-                      {blog.readTime && (
-                        <>
-                          <span>•</span>
-                          <span>{blog.readTime} min read</span>
-                        </>
-                      )}
+                      <span>•</span>
+                      <span>{readingTime} min read</span>
                     </p>
                   </div>
+                </div>
+
+                {/* Social Stats */}
+                <div className="flex items-center gap-6 text-white/80">
+                  <button 
+                    onClick={handleLike}
+                    className={`flex items-center gap-2 transition-all duration-300 ${
+                      hasLiked ? 'text-red-400' : 'hover:text-red-300'
+                    }`}
+                  >
+                    <svg className="w-5 h-5" fill={hasLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>{likes}</span>
+                  </button>
+                  
+                  <button className="flex items-center gap-2 hover:text-blue-300 transition-colors duration-300">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    <span>Share</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -206,63 +348,75 @@ export default function BlogDetails({ slug }) {
 
           {/* Featured Image */}
           {blog.featuredImage?.url && (
-            <div className="relative h-96 -mt-8 mx-8 rounded-2xl overflow-hidden shadow-2xl">
-              <Image
+            <div className="relative h-96 -mt-8 mx-8 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+              <img
                 src={blog.featuredImage.url}
-                alt={blog.title}
-                fill
-                className="object-cover"
-                priority
+                alt={blog.featuredImage.alt || blog.title}
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
             </div>
           )}
 
           {/* Content Area */}
-          <div className="p-12">
+          <div className="p-8 md:p-12">
             {/* Excerpt */}
             {blog.excerpt && (
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-12 border border-blue-100">
-                <p className="text-xl text-gray-700 leading-relaxed font-medium italic">
-                  "{blog.excerpt}"
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-12 border border-blue-100 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-4 h-full bg-gradient-to-b from-blue-500 to-purple-500"></div>
+                <div className="relative z-10">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Quick Summary
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed text-lg">
+                    {blog.excerpt}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Description */}
+            {blog.description && (
+              <div className="mb-12">
+                <p className="text-gray-600 text-lg leading-relaxed border-l-4 border-green-500 pl-6 py-2 bg-green-50/30 rounded-r-lg">
+                  {blog.description}
                 </p>
               </div>
             )}
 
-            {/* Main Content */}
+            {/* Main Content Blocks */}
             <div className="prose prose-lg max-w-none">
-              {blog.content?.map((block, index) => {
-                if (block.type === 'paragraph' && block.data?.text) {
-                  const textContent = block.data.text.map(text => text.value).join('');
-                  if (textContent.trim()) {
-                    return (
-                      <p key={index} className="text-gray-700 leading-relaxed text-lg mb-8">
-                        {textContent}
-                      </p>
-                    );
-                  }
-                }
-                return null;
-              })}
-              
-              {(!blog.content?.length || blog.content.every(block => 
-                !block.data?.text?.some(text => text.value.trim())
-              )) && blog.description && (
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {blog.description}
-                </p>
+              {blog.content && blog.content.length > 0 ? (
+                blog.content.map((block, index) => renderContentBlock(block, index))
+              ) : (
+                <div className="text-center py-12">
+                  <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-lg">Content coming soon...</p>
+                </div>
               )}
             </div>
 
             {/* Tags */}
             {blog.tags && blog.tags.length > 0 && (
               <div className="mt-16 pt-12 border-t border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Topics</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                  <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  Related Topics
+                </h3>
                 <div className="flex flex-wrap gap-3">
                   {blog.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-5 py-3 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 text-base font-medium rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer"
+                      className="px-5 py-3 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 text-base font-medium rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer hover:border-blue-200 hover:text-blue-600"
                     >
                       #{tag}
                     </span>
@@ -271,27 +425,88 @@ export default function BlogDetails({ slug }) {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="mt-12 pt-8 border-t border-gray-200 flex flex-wrap gap-4">
-              <button className="flex items-center gap-3 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-medium transition-all duration-300 hover:scale-105">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                </svg>
-                Like
-              </button>
-              <button className="flex items-center gap-3 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-medium transition-all duration-300 hover:scale-105">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                </svg>
-                Share
-              </button>
+            {/* Author Bio */}
+            <div className="mt-16 pt-12 border-t border-gray-200">
+              <div className="flex flex-col md:flex-row items-start gap-6 bg-gray-50 rounded-2xl p-8">
+                {blog.author?.avatar ? (
+                  <img 
+                    src={blog.author.avatar} 
+                    alt={blog.author.name}
+                    className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center border-4 border-white shadow-lg flex-shrink-0">
+                    <span className="text-white font-bold text-xl">
+                      {blog.author?.name?.charAt(0) || 'B'}
+                    </span>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">
+                    {blog.author?.name || 'Best Buyers View Team'}
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed mb-4">
+                    {blog.author?.bio || 'Our team of expert reviewers tests and analyzes products to bring you unbiased, comprehensive reviews and buying guides.'}
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <span>Senior Product Reviewer</span>
+                    <span>•</span>
+                    <span>5+ years experience</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social Share & Actions */}
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <span className="text-gray-700 font-medium">Share this review:</span>
+                  <div className="flex items-center gap-3">
+                    {['Twitter', 'Facebook', 'LinkedIn', 'Copy'].map((platform) => (
+                      <button
+                        key={platform}
+                        className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
+                        title={`Share on ${platform}`}
+                      >
+                        <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={handleLike}
+                    className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
+                      hasLiked 
+                        ? 'bg-red-50 text-red-600 border border-red-200' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <svg className="w-5 h-5" fill={hasLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    {likes} {hasLiked ? 'Liked' : 'Like'}
+                  </button>
+                  
+                  <button className="flex items-center gap-3 px-6 py-3 bg-blue-600 text-white rounded-2xl font-medium hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
+                    Add Comment
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </article>
 
-        {/* Related Posts Suggestion */}
-        <div className="mt-16 text-center">
-          <p className="text-gray-600 mb-4">Enjoyed this article?</p>
+
+        {/* Back to Blog CTA */}
+        <div className="mt-12 text-center">
           <Link
             href="/blog"
             className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -299,9 +514,83 @@ export default function BlogDetails({ slug }) {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-            Explore More Articles
+            Explore More Reviews
           </Link>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Skeleton Loading for Blog Details
+function BlogDetailsSkeleton({ readingProgress }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
+      <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/50 z-50 backdrop-blur-sm">
+        <div 
+          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-150 ease-out shadow-lg shadow-blue-500/25"
+          style={{ width: `${readingProgress}%` }}
+        />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-16">
+        <div className="animate-pulse space-y-8">
+          {/* Back Button Skeleton */}
+          <div className="h-6 bg-gray-200 rounded w-24 mb-12"></div>
+          
+          {/* Header Skeleton */}
+          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-12 space-y-6">
+            <div className="h-4 bg-white/20 rounded w-32"></div>
+            <div className="h-12 bg-white/20 rounded w-3/4"></div>
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-2xl"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-white/20 rounded w-24"></div>
+                <div className="h-3 bg-white/20 rounded w-16"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Featured Image Skeleton */}
+          <div className="h-96 bg-gray-200 rounded-2xl -mt-8 mx-8"></div>
+
+          {/* Content Skeleton */}
+          <div className="bg-white rounded-3xl p-12 space-y-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Not Found State
+function NotFoundState() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
+      <div className="text-center max-w-md mx-auto px-6">
+        <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">Review Not Found</h1>
+        <p className="text-gray-600 mb-8">The product review you're looking for doesn't exist or has been moved.</p>
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Reviews
+        </Link>
       </div>
     </div>
   );
