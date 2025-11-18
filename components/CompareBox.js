@@ -28,7 +28,7 @@ export default function CompareBox() {
           {compareItems.map((product) => (
             <div
               key={product._id}
-              className="border border-gray-300 rounded-lg p-1 sm:p-1 md:p-2 relative hover:border-blue-400 transition-colors bg-gray-50"
+              className="border border-gray-300 rounded-lg p-1 p-1 relative hover:border-blue-400 transition-colors bg-gray-50"
             >
               <button
                 onClick={() => removeFromCompare(product._id)}
@@ -52,11 +52,11 @@ export default function CompareBox() {
                 />
               </div>
 
-              <h4 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-2 leading-tight">
+              <h4 className="font-semibold text-xs sm:text-sm  line-clamp-2 leading-tight text-center">
                 {product.title}
               </h4>
 
-              <div className="text-sm sm:text-base md:text-lg text-center font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="text-sm sm:text-base md:text-lg text-center font-bold bg-green-600 bg-clip-text text-transparent">
                 Save {product.discount?.percentage || 36}%
               </div>
             </div>
