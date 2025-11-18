@@ -207,6 +207,26 @@ export default function BlogDetails({ slug }) {
 
   const readingTime = Math.ceil((blog.content?.length || 0) / 5);
 
+  const applyAnchorTags = (text, anchors) => {
+  if (!anchors || !Array.isArray(anchors) || !text) return text;
+
+  let result = text;
+
+  anchors.forEach(({ keyword, url }) => {
+    if (!keyword || !url) return;
+
+    // Replace ONLY first occurrence per paragraph
+    const regex = new RegExp(`\\b${keyword}\\b`, "i"); 
+    result = result.replace(
+      regex,
+      `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${keyword}</a>`
+    );
+  });
+
+  return result;
+};
+
+
   return (
     <div className=" bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
       {/* Reading Progress Bar */}
@@ -365,14 +385,14 @@ export default function BlogDetails({ slug }) {
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-12 border border-blue-100 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-4 h-full bg-gradient-to-b from-blue-500 to-purple-500"></div>
                 <div className="relative z-10">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2" >
                     <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Quick Summary
+                    
                   </h3>
-                  <p className="text-gray-700 leading-relaxed text-lg">
-                    {blog.excerpt}
+                  <p className="text-gray-700 leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: applyAnchorTags(blog.excerpt, blog.anchors) }}>
                   </p>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 "use client";
+import { LinkIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 export default function CreateBlog({onSubmit, onCancel}) {
@@ -433,7 +434,7 @@ const addAnchorTag = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Anchor Tags</h2>
 
           <div className="space-y-4">
-            {formData.anchorTags?.map((anchor, index) => (
+            {form.anchorTags?.map((anchor, index) => (
               <div
                 key={index}
                 className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-white"
@@ -475,12 +476,12 @@ const addAnchorTag = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        anchorTags:
-                          prev.anchorTags?.filter((_, i) => i !== index) || [],
-                      }));
-                    }}
+                        setForm((prev) => ({
+                          ...prev,
+                          anchorTags: prev.anchorTags.filter((_, i) => i !== index)
+                        }));
+                      }}
+
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Remove anchor tag"
                   >
@@ -578,21 +579,21 @@ const addAnchorTag = () => {
             </div>
 
             {/* Anchor Tags Summary */}
-            {formData.anchorTags?.length > 0 && (
+            {form.anchorTags?.length > 0 && (
               <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-blue-800">
                     Total anchor tags:{" "}
-                    <strong>{formData.anchorTags.length}</strong>
+                    <strong>{form.anchorTags.length}</strong>
                   </span>
                   <span className="text-sm text-blue-800">
                     External:{" "}
                     <strong>
-                      {formData.anchorTags.filter((a) => a.isExternal).length}
+                      {form.anchorTags.filter((a) => a.isExternal).length}
                     </strong>{" "}
                     | Internal:{" "}
                     <strong>
-                      {formData.anchorTags.filter((a) => !a.isExternal).length}
+                      {form.anchorTags.filter((a) => !a.isExternal).length}
                     </strong>
                   </span>
                 </div>
