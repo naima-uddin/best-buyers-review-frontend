@@ -525,6 +525,7 @@ export default function BlogDetails({ slug }) {
 // Skeleton Loading for Blog Details
 function BlogDetailsSkeleton({ readingProgress }) {
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/50 z-50 backdrop-blur-sm">
         <div 
@@ -567,6 +568,7 @@ function BlogDetailsSkeleton({ readingProgress }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

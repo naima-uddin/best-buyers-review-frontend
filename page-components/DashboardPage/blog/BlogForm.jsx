@@ -7,18 +7,37 @@ export default function CreateBlog({onSubmit, onCancel}) {
     "Gifts", "Home", "Garden", "Tech", "Fitness", "Fashion", "Beauty", "Baby"
   ];
 
-  const [form, setForm] = useState({
-    title: "",
-    slug: "",
-    description: "",
-    excerpt: "",
-    author: { name: "", avatar: "", bio: "" },
-    categories: [],
-    tags: [],
-    seo: { title: "", description: "", keywords: "", canonicalUrl: "" },
-    isFeatured: false,
-    published: false
-  });
+const [form, setForm] = useState({
+  title: "",
+  slug: "",
+  description: "",
+  excerpt: "",
+  author: { name: "", avatar: "", bio: "" },
+  categories: [],
+  tags: [],
+  seo: { title: "", description: "", keywords: "", canonicalUrl: "" },
+  isFeatured: false,
+  published: false,
+  anchorTags: [] 
+});
+
+const [newAnchorTag, setNewAnchorTag] = useState({
+  word: "",
+  link: "",
+  isExternal: false,
+});
+
+const addAnchorTag = () => {
+  if (!newAnchorTag.word || !newAnchorTag.link) return;
+
+  setForm(prev => ({
+    ...prev,
+    anchorTags: [...prev.anchorTags, newAnchorTag]
+  }));
+
+  setNewAnchorTag({ word: "", link: "", isExternal: false });
+};
+
 
   const [featuredImage, setFeaturedImage] = useState(null);
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
@@ -154,6 +173,7 @@ export default function CreateBlog({onSubmit, onCancel}) {
         description: form.description,
         excerpt: form.excerpt,
         author: form.author,
+        anchorTags: form.anchorTags,
         categories: form.categories.map(cat => ({
           name: cat,
           slug: cat.toLowerCase().replace(/\s+/g, "-")
@@ -406,6 +426,179 @@ export default function CreateBlog({onSubmit, onCancel}) {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Anchor Tags Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Anchor Tags</h2>
+
+          <div className="space-y-4">
+            {formData.anchorTags?.map((anchor, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-white"
+              >
+                <div className="flex-1 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Word/Phrase
+                    </label>
+                    <input
+                      type="text"
+                      value={anchor.word}
+                      readOnly
+                      className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Link
+                    </label>
+                    <input
+                      type="text"
+                      value={anchor.link}
+                      readOnly
+                      className="w-full p-2 border border-gray-300 rounded bg-gray-50 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span
+                    className={`px-2 py-1 text-xs rounded ${
+                      anchor.isExternal
+                        ? "bg-orange-100 text-orange-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {anchor.isExternal ? "External" : "Internal"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        anchorTags:
+                          prev.anchorTags?.filter((_, i) => i !== index) || [],
+                      }));
+                    }}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Remove anchor tag"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Add New Anchor Tag Form */}
+            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+              <h3 className="text-lg font-semibold text-gray-700">
+                Add New Anchor Tag
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Word/Phrase *
+                  </label>
+                  <input
+                    type="text"
+                    value={newAnchorTag.word}
+                    onChange={(e) =>
+                      setNewAnchorTag((prev) => ({
+                        ...prev,
+                        word: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., best features"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">
+                    Link URL *
+                  </label>
+                  <input
+                    type="url"
+                    value={newAnchorTag.link}
+                    onChange={(e) =>
+                      setNewAnchorTag((prev) => ({
+                        ...prev,
+                        link: e.target.value,
+                      }))
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., https://example.com/features"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={newAnchorTag.isExternal}
+                    onChange={(e) =>
+                      setNewAnchorTag((prev) => ({
+                        ...prev,
+                        isExternal: e.target.checked,
+                      }))
+                    }
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    id="isExternal"
+                  />
+                  <label
+                    htmlFor="isExternal"
+                    className="ml-2 text-sm font-medium text-gray-800"
+                  >
+                    External Link (opens in new tab)
+                  </label>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addAnchorTag}
+                  disabled={
+                    !newAnchorTag.word.trim() || !newAnchorTag.link.trim()
+                  }
+                  className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                >
+                  <LinkIcon size={16} />
+                  Add Anchor Tag
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-500">
+                Anchor tags will be automatically converted to links in your
+                product description and content.
+                {newAnchorTag.isExternal &&
+                  " External links will open in a new tab."}
+              </p>
+            </div>
+
+            {/* Anchor Tags Summary */}
+            {formData.anchorTags?.length > 0 && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-blue-800">
+                    Total anchor tags:{" "}
+                    <strong>{formData.anchorTags.length}</strong>
+                  </span>
+                  <span className="text-sm text-blue-800">
+                    External:{" "}
+                    <strong>
+                      {formData.anchorTags.filter((a) => a.isExternal).length}
+                    </strong>{" "}
+                    | Internal:{" "}
+                    <strong>
+                      {formData.anchorTags.filter((a) => !a.isExternal).length}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Publish Settings */}
