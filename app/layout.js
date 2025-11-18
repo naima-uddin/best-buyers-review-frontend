@@ -4,7 +4,6 @@ import { AuthProvider } from "@/lib/auth";
 import "hover.css/css/hover-min.css";
 import { CategoryProvider } from "@/context/CategoryContext";
 import { CompareProvider } from "@/context/CompareContext";
-import RouteLoader from "@/components/common/RouteLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +31,6 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <CategoryProvider>
             <CompareProvider>
-              <RouteLoader />  
               {children}
             </CompareProvider>
           </CategoryProvider>

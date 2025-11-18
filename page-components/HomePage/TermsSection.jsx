@@ -54,12 +54,7 @@ export default function TermsOfService() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white shadow-lg shadow-gray-200/50 border border-gray-100 mb-6">
-            <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
-            <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              EFFECTIVE DATE: DEC 2024
-            </span>
-          </div>
+         
           
           <h1 className="text-5xl font-bold md:text-7xl mb-6">
             Terms of <Highlight>Service</Highlight>
@@ -287,7 +282,6 @@ export default function TermsOfService() {
           transition={{ duration: 0.6, delay: 1.2 }}
           className="text-center text-gray-500 text-sm pt-8 border-t border-gray-200"
         >
-          <p>Last updated: December 2024</p>
         </motion.div>
       </div>
     </div>

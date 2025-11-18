@@ -172,9 +172,7 @@ function FeaturedSection({ blogs }) {
                   {category.name || category}
                 </span>
               ))}
-              <span className="text-xs sm:text-sm text-gray-500">
-                {new Date(featuredBlog.datePublished || featuredBlog.createdAt).toLocaleDateString()}
-              </span>
+              
             </div>
             
             <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 leading-tight">

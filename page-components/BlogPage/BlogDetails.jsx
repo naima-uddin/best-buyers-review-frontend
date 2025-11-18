@@ -308,13 +308,9 @@ export default function BlogDetails({ slug }) {
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-white/95 text-lg">{blog.author?.name || 'Best Buyers View'}</p>
+                    <p className="font-semibold text-white/95 text-lg">Best Buyers View</p>
                     <p className="text-white/70 flex items-center gap-3 text-sm">
-                      <span>{new Date(blog.datePublished || blog.createdAt).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}</span>
+                      
                       <span>•</span>
                       <span>{readingTime} min read</span>
                     </p>
@@ -443,10 +439,10 @@ export default function BlogDetails({ slug }) {
                 )}
                 <div className="flex-1">
                   <h4 className="text-xl font-bold text-gray-900 mb-2">
-                    {blog.author?.name || 'Best Buyers View Team'}
+                    Best Buyers View Team
                   </h4>
                   <p className="text-gray-600 leading-relaxed mb-4">
-                    {blog.author?.bio || 'Our team of expert reviewers tests and analyzes products to bring you unbiased, comprehensive reviews and buying guides.'}
+                    Our team of expert reviewers tests and analyzes products to bring you unbiased, comprehensive reviews and buying guides.
                   </p>
                   <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>Senior Product Reviewer</span>

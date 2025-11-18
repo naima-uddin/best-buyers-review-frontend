@@ -189,11 +189,7 @@ function Sidebar({ recentPosts, categories }) {
                   {post.title}
                 </h4>
                 <p className="text-xs text-gray-500">
-                  {new Date(post.datePublished || post.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
+                  Buyers View
                 </p>
               </div>
             </Link>
@@ -253,12 +249,7 @@ function FeaturedSection({ blog }) {
         {/* Content Column */}
         <div className="lg:col-span-2 p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
           <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4 text-xs sm:text-sm text-gray-500">
-            <span>{new Date(blog.datePublished || blog.createdAt).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })}</span>
-            <span>•</span>
+            
             <span>{readingTime} min read</span>
           </div>
           
@@ -287,7 +278,7 @@ function FeaturedSection({ blog }) {
               )}
               <div>
                 <p className="text-xs sm:text-sm font-semibold text-gray-900">
-                  {blog.author?.bio || 'senior Reviewer'}
+                  Best Buyers View
                 </p>
               </div>
             </div>
@@ -368,12 +359,7 @@ function BlogCard({ blog }) {
         {/* Meta Info */}
         <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">
           <div className="flex items-center gap-2 sm:gap-4">
-            <span>{new Date(blog.datePublished || blog.createdAt).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })}</span>
-            <span>•</span>
+            
             <span>{readingTime} min read</span>
           </div>
         </div>
@@ -406,7 +392,7 @@ function BlogCard({ blog }) {
             )}
             <div>
               <p className="text-xs sm:text-sm font-semibold text-gray-900">
-                {blog.author?.name || 'Best Buyers View'}
+                Best Buyers View
               </p>
             </div>
           </div>

@@ -35,6 +35,8 @@ function CategoryPageContent() {
     );
   }
 
+
+
   return (
     <>
       <Navbar />
@@ -59,7 +61,9 @@ function CategoryPageContent() {
 
         {/* Category List */}
         <div className="space-y-10">
-          {categories.map((main) => (
+          {categories
+  .filter((main) => main.name.toLowerCase() !== "uncategorized")   // 👈 filter added
+  .map((main) => (
             <div
               key={main._id}
               ref={(el) => (categoryRefs.current[main.name] = el)}
