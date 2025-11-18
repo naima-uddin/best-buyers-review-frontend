@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import Breadcrumbs from "@/ui/Breadcrumbs";
+import BackButton from "@/ui/BackButton";
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState([]);
@@ -69,10 +71,12 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/10">
+    <div className=" bg-gradient-to-br from-slate-50 via-blue-50/20 to-purple-50/10">
       {/* Category Filter */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
+      <Breadcrumbs/>
+      <BackButton />
           <div className="flex flex-wrap gap-2 justify-center">
             {categories.slice(0, 8).map((category) => (
               <button

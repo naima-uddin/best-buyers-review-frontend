@@ -2,6 +2,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import BackButton from "@/ui/BackButton";
+import Breadcrumbs from "@/ui/Breadcrumbs";
 
 const Highlight = ({ children }) => (
   <span className="relative whitespace-nowrap">
@@ -39,30 +41,11 @@ const LegalNotice = ({ children }) => (
 
 export default function TermsOfService() {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-blue-50/20 py-16">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-blue-50/20 py-6">
       <div className="max-w-5xl mx-auto px-6 space-y-8">
+        <Breadcrumbs />
         {/* Back Button */}
-        <div className="mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors duration-200 group"
-          >
-            <svg
-              className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
+        <BackButton />
 
         {/* Hero Section */}
         <motion.section

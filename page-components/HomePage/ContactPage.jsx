@@ -2,6 +2,8 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Mail, MapPin, Globe, Clock, MessageCircle } from "lucide-react";
+import BackButton from "@/ui/BackButton";
+import Breadcrumbs from "@/ui/Breadcrumbs";
 
 const ContactPage = () => {
   const router = useRouter();
@@ -13,14 +15,9 @@ const ContactPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/20 py-8">
       <div className="px-4 max-w-7xl mx-auto">
+        <Breadcrumbs/>
         {/* Back Button */}
-        <button
-          onClick={handleGoBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-8 transition-colors duration-200 group"
-        >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          Back to Home
-        </button>
+       <BackButton />
 
         {/* Header Section */}
         <div className="text-center mb-16">

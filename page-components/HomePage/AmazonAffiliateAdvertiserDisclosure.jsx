@@ -1,10 +1,14 @@
 import React from "react";
 import Link from "next/link";
+import Breadcrumbs from "@/ui/Breadcrumbs";
+import BackButton from "@/ui/BackButton";
 
 const AmazonAffiliateAdvertiserDisclosure = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pt-20 pb-10">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pt-10 pb-10">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Breadcrumbs/>
+        <BackButton />
         {/* Header Section */}
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
