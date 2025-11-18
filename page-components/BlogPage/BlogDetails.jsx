@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useBlogData } from "./BlogDataProvider";
 import React, { useState, useEffect } from "react";
+import Breadcrumbs from "@/ui/Breadcrumbs";
 
 export default function BlogDetails({ slug }) {
   const { blogs } = useBlogData();
@@ -207,7 +208,7 @@ export default function BlogDetails({ slug }) {
   const readingTime = Math.ceil((blog.content?.length || 0) / 5);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
+    <div className=" bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
       {/* Reading Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/50 z-50 backdrop-blur-sm">
         <div 
@@ -243,7 +244,10 @@ export default function BlogDetails({ slug }) {
         </div>
       )}
 
+
       <div className="max-w-6xl mx-auto px-6 py-16">
+      <Breadcrumbs />
+
         {/* Back Button */}
         <div className="mb-12">
           <Link
