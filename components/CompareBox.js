@@ -11,8 +11,8 @@ export default function CompareBox() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
-        <div className="flex items-center justify-between mb-3 sm:mb-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-1 py-1 sm:py-1">
+        <div className="flex items-center justify-between mb-1 sm:mb-1">
           <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800">
             Compare Products ({compareItems.length}/3)
           </h3>
@@ -28,7 +28,7 @@ export default function CompareBox() {
           {compareItems.map((product) => (
             <div
               key={product._id}
-              className="border border-gray-300 rounded-lg p-2 sm:p-3 md:p-4 relative hover:border-blue-400 transition-colors bg-gray-50"
+              className="border border-gray-300 rounded-lg p-1 sm:p-1 md:p-2 relative hover:border-blue-400 transition-colors bg-gray-50"
             >
               <button
                 onClick={() => removeFromCompare(product._id)}
@@ -38,7 +38,7 @@ export default function CompareBox() {
                 <X size={14} className="sm:w-4 sm:h-4" />
               </button>
 
-              <div className="relative w-full h-16 sm:h-20 md:h-24 mb-2 sm:mb-3">
+              <div className="relative w-full h-10 sm:h-14 md:h-14 mb-2 sm:mb-3">
                 <Image
                   src={
                     product.images?.find((img) => img.variant === "MAIN")

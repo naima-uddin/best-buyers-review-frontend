@@ -117,6 +117,10 @@ function ProductByCategoryContent() {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
   };
+  const truncateTitle = (text, maxLength = 50) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
 
   const handleCompareCheckbox = (product, isChecked) => {
     if (isChecked) {
@@ -222,7 +226,7 @@ function ProductByCategoryContent() {
             <Breadcrumbs mainName={mainName} subName={subName} />
 
           </div>
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
       {/* Header */}
       <div className="text-center mb-6 md:mb-8">
         <BackButton className="-mb-2" />
@@ -296,7 +300,7 @@ function ProductByCategoryContent() {
                 return (
                   <div key={product._id} className="relative">
                     {/* Product Number Badge */}
-                    <div className="absolute -left-2 sm:left-2 md:left-4 top-6 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base transform sm:-translate-y-1/2 shadow-lg">
+                    <div className="absolute -left-2 sm:left-0 md:left-4 top-6 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base transform sm:-translate-y-1/2 shadow-lg">
                       {productNumber}
                     </div>
 
@@ -384,55 +388,56 @@ function ProductByCategoryContent() {
 
                             {/* Product Title */}
                             <h2 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 leading-tight text-gray-900">
-                              {product.title}
+                              {truncateTitle(product.title, 47)}
                             </h2>
 
                             {/* Features from API */}
                             <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
-                              {product.features?.feature &&
-                              product.features.feature.length > 0 ? (
-                                product.features.feature
-                                  .slice(0, 4)
-                                  .map((feature, featureIndex) => (
-                                    <div
-                                      key={featureIndex}
-                                      className="flex items-start"
-                                    >
-                                      <span className="text-gray-800 text-xs sm:text-sm leading-relaxed">
-                                        • {truncateFeature(feature, 47)}
-                                      </span>
-                                    </div>
-                                  ))
+                              {product.features?.feature && product.features.feature.length > 0 ? (
+                                product.features.feature.slice(0, 4).map((feature, featureIndex) => (
+                                  <div key={featureIndex} className="flex items-start gap-2">
+                                    
+                                    {/* Subtle bullet icon */}
+                                    <div className="w-1.5 h-1.5 mt-1 rounded-full bg-gray-400"></div>
+
+                                    {/* Text */}
+                                    <span className="text-gray-700 text-xs sm:text-sm leading-relaxed tracking-[0.2px]">
+                                      {truncateFeature(feature, 45)}
+                                    </span>
+                                  </div>
+                                ))
                               ) : (
-                                // Fallback features if none available
                                 <>
-                                  <div className="flex items-start">
-                                    <span className="text-gray-800 text-xs sm:text-sm">
-                                      • 16-inch carbon steel frame ideal for
-                                      teens and adults under 5'2"
+                                  <div className="flex items-start gap-2">
+                                    <div className="w-1.5 h-1.5 mt-1 rounded-full bg-gray-400"></div>
+                                    <span className="text-gray-700 text-xs sm:text-sm leading-relaxed tracking-[0.2px]">
+                                      16-inch carbon steel frame ideal for teens and adults under 5'2"
                                     </span>
                                   </div>
-                                  <div className="flex items-start">
-                                    <span className="text-gray-800 text-xs sm:text-sm">
-                                      • Dual suspension system with 4 shock
-                                      absorbers and large shock-absorbing seat
+
+                                  <div className="flex items-start gap-2">
+                                    <div className="w-1.5 h-1.5 mt-1 rounded-full bg-gray-400"></div>
+                                    <span className="text-gray-700 text-xs sm:text-sm leading-relaxed tracking-[0.2px]">
+                                      Dual suspension system with 4 shock absorbers and large shock-absorbing seat
                                     </span>
                                   </div>
-                                  <div className="flex items-start">
-                                    <span className="text-gray-800 text-xs sm:text-sm">
-                                      • 16" X 4" fat tires suitable for
-                                      mountains, sand, snow, and grass
+
+                                  <div className="flex items-start gap-2">
+                                    <div className="w-1.5 h-1.5 mt-1 rounded-full bg-gray-400"></div>
+                                    <span className="text-gray-700 text-xs sm:text-sm leading-relaxed tracking-[0.2px]">
+                                      16&quot; × 4&quot; fat tires suitable for mountains, sand, snow, and grass
                                     </span>
                                   </div>
-                                  <div className="flex items-start">
-                                    <span className="text-gray-800 text-xs sm:text-sm">
-                                      • Peak 1200W motor with 55-75 miles range
+
+                                  <div className="flex items-start gap-2">
+                                    <div className="w-1.5 h-1.5 mt-1 rounded-full bg-gray-400"></div>
+                                    <span className="text-gray-700 text-xs sm:text-sm leading-relaxed tracking-[0.2px]">
+                                      Peak 1200W motor with 55–75 miles range
                                     </span>
                                   </div>
                                 </>
                               )}
                             </div>
-
                             {/* Read More Link */}
                             {product?.isFullReview && (
                               <Link
@@ -476,6 +481,8 @@ function ProductByCategoryContent() {
                               </div>
 
                               {/* Compare Checkbox */}
+                              <div className="hidden md:block">
+
                               <div className="flex items-center justify-center mt-4 sm:mt-6">
                                 <input
                                   type="checkbox"
@@ -497,6 +504,7 @@ function ProductByCategoryContent() {
                                 >
                                   Compare
                                 </label>
+                              </div>
                               </div>
                             </div>
                           </div>
@@ -592,8 +600,12 @@ function ProductByCategoryContent() {
         </div>
       </div>
 
-      <CompareBox />
-      <CompareModal />
+      {/* Compare features hidden on mobile */}
+      <div className="hidden md:block">
+        <CompareBox />
+        <CompareModal />
+      </div>
+
       <CouponPopup
         show={showCoupon}
         onClose={handleCloseCoupon}
