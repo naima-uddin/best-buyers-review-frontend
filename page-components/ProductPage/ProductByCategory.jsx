@@ -332,8 +332,7 @@ function ProductByCategoryContent() {
                                 <Image
                                   src={currentImage || "/placeholder-image.jpg"}
                                   alt={product.title}
-                                  width={192}
-                                  height={192}
+                                  
                                   fill
                                   className="object-contain rounded-lg"
                                 />
@@ -354,7 +353,9 @@ function ProductByCategoryContent() {
                                     >
                                       <Image
                                         src={thumb.url}
-                                        alt={`${product.title} thumbnail ${i + 1}`}
+                                        alt={`${product.title} 
+                                        thumbnail ${i + 1}`}
+                                        
                                         fill
                                         className="object-cover rounded"
                                       />
