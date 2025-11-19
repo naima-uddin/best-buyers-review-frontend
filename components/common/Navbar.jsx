@@ -215,7 +215,7 @@ export default function Navbar() {
 
             <Link
               href="/about"
-              className="block text-gray-700 hover:text-[#0313ff] font-semibold py-3 px-4 rounded-lg hover:bg-blue-50"
+              className="block text-gray-700 hover:text-[#0313ff] font-semibold py-1 px-4 rounded-lg hover:bg-blue-50"
               onClick={() => setIsMenuOpen(false)}
             >
               About
@@ -229,10 +229,20 @@ export default function Navbar() {
               Blog
             </Link>
 
+            <Link
+              href="/category"
+              className="block text-gray-700 hover:text-[#0313ff] font-semibold py-3 px-4 rounded-lg hover:bg-blue-50"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Categories
+            </Link>
+
             <div className="pt-2">
-              <Button variant="primary" size="medium" className="w-full justify-center">
-                Get Started
-              </Button>
+              <Link href="/">
+                <Button variant="primary" size="medium" className="w-full justify-center">
+                  Get Started
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
