@@ -10,6 +10,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import Image from "next/image";
 
 export default function ProductEdit({
   product,
@@ -1048,7 +1049,7 @@ export default function ProductEdit({
                 </h3>
                 {formData.mainImage ? (
                   <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                    <img
+                    <Image
                       src={formData.mainImage}
                       alt="Main product"
                       className="w-24 h-24 object-cover rounded-lg border"
@@ -1201,7 +1202,7 @@ export default function ProductEdit({
                     className="border border-gray-200 rounded-lg p-3 bg-white hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex flex-col space-y-3">
-                      <img
+                      <Image
                         src={url}
                         alt={`Sub image ${index + 1}`}
                         className="w-full h-24 object-cover rounded border"

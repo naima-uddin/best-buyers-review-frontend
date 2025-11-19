@@ -459,7 +459,7 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
 
           {featuredPreview && (
             <div className="mt-2">
-              <img src={featuredPreview} className="w-40 h-40 object-cover rounded border" />
+              <Image src={featuredPreview} className="w-40 h-40 object-cover rounded border" />
               <p className="text-sm text-gray-600 mt-1">Current preview</p>
             </div>
           )}
@@ -562,7 +562,7 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
                     onChange={(e) => updateBlockData(index, "url", e.target.value)} 
                   />
                   {block.data.url && (
-                    <img src={block.data.url} className="w-32 h-32 object-cover rounded border" />
+                    <Image src={block.data.url} className="w-32 h-32 object-cover rounded border" />
                   )}
                 </div>
               )}

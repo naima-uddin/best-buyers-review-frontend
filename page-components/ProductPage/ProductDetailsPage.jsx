@@ -299,7 +299,7 @@ function ProductDetailsContent() {
               </a>
 
               <div className="flex items-center justify-center mt-4">
-                <img
+                <Image
                   src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                   alt="Amazon"
                   className="h-4 mr-1"
@@ -362,7 +362,7 @@ function ProductDetailsContent() {
                   </a>
 
                   <div className="flex items-center justify-center mt-2">
-                    <img
+                    <Image
                       src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                       alt="Amazon"
                       className="h-4 mr-1.5"

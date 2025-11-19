@@ -368,7 +368,7 @@ const addAnchorTag = () => {
             value={featuredImageUrl} 
             onChange={handleFeaturedImageUrl} 
           />
-          {featuredPreview && (<img src={featuredPreview} className="w-40 h-40 object-cover rounded border mt-2" />)}
+          {featuredPreview && (<Image src={featuredPreview} className="w-40 h-40 object-cover rounded border mt-2" />)}
         </div>
 
         {/* Content Blocks */}
@@ -422,7 +422,7 @@ const addAnchorTag = () => {
                     value={block.data.url || ""}
                     onChange={(e)=>updateBlockData(index,"url",e.target.value)} 
                   />
-                  {block.data.url && <img src={block.data.url} className="w-32 h-32 object-cover rounded border mt-2" />}
+                  {block.data.url && <Image src={block.data.url} className="w-32 h-32 object-cover rounded border mt-2" />}
                 </div>
               )}
             </div>

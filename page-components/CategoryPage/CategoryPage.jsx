@@ -89,11 +89,7 @@ function CategoryPageContent() {
                         key={sub._id}
                         className="flex flex-col items-center text-center group cursor-pointer hover:scale-105 transition-transform duration-200"
                         onClick={() =>
-                          router.push(
-                            `/category/${main._id}/${sub._id}?mainName=${encodeURIComponent(
-                              main.name
-                            )}&subName=${encodeURIComponent(sub.name)}`
-                          )
+                          router.push(`/category/${main.slug}/${sub.slug}`)
                         }
                       >
                         <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg shadow-sm overflow-hidden">

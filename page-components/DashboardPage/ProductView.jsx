@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Star, ExternalLink, ShoppingCart, Package, DollarSign } from "lucide-react";
+import Image from "next/image";
 
 export default function ProductView({ product, onClose }) {
   // Format price
@@ -75,7 +76,7 @@ export default function ProductView({ product, onClose }) {
             <div>
               {product.images && product.images.length > 0 ? (
                 <div className="space-y-4">
-                  <img
+                  <Image
                     src={getMainImage(product)}
                     alt={product.title}
                     className="w-full h-96 object-cover rounded-xl"
@@ -84,7 +85,7 @@ export default function ProductView({ product, onClose }) {
                   {product.images.length > 1 && (
                     <div className="flex flex-wrap gap-2">
                       {product.images.slice(1, 5).map((img, idx) => (
-                        <img
+                        <Image
                           key={idx}
                           src={img.url}
                           alt={`Variant ${idx}`}

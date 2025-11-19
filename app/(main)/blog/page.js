@@ -5,7 +5,7 @@ import BlogPage from "@/page-components/BlogPage/Blogpage";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
 
 export const metadata = {
-  title: "Blog | Best Buyers View | Product Reviews & Buying Guides",
+  title: "Blog",
   description:
     "Read the latest product reviews, buying guides, and insights from Best Buyers View. Get expert opinions on baby gear, tech gadgets, home products, and more.",
   keywords: [

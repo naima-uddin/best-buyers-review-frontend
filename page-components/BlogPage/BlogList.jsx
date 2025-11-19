@@ -141,7 +141,7 @@ function FeaturedSection({ blogs }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           <div className="relative h-60 sm:h-72 lg:h-80 xl:h-96 min-h-[300px] sm:min-h-[350px] lg:min-h-[400px]">
             {featuredBlog.featuredImage?.url ? (
-              <img
+              <Image
                 src={featuredBlog.featuredImage.url}
                 alt={featuredBlog.featuredImage.alt || featuredBlog.title}
                 className="w-full h-full object-cover"
@@ -186,7 +186,7 @@ function FeaturedSection({ blogs }) {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
               <div className="flex items-center gap-2 sm:gap-3">
                 {featuredBlog.author?.avatar ? (
-                  <img 
+                  <Image 
                     src={featuredBlog.author.avatar} 
                     alt={featuredBlog.author.name}
                     className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 rounded-full object-cover border-2 border-white shadow-lg"
@@ -285,7 +285,7 @@ function BlogCard({ blog }) {
       {/* Image */}
       <div className="relative h-40 sm:h-48 overflow-hidden">
         {blog.featuredImage?.url ? (
-          <img
+          <Image
             src={blog.featuredImage.url}
             alt={blog.featuredImage.alt || blog.title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -348,7 +348,7 @@ function BlogCard({ blog }) {
         <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2 sm:gap-3">
             {blog.author?.avatar ? (
-              <img 
+              <Image 
                 src={blog.author.avatar} 
                 alt={blog.author.name}
                 className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full object-cover border-2 border-white shadow-sm"

@@ -18,12 +18,11 @@ function ProductByCategoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const mainCategory = params?.mainCategory;
-  const subCategory = params?.subCategory;
-  const mainName = searchParams?.get("mainName");
-  const subName = searchParams?.get("subName");
+  const mainCategorySlug = params?.mainCategorySlug;
+  const subCategorySlug = params?.subCategorySlug;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
 
+  const [categoryData, setCategoryData] = useState(null);
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -40,28 +39,43 @@ function ProductByCategoryContent() {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (!mainCategory || !subCategory) {
+    if (!mainCategorySlug || !subCategorySlug) {
       setLoading(false);
       return;
     }
 
-    async function fetchProducts() {
+    async function fetchCategoryAndProducts() {
       try {
         setLoading(true);
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL ||
           "https://api.bestbuyersview.com/api";
-        const res = await fetch(
-          `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}&page=${pageParam}&limit=10&sort=${sortParam}`
-        );
-        const data = await res.json();
 
-        if (data.success && data.data) {
-          setProducts(data.data.products || []);
-          setTotalPages(data.data.pagination?.pages || 1);
+        // First, get category data using slugs
+        const categoryRes = await fetch(
+          `${apiUrl}/categories/slugs/${mainCategorySlug}/${subCategorySlug}`
+        );
+
+        if (!categoryRes.ok) {
+          throw new Error(`Category not found: ${categoryRes.status}`);
+        }
+
+        const categoryData = await categoryRes.json();
+        setCategoryData(categoryData);
+
+        // Then fetch products using the category IDs
+        const productsRes = await fetch(
+          `${apiUrl}/products?mainCategory=${categoryData.mainCategory._id}&subCategory=${categoryData.subCategory._id}&page=${pageParam}&limit=10&sort=${sortParam}`
+        );
+        
+        const productsData = await productsRes.json();
+
+        if (productsData.success && productsData.data) {
+          setProducts(productsData.data.products || []);
+          setTotalPages(productsData.data.pagination?.pages || 1);
 
           const initialImages = {};
-          data.data.products.forEach((product) => {
+          productsData.data.products.forEach((product) => {
             const mainImage =
               product.images?.find((img) => img.variant === "MAIN")?.url ||
               product.images?.[0]?.url;
@@ -72,21 +86,20 @@ function ProductByCategoryContent() {
           setProducts([]);
         }
       } catch (err) {
-        console.error("Error fetching products:", err);
-        setProducts([]);
+        console.error("Error fetching data:", err);
+        // Redirect to categories page if category not found
+        router.push('/category');
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProducts();
-  }, [mainCategory, subCategory, pageParam, sortParam]);
+    fetchCategoryAndProducts();
+  }, [mainCategorySlug, subCategorySlug, pageParam, sortParam, router]);
 
   const handlePageChange = (newPage) => {
     router.push(
-      `/category/${mainCategory}/${subCategory}?page=${newPage}&mainName=${encodeURIComponent(
-        mainName
-      )}&subName=${encodeURIComponent(subName)}`,
+      `/category/${mainCategorySlug}/${subCategorySlug}?page=${newPage}`,
       { scroll: false }
     );
   };
@@ -126,12 +139,16 @@ function ProductByCategoryContent() {
     if (isChecked) addToCompare(product);
   };
 
+  const handleProductClick = (product) => {
+    router.push(`/category/${mainCategorySlug}/${subCategorySlug}/${product.slug}`);
+  };
+
   useEffect(() => {
     if (!products || products.length === 0) return;
     const coupons = products.filter((p) => p.isCoupon);
     setCouponQueue(coupons);
     setCouponIndex(0);
-  }, [products, subCategory]);
+  }, [products, subCategorySlug]);
 
   useEffect(() => {
     clearTimeout(timerRef.current);
@@ -144,7 +161,7 @@ function ProductByCategoryContent() {
     }, 4000);
 
     return () => clearTimeout(timerRef.current);
-  }, [couponQueue, subCategory]);
+  }, [couponQueue, subCategorySlug]);
 
   const handleCloseCoupon = () => {
     setShowCoupon(false);
@@ -163,9 +180,7 @@ function ProductByCategoryContent() {
   const handleSortChange = (e) => {
     const newSort = e.target.value;
     router.push(
-      `/category/${mainCategory}/${subCategory}?page=${pageParam}&sort=${newSort}&mainName=${encodeURIComponent(
-        mainName
-      )}&subName=${encodeURIComponent(subName)}`
+      `/category/${mainCategorySlug}/${subCategorySlug}?page=${pageParam}&sort=${newSort}`
     );
   };
 
@@ -174,13 +189,13 @@ function ProductByCategoryContent() {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 md:py-10">
         <div className="text-center mb-6 md:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Best {subName} ({mainName})
+            {categoryData ? `Best ${categoryData.subCategory.name} (${categoryData.mainCategory.name})` : "Loading..."}
           </h1>
           <p className="text-xs sm:text-sm md:text-base text-gray-600 px-4 sm:px-8">
             Explore our expertly curated collection designed to fit your
             lifestyle, budget, and every need. Updated{" "}
             {new Date().toLocaleString("default", { month: "long" })}{" "}
-            {new Date().getFullYear()} • Top-rated {subName} selected by
+            {new Date().getFullYear()} • Top-rated products selected by
             experts.
           </p>
         </div>
@@ -195,10 +210,12 @@ function ProductByCategoryContent() {
             </div>
           </div>
           <div className="w-full lg:w-80">
-            <ProductPageSidebar
-              mainCategory={mainCategory}
-              currentSubCategory={subCategory}
-            />
+            {categoryData && (
+              <ProductPageSidebar
+                mainCategory={categoryData.mainCategory._id}
+                currentSubCategory={categoryData.subCategory._id}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -218,7 +235,10 @@ function ProductByCategoryContent() {
     <>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4">
-        <Breadcrumbs mainName={mainName} subName={subName} />
+        <Breadcrumbs 
+          mainName={categoryData?.mainCategory.name} 
+          subName={categoryData?.subCategory.name} 
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
@@ -226,7 +246,7 @@ function ProductByCategoryContent() {
         <div className="text-center mb-6 md:mb-8">
           <BackButton className="-mb-2" />
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Best {subName} ({mainName})
+            Best {categoryData?.subCategory.name} ({categoryData?.mainCategory.name})
           </h1>
           <h2 className="text-xs sm:text-sm md:text-base px-4 sm:px-8 md:px-16 lg:px-40 text-gray-700 mb-2 leading-relaxed">
             Home, Food, Fashion, Beauty, Baby, Electronics, Sports, Health,
@@ -235,7 +255,7 @@ function ProductByCategoryContent() {
           </h2>
           <p className="text-xs sm:text-sm md:text-base text-gray-600">
             Updated {new Date().toLocaleString("default", { month: "long" })}{" "}
-            {new Date().getFullYear()} • Top-rated {subName} selected by experts.
+            {new Date().getFullYear()} • Top-rated {categoryData?.subCategory.name} selected by experts.
           </p>
         </div>
 
@@ -266,11 +286,13 @@ function ProductByCategoryContent() {
         <div className="block lg:hidden mb-6">
           <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
             <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
-            <ProductPageSidebar
-              mainCategory={mainCategory}
-              currentSubCategory={subCategory}
-              showOnlyRelatedCategories={true}
-            />
+            {categoryData && (
+              <ProductPageSidebar
+                mainCategory={categoryData.mainCategory._id}
+                currentSubCategory={categoryData.subCategory._id}
+                showOnlyRelatedCategories={true}
+              />
+            )}
           </div>
         </div>
 
@@ -416,7 +438,7 @@ function ProductByCategoryContent() {
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${mainCategory}/${subCategory}/${product._id}`}
+                                  href={`/category/${mainCategorySlug}/${subCategorySlug}/${product.slug}`}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
@@ -441,9 +463,11 @@ function ProductByCategoryContent() {
                                 </a>
 
                                 <div className="flex flex-col items-center my-3 sm:my-4">
-                                  <img
+                                  <Image
                                     src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                                     alt="Amazon"
+                                    width={44}
+                                    height={24}
                                     className="h-5 sm:h-6 mb-1"
                                   />
                                   <span className="text-xs text-gray-500">
@@ -579,7 +603,7 @@ function ProductByCategoryContent() {
 
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${mainCategory}/${subCategory}/${topProduct._id}`}
+                                href={`/category/${mainCategorySlug}/${subCategorySlug}/${topProduct.slug}`}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →
@@ -602,9 +626,11 @@ function ProductByCategoryContent() {
                               👉 Check Latest Price
                             </a>
 
-                            <img
+                            <Image
                               src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                               alt="Amazon"
+                              width={24}
+                              height={24}
                               className="h-6 mt-2 mx-auto opacity-80"
                             />
                           </div>
@@ -639,7 +665,7 @@ function ProductByCategoryContent() {
                     We couldn't find any products in this category.
                   </p>
                   <Link
-                    href="/"
+                    href="/category"
                     className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm sm:text-base rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
                   >
                     Browse Other Categories
@@ -651,10 +677,12 @@ function ProductByCategoryContent() {
 
           {/* Sidebar */}
           <div className="w-full lg:w-80 lg:sticky lg:top-24 lg:self-start">
-            <ProductPageSidebar
-              mainCategory={mainCategory}
-              currentSubCategory={subCategory}
-            />
+            {categoryData && (
+              <ProductPageSidebar
+                mainCategory={categoryData.mainCategory._id}
+                currentSubCategory={categoryData.subCategory._id}
+              />
+            )}
           </div>
         </div>
 

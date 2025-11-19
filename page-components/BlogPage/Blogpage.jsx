@@ -169,9 +169,11 @@ function Sidebar({ recentPosts, categories }) {
             >
               <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gray-100">
                 {post.featuredImage?.url ? (
-                  <img
+                  <Image
                     src={post.featuredImage.url}
                     alt={post.featuredImage.alt || post.title}
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 ) : (
@@ -213,9 +215,11 @@ function FeaturedSection({ blog }) {
         <div className="lg:col-span-1">
           <div className="relative h-48 sm:h-64 lg:h-80 min-h-[200px] sm:min-h-[300px]">
             {blog.featuredImage?.url ? (
-              <img
+              <Image
                 src={blog.featuredImage.url}
                 alt={blog.featuredImage.alt || blog.title}
+                width={320}
+                height={240}
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -264,9 +268,11 @@ function FeaturedSection({ blog }) {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
             <div className="flex items-center gap-2 sm:gap-3">
               {blog.author?.avatar ? (
-                <img 
+                <Image 
                   src={blog.author.avatar} 
                   alt={blog.author.name}
+                  width={40}
+                  height={40}
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white shadow-lg"
                 />
               ) : (
@@ -312,9 +318,11 @@ function BlogCard({ blog }) {
       {/* Image */}
       <div className="relative h-40 sm:h-48 overflow-hidden">
         {blog.featuredImage?.url ? (
-          <img
+          <Image
             src={blog.featuredImage.url}
             alt={blog.featuredImage.alt || blog.title}
+            width={320}
+            height={240}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
@@ -378,11 +386,14 @@ function BlogCard({ blog }) {
         <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2 sm:gap-3">
             {blog.author?.avatar ? (
-              <img 
-                src={blog.author.avatar} 
+              <Image 
+                src={blog.author.avatar?.trim() || ""}
                 alt={blog.author.name}
+                width={32}
+                height={32}
                 className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border-2 border-white shadow-sm"
               />
+
             ) : (
               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                 <span className="text-white text-xs font-semibold">

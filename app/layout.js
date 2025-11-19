@@ -16,8 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Best Buyers View",
-  description: "Best Buyers View: Discover, Compare & Pick the Best",
+  title: {
+    default: "Best Buyers View",
+    template: "%s | Best Buyers View",
+  },
+  description: "Discover, Compare & Pick the Best",
+  twitter:{
+    card: "summary_large_image",
+    title: "Best Buyers View",
+    description: "Discover, Compare & Pick the Best",
+    site: "https://bestbuyersview.com"
+  }
 };
 
 export default function RootLayout({ children }) {

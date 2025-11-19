@@ -18,6 +18,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/Card";
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
+import Image from "next/image";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -183,7 +184,7 @@ export default function ProductViewPage() {
               <div>
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-4">
                   {displayImages.length > 0 ? (
-                    <img
+                    <Image
                       src={displayImages[activeImage]?.url || "/placeholder-image.jpg"}
                       alt={product.title}
                       className="w-full h-full object-contain"
@@ -211,7 +212,7 @@ export default function ProductViewPage() {
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       >
-                        <img
+                        <Image
                           src={img.url}
                           alt={`${product.title} ${index + 1}`}
                           className="w-full h-full object-cover"

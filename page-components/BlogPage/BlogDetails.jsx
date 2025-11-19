@@ -175,9 +175,11 @@ export default function BlogDetails({ slug }) {
           return (
             <div key={index} className="my-12">
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl group">
-                <img
+                <Image
                   src={imageUrl}
                   alt={imageAlt}
+                  width={320}
+                  height={240}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -318,7 +320,7 @@ export default function BlogDetails({ slug }) {
                 <div className="flex items-center gap-4">
                   {blog.author?.avatar ? (
                     <div className="w-14 h-14 rounded-2xl border-2 border-white/30 overflow-hidden shadow-lg">
-                      <img 
+                      <Image 
                         src={blog.author.avatar} 
                         alt={blog.author.name} 
                         className="w-full h-full object-cover"
@@ -369,9 +371,11 @@ export default function BlogDetails({ slug }) {
           {/* Featured Image */}
           {blog.featuredImage?.url && (
             <div className="relative h-96 -mt-8 mx-8 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-              <img
+              <Image
                 src={blog.featuredImage.url}
                 alt={blog.featuredImage.alt || blog.title}
+                width={320}
+                height={240}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -449,7 +453,7 @@ export default function BlogDetails({ slug }) {
             <div className="mt-16 pt-12 border-t border-gray-200">
               <div className="flex flex-col md:flex-row items-start gap-6 bg-gray-50 rounded-2xl p-8">
                 {blog.author?.avatar ? (
-                  <img 
+                  <Image 
                     src={blog.author.avatar} 
                     alt={blog.author.name}
                     className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0"

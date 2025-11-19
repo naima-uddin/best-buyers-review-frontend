@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Eye, Edit, Trash2, ExternalLink } from "lucide-react";
+import Image from "next/image";
 
 export default function ProductList({ products = [], loading, onRefresh, onEdit, onView, onDelete }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -134,7 +135,7 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
                         <div className="flex items-center space-x-3">
                           <div className="w-12 h-12 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
                             {product.images?.length > 0 ? (
-                              <img
+                              <Image
                                 src={product.images[0].url}
                                 alt={product.title}
                                 className="w-full h-full object-cover"
