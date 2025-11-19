@@ -3,6 +3,12 @@ import React from 'react'
 import Navbar from "@/components/common/Navbar";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
 import { Footer } from "@/components/common/Footer";
+
+export const metadata = {
+  title: "Advertiser Disclosure",
+  description: "Learn about our advertiser disclosure and how we earn commissions through affiliate links.",
+};
+
 export default function page() {
   return (
     <>
