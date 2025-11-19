@@ -19,6 +19,8 @@ import Accordion from "@/ui/Accordion";
 import RelatedProducts from "./RelatedProducts";
 import ProductInfoTabs from "./ProductInfoTabs";
 import BackButton from "@/ui/BackButton";
+import Navbar from "@/components/common/Navbar";
+import { Footer } from "@/components/common/Footer";
 
 function ProductDetailsContent() {
   const params = useParams();
@@ -138,6 +140,8 @@ function ProductDetailsContent() {
   const currentImage = product.images?.[selectedImageIndex]?.url || mainImage;
 
   return (
+    <>
+    <Navbar />
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <BackButton className="mb-2" />
@@ -302,6 +306,8 @@ function ProductDetailsContent() {
                 <Image
                   src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                   alt="Amazon"
+                  width={24}
+                  height={24}
                   className="h-4 mr-1"
                 />
                 <span className="text-xs text-gray-500">
@@ -347,7 +353,7 @@ function ProductDetailsContent() {
                   >
                     <span className="text-base mr-2">Buy at Amazon</span>
                     <svg
-                      className="w-4 w-4 group-hover:translate-x-0.5 transition-transform"
+                      className="w-4  group-hover:translate-x-0.5 transition-transform"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -365,6 +371,8 @@ function ProductDetailsContent() {
                     <Image
                       src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                       alt="Amazon"
+                      width={24}
+                      height={24}
                       className="h-4 mr-1.5"
                     />
                     <span className="text-xs text-gray-500 font-medium">
@@ -549,6 +557,8 @@ function ProductDetailsContent() {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
 
