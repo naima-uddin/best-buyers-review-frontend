@@ -59,10 +59,12 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               rel="noopener noreferrer"
               className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center w-full max-w-xs"
             >
-              View 
+              View
               <Image
                 src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                 alt="Amazon"
+                width={60}
+                height={20}
                 className="h-5 ml-2 mr-2 flex items-center justify-center"
               />
               Deal

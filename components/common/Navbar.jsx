@@ -75,9 +75,7 @@ export default function Navbar() {
     setIsMobileSearchOpen(false);
 
     router.push(
-      `/category/${item.mainId}/${item.subId}?mainName=${encodeURIComponent(
-        item.mainName
-      )}&subName=${encodeURIComponent(item.subName)}`
+      `/category/${encodeURIComponent(item.mainName)}/${encodeURIComponent(item.subName)}`
     );
   };
 

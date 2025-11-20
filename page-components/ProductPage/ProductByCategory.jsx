@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, Suspense, useRef } from "react";
+import { useEffect, useState, Suspense, useRef, useMemo } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import ProductPageSidebar from "./ProductPageSidebar";
@@ -12,17 +12,25 @@ import BackButton from "@/ui/BackButton";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import Breadcrumbs from "@/ui/Breadcrumbs";
+import ProductListSkeleton from "@/components/skeletons/ProductListSkeleton";
 
 function ProductByCategoryContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const mainCategory = params?.mainCategory;
-  const subCategory = params?.subCategory;
-  const mainName = searchParams?.get("mainName");
-  const subName = searchParams?.get("subName");
+  // Decode URL params (Next.js usually decodes them, but let's be explicit)
+  const mainCategoryName = params?.mainCategory ? decodeURIComponent(params.mainCategory) : null;
+  const subCategoryName = params?.subCategory ? decodeURIComponent(params.subCategory) : null;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
+
+  console.log('🔍 ProductByCategory - Raw params:', params);
+  console.log('🔍 ProductByCategory - mainCategoryName:', mainCategoryName);
+  console.log('🔍 ProductByCategory - subCategoryName:', subCategoryName);
+
+  // Compute date values once to avoid hydration mismatch
+  const currentMonth = useMemo(() => new Date().toLocaleString("default", { month: "long" }), []);
+  const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   const [products, setProducts] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -40,7 +48,7 @@ function ProductByCategoryContent() {
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (!mainCategory || !subCategory) {
+    if (!mainCategoryName || !subCategoryName) {
       setLoading(false);
       return;
     }
@@ -51,10 +59,15 @@ function ProductByCategoryContent() {
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL ||
           "https://api.bestbuyersview.com/api";
-        const res = await fetch(
-          `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}&page=${pageParam}&limit=10&sort=${sortParam}`
-        );
+
+        const url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
+        console.log('Fetching products from:', url);
+        console.log('Main Category:', mainCategoryName);
+        console.log('Sub Category:', subCategoryName);
+
+        const res = await fetch(url);
         const data = await res.json();
+        console.log('API Response:', data);
 
         if (data.success && data.data) {
           setProducts(data.data.products || []);
@@ -80,13 +93,11 @@ function ProductByCategoryContent() {
     }
 
     fetchProducts();
-  }, [mainCategory, subCategory, pageParam, sortParam]);
+  }, [mainCategoryName, subCategoryName, pageParam, sortParam]);
 
   const handlePageChange = (newPage) => {
     router.push(
-      `/category/${mainCategory}/${subCategory}?page=${newPage}&mainName=${encodeURIComponent(
-        mainName
-      )}&subName=${encodeURIComponent(subName)}`,
+      `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}?page=${newPage}`,
       { scroll: false }
     );
   };
@@ -131,7 +142,7 @@ function ProductByCategoryContent() {
     const coupons = products.filter((p) => p.isCoupon);
     setCouponQueue(coupons);
     setCouponIndex(0);
-  }, [products, subCategory]);
+  }, [products, subCategoryName]);
 
   useEffect(() => {
     clearTimeout(timerRef.current);
@@ -144,7 +155,7 @@ function ProductByCategoryContent() {
     }, 4000);
 
     return () => clearTimeout(timerRef.current);
-  }, [couponQueue, subCategory]);
+  }, [couponQueue, subCategoryName]);
 
   const handleCloseCoupon = () => {
     setShowCoupon(false);
@@ -163,45 +174,71 @@ function ProductByCategoryContent() {
   const handleSortChange = (e) => {
     const newSort = e.target.value;
     router.push(
-      `/category/${mainCategory}/${subCategory}?page=${pageParam}&sort=${newSort}&mainName=${encodeURIComponent(
-        mainName
-      )}&subName=${encodeURIComponent(subName)}`
+      `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}?page=${pageParam}&sort=${newSort}`
     );
   };
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-6 md:py-10">
-        <div className="text-center mb-6 md:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Best {subName} ({mainName})
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-gray-600 px-4 sm:px-8">
-            Explore our expertly curated collection designed to fit your
-            lifestyle, budget, and every need. Updated{" "}
-            {new Date().toLocaleString("default", { month: "long" })}{" "}
-            {new Date().getFullYear()} • Top-rated {subName} selected by
-            experts.
-          </p>
+      <>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4">
+          <Breadcrumbs mainName={mainCategoryName} subName={subCategoryName} />
         </div>
 
-        <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
-          <div className="flex-1">
-            <div className="flex flex-col justify-center items-center h-64 md:h-96 text-gray-500">
-              <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-4 border-blue-600 mb-4"></div>
-              <p className="text-sm sm:text-base md:text-lg font-medium">
-                Loading products...
-              </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
+          {/* Header */}
+          <div className="text-center mb-6 md:mb-8">
+            <BackButton className="-mb-2" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Best {subCategoryName} ({mainCategoryName})
+            </h1>
+            <h2 className="text-xs sm:text-sm md:text-base px-4 sm:px-8 md:px-16 lg:px-40 text-gray-700 mb-2 leading-relaxed">
+              Home, Food, Fashion, Beauty, Baby, Electronics, Sports, Health,
+              Automotive, Pets and so many more. Explore our expertly curated
+              collection designed to fit your lifestyle, budget, and every need
+            </h2>
+            <p className="text-xs sm:text-sm md:text-base text-gray-600" suppressHydrationWarning>
+              Updated {currentMonth} {currentYear} • Top-rated {subCategoryName} selected by experts.
+            </p>
+          </div>
+
+          {/* Sorting Skeleton */}
+          <div className="flex justify-between items-center mb-4 md:mb-6 px-2 sm:px-0">
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-40 bg-gray-200 rounded-lg animate-pulse"></div>
+            </div>
+            <div className="h-5 w-24 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+
+          {/* Mobile Related Sidebar */}
+          <div className="block lg:hidden mb-6">
+            <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
+              <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
+              <ProductPageSidebar
+                mainCategoryName={mainCategoryName}
+                currentSubCategoryName={subCategoryName}
+                showOnlyRelatedCategories={true}
+              />
             </div>
           </div>
-          <div className="w-full lg:w-80">
-            <ProductPageSidebar
-              mainCategory={mainCategory}
-              currentSubCategory={subCategory}
-            />
+
+          {/* Layout with Skeleton */}
+          <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
+            <div className="flex-1">
+              <ProductListSkeleton />
+            </div>
+            <div className="w-full lg:w-80 lg:sticky lg:top-24 lg:self-start">
+              <ProductPageSidebar
+                mainCategoryName={mainCategoryName}
+                currentSubCategoryName={subCategoryName}
+              />
+            </div>
           </div>
         </div>
-      </div>
+
+        <Footer />
+      </>
     );
   }
 
@@ -218,7 +255,7 @@ function ProductByCategoryContent() {
     <>
       <Navbar />
       <div className="max-w-7xl mx-auto px-4">
-        <Breadcrumbs mainName={mainName} subName={subName} />
+        <Breadcrumbs mainName={mainCategoryName} subName={subCategoryName} />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
@@ -226,16 +263,15 @@ function ProductByCategoryContent() {
         <div className="text-center mb-6 md:mb-8">
           <BackButton className="-mb-2" />
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Best {subName} ({mainName})
+            Best {subCategoryName} ({mainCategoryName})
           </h1>
           <h2 className="text-xs sm:text-sm md:text-base px-4 sm:px-8 md:px-16 lg:px-40 text-gray-700 mb-2 leading-relaxed">
             Home, Food, Fashion, Beauty, Baby, Electronics, Sports, Health,
             Automotive, Pets and so many more. Explore our expertly curated
             collection designed to fit your lifestyle, budget, and every need
           </h2>
-          <p className="text-xs sm:text-sm md:text-base text-gray-600">
-            Updated {new Date().toLocaleString("default", { month: "long" })}{" "}
-            {new Date().getFullYear()} • Top-rated {subName} selected by experts.
+          <p className="text-xs sm:text-sm md:text-base text-gray-600" suppressHydrationWarning>
+            Updated {currentMonth} {currentYear} • Top-rated {subCategoryName} selected by experts.
           </p>
         </div>
 
@@ -267,8 +303,8 @@ function ProductByCategoryContent() {
           <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
             <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
             <ProductPageSidebar
-              mainCategory={mainCategory}
-              currentSubCategory={subCategory}
+              mainCategoryName={mainCategoryName}
+              currentSubCategoryName={subCategoryName}
               showOnlyRelatedCategories={true}
             />
           </div>
@@ -419,7 +455,7 @@ function ProductByCategoryContent() {
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${mainCategory}/${subCategory}/${product._id}?mainName=${encodeURIComponent(mainName)}&subName=${encodeURIComponent(subName)}`}
+                                  href={`/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}/${product._id}`}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
@@ -584,7 +620,7 @@ function ProductByCategoryContent() {
 
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${mainName}/${subName}/${topProduct._id}`}
+                                href={`/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}/${topProduct._id}`}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →
@@ -659,8 +695,8 @@ function ProductByCategoryContent() {
           {/* Sidebar */}
           <div className="w-full lg:w-80 lg:sticky lg:top-24 lg:self-start">
             <ProductPageSidebar
-              mainCategory={mainCategory}
-              currentSubCategory={subCategory}
+              mainCategoryName={mainCategoryName}
+              currentSubCategoryName={subCategoryName}
             />
           </div>
         </div>

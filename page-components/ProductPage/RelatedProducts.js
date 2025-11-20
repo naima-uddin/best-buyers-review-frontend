@@ -25,9 +25,9 @@ export default function RelatedProducts({
           "https://api.bestbuyersview.com/api";
 
         const res = await fetch(
-          `${apiUrl}/products?mainCategory=${encodeURIComponent(
+          `${apiUrl}/products?mainCategoryName=${encodeURIComponent(
             mainCategory
-          )}&subCategory=${encodeURIComponent(subCategory)}`
+          )}&subCategoryName=${encodeURIComponent(subCategory)}`
         );
         const data = await res.json();
 
