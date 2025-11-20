@@ -638,6 +638,43 @@ function ProductDetailsContent() {
       />
     )}
 
+    {/* BreadcrumbList Structured Data */}
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://bestbuyersview.com",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: product.mainCategory?.name || mainCategory,
+              item: `https://bestbuyersview.com/category/${mainCategory}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: product.subCategory?.name || subCategory,
+              item: `https://bestbuyersview.com/category/${mainCategory}/${subCategory}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 4,
+              name: product.title,
+              item: `https://bestbuyersview.com/category/${mainCategory}/${subCategory}/${productId}`,
+            },
+          ],
+        }),
+      }}
+    />
+
     <Footer />
     </>
   );

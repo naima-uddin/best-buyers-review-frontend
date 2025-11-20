@@ -1,6 +1,15 @@
 // app/not-found.js
 import Link from "next/link";
 
+export const metadata = {
+  title: "404 - Page Not Found | Best Buyers View",
+  description: "The page you're looking for doesn't exist. Browse our product reviews and categories.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
+
 export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

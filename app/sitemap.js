@@ -66,7 +66,7 @@ export default async function sitemap() {
       const products = productsData.data || [];
 
       productPages = products.map((product) => ({
-        url: `${baseUrl}/category/${product.mainCategory?.name?.toLowerCase().replace(/\s+/g, "-")}/${product.subCategory?.name?.toLowerCase().replace(/\s+/g, "-")}/${product.asin}`,
+        url: `${baseUrl}/category/${product.mainCategory?.name?.toLowerCase().replace(/\s+/g, "-")}/${product.subCategory?.name?.toLowerCase().replace(/\s+/g, "-")}/${product._id}`,
         lastModified: product.updatedAt
           ? new Date(product.updatedAt)
           : new Date(),
