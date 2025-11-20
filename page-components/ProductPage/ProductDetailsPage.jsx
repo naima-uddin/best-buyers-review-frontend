@@ -22,51 +22,80 @@ import BackButton from "@/ui/BackButton";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 
-function ProductDetailsContent() {
+function ProductDetailsContent({ initialProduct }) {
   const params = useParams();
   const router = useRouter();
-  const { mainCategory, subCategory, productId } = params;
 
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Decode URL params
+  const mainCategory = params?.mainCategory ? decodeURIComponent(params.mainCategory) : null;
+  const subCategory = params?.subCategory ? decodeURIComponent(params.subCategory) : null;
+  const productId = params?.productId;
+
+  console.log('🔍 ProductDetails - mainCategory:', mainCategory);
+  console.log('🔍 ProductDetails - subCategory:', subCategory);
+  console.log('🔍 ProductDetails - productId:', productId);
+  console.log('🔍 ProductDetails - initialProduct:', initialProduct ? 'Received' : 'Not received');
+
+  const [product, setProduct] = useState(initialProduct || null);
+  const [loading, setLoading] = useState(!initialProduct);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
+    // If we already have the initial product, just fetch related products
+    if (initialProduct) {
+      async function fetchRelatedProducts() {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.bestbuyersview.com/api";
+          const res = await fetch(
+            `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategory)}&subCategoryName=${encodeURIComponent(subCategory)}&limit=20`
+          );
+          const data = await res.json();
+
+          if (data.success && data.data) {
+            const filteredRelated = data.data.products?.filter((p) => p._id !== productId) || [];
+            setRelatedProducts(filteredRelated.slice(0, 6));
+          }
+        } catch (err) {
+          console.error("Error fetching related products:", err);
+        }
+      }
+
+      fetchRelatedProducts();
+      return;
+    }
+
+    // Fallback: fetch product if not passed as prop
     async function fetchProductDetails() {
       try {
         setLoading(true);
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://api.bestbuyersview.com/api";
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.bestbuyersview.com/api";
 
-        // Fetch ALL products first to find the specific one
-        const res = await fetch(
-          `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategory)}&subCategoryName=${encodeURIComponent(subCategory)}`
-        );
+        console.log('🔍 Fetching product by ID:', productId);
+        const res = await fetch(`${apiUrl}/products/${productId}`);
         const data = await res.json();
 
+        console.log('🔍 Product fetch response:', data);
+
         if (data.success && data.data) {
-          // Find the specific product by ID
-          const foundProduct = data.data.products?.find(
-            (p) => p._id === productId
+          setProduct(data.data);
+
+          // Fetch related products
+          const relatedRes = await fetch(
+            `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategory)}&subCategoryName=${encodeURIComponent(subCategory)}&limit=20`
           );
+          const relatedData = await relatedRes.json();
 
-          if (foundProduct) {
-            setProduct(foundProduct);
-
-            // Get related products (excluding current product)
-            const filteredRelated =
-              data.data.products?.filter((p) => p._id !== productId) || [];
+          if (relatedData.success && relatedData.data) {
+            const filteredRelated = relatedData.data.products?.filter((p) => p._id !== productId) || [];
             setRelatedProducts(filteredRelated.slice(0, 6));
-          } else {
-            setProduct(null);
           }
         } else {
+          console.error('❌ Product not found:', data.message);
           setProduct(null);
         }
       } catch (err) {
-        console.error("Error fetching product:", err);
+        console.error("❌ Error fetching product:", err);
         setProduct(null);
       } finally {
         setLoading(false);
@@ -76,7 +105,7 @@ function ProductDetailsContent() {
     if (productId && mainCategory && subCategory) {
       fetchProductDetails();
     }
-  }, [productId, mainCategory, subCategory]);
+  }, [productId, mainCategory, subCategory, initialProduct]);
 
   const nextImage = () => {
     if (product?.images?.length) {
@@ -680,6 +709,6 @@ function ProductDetailsContent() {
   );
 }
 
-export default function ProductDetails() {
-  return <ProductDetailsContent />;
+export default function ProductDetails({ product }) {
+  return <ProductDetailsContent initialProduct={product} />;
 }
