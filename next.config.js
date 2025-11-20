@@ -3,7 +3,7 @@
 const nextConfig = {
   // output: 'export',
 
-  trailingSlash: true,
+  trailingSlash: false,
   images: {
     unoptimized: true,
     domains: ['bestbuyersview.com', 'api.bestbuyersview.com'],
