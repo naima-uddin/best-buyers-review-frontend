@@ -101,7 +101,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md py-4 border-b border-gray-200/60 sticky top-0 z-50 shadow-sm">
+    <nav className="bg-white/95 backdrop-blur-md py-1.5 border-b border-gray-200/60 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto flex items-center justify-between relative px-4 lg:px-0">
         
         {/* -------------------------------------- */}
