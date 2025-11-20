@@ -13,10 +13,18 @@ export default function BlogDetails({ slug }) {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [showTableOfContents, setShowTableOfContents] = useState(false);
+  const [showTableOfContents, setShowTableOfContents] = useState(() => {
+  // Check if the user has closed TOC before
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("tocClosed") !== "true";
+  }
+  return true; // default visible
+});
   const [likes, setLikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
   const router = useRouter();
+
+  
 
   useEffect(() => {
     const cachedBlog = blogs.find(b => b.slug === slug);
@@ -44,20 +52,23 @@ export default function BlogDetails({ slug }) {
   }, [slug, router, blogs]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight - windowHeight;
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const progress = (scrollTop / documentHeight) * 100;
-      setReadingProgress(Math.min(100, Math.max(0, progress)));
-      
-      // Show table of contents after scrolling past hero
+  const handleScroll = () => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight - windowHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const progress = (scrollTop / documentHeight) * 100;
+    setReadingProgress(Math.min(100, Math.max(0, progress)));
+    
+    // Only show TOC if user hasn't closed it
+    if (localStorage.getItem("tocClosed") !== "true") {
       setShowTableOfContents(scrollTop > 400);
-    };
+    }
+  };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+
 
   const handleLike = () => {
     if (!hasLiked) {
@@ -244,31 +255,47 @@ export default function BlogDetails({ slug }) {
         </div>
 
         {/* Table of Contents Sidebar */}
-        {showTableOfContents && tableOfContents.length > 0 && (
-          <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden xl:block">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-200/50 max-w-xs">
-              <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Contents</h4>
-              <nav className="space-y-2">
-                {tableOfContents.map((item, index) => (
-                  <a
-                    key={item.id}
-                    href={`#${item.id}`}
-                    className="block text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200 py-1 border-l-2 border-transparent hover:border-blue-500 hover:pl-2 pl-1"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById(item.id)?.scrollIntoView({ 
-                        behavior: 'smooth',
-                        block: 'start'
-                      });
-                    }}
-                  >
-                    {item.text}
-                  </a>
-                ))}
-              </nav>
-            </div>
-          </div>
-        )}
+        {/* Table of Contents Sidebar */}
+{showTableOfContents && tableOfContents.length > 0 && (
+  <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden xl:block">
+    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-200/50 max-w-xs relative">
+      {/* Close Button */}
+      <button
+  onClick={() => {
+    setShowTableOfContents(false);
+    localStorage.setItem("tocClosed", "true"); // remember user closed it
+  }}
+  className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors"
+>
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+</button>
+
+
+      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Contents</h4>
+      <nav className="space-y-2">
+        {tableOfContents.map((item, index) => (
+          <a
+            key={item.id}
+            href={`#${item.id}`}
+            className="block text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200 py-1 border-l-2 border-transparent hover:border-blue-500 hover:pl-2 pl-1"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById(item.id)?.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }}
+          >
+            {item.text}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+)}
+
 
 
         <div className="max-w-6xl mx-auto px-6 py-16">
@@ -363,12 +390,7 @@ export default function BlogDetails({ slug }) {
                       <span>{likes}</span>
                     </button>
                     
-                    <button className="flex items-center gap-2 hover:text-blue-300 transition-colors duration-300">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                      </svg>
-                      <span>Share</span>
-                    </button>
+                    
                   </div>
                 </div>
               </div>
@@ -492,22 +514,7 @@ export default function BlogDetails({ slug }) {
               {/* Social Share & Actions */}
               <div className="mt-12 pt-8 border-t border-gray-200">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <span className="text-gray-700 font-medium">Share this review:</span>
-                    <div className="flex items-center gap-3">
-                      {['Twitter', 'Facebook', 'LinkedIn', 'Copy'].map((platform) => (
-                        <button
-                          key={platform}
-                          className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
-                          title={`Share on ${platform}`}
-                        >
-                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                          </svg>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  
 
                   <div className="flex items-center gap-4">
                     <button 
@@ -524,12 +531,7 @@ export default function BlogDetails({ slug }) {
                       {likes} {hasLiked ? 'Liked' : 'Like'}
                     </button>
                     
-                    <button className="flex items-center gap-3 px-6 py-3 bg-blue-600 text-white rounded-2xl font-medium hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                      </svg>
-                      Add Comment
-                    </button>
+                    
                   </div>
                 </div>
               </div>
