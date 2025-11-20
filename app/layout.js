@@ -16,17 +16,67 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://bestbuyersview.com"),
   title: {
-    default: "Best Buyers View",
+    default: "Best Buyers View | Product Reviews & Comparisons",
     template: "%s | Best Buyers View",
   },
-  description: "Discover, Compare & Pick the Best",
-  twitter:{
+  description:
+    "Discover, Compare & Pick the Best products with expert reviews, comprehensive comparisons, and buying guides across tech, home, baby, beauty, fitness, and more categories.",
+  keywords: [
+    "product reviews",
+    "product comparisons",
+    "buying guides",
+    "best products",
+    "consumer reviews",
+  ],
+  authors: [{ name: "Best Buyers View" }],
+  creator: "Best Buyers View",
+  publisher: "Best Buyers View",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://bestbuyersview.com",
+    siteName: "Best Buyers View",
+    title: "Best Buyers View | Product Reviews & Comparisons",
+    description:
+      "Your trusted source for product reviews, comparisons, and buying guides. Make informed purchase decisions with expert recommendations.",
+    images: [
+      {
+        url: "https://bestbuyersview.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Best Buyers View",
+      },
+    ],
+  },
+  twitter: {
     card: "summary_large_image",
-    title: "Best Buyers View",
-    description: "Discover, Compare & Pick the Best",
-    site: "https://bestbuyersview.com"
-  }
+    title: "Best Buyers View | Product Reviews & Comparisons",
+    description: "Discover, Compare & Pick the Best products",
+    site: "@bestbuyersview",
+    creator: "@bestbuyersview",
+    images: ["https://bestbuyersview.com/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-code", // Replace with actual Google Search Console verification code
+  },
 };
 
 export default function RootLayout({ children }) {
