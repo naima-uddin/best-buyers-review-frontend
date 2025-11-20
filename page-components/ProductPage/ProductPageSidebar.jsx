@@ -18,13 +18,25 @@ export default function ProductPageSidebar({
     setVisibleCount(7);
   }, [mainCategoryName]);
 
+  console.log('🔍 Sidebar - mainCategoryName:', mainCategoryName);
+  console.log('🔍 Sidebar - currentSubCategoryName:', currentSubCategoryName);
+
   const mainCat = categories?.find((cat) => cat.name === mainCategoryName);
-  if (!mainCat) return <aside className="hidden md:block w-72"></aside>;
+  if (!mainCat) {
+    console.log('❌ Sidebar - Main category not found:', mainCategoryName);
+    return <aside className="hidden md:block w-72"></aside>;
+  }
+
+  console.log('✅ Sidebar - Found main category:', mainCat.name);
 
   const subcategories = mainCat.children || [];
   const hasMore = subcategories.length > visibleCount;
 
+  console.log('🔍 Sidebar - Subcategories:', subcategories.map(s => s.name));
+
   const handleSubCategoryClick = (sub) => {
+    console.log('🔍 Sidebar - Clicking on subcategory:', sub.name);
+    console.log('🔍 Sidebar - Navigating to:', `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(sub.name)}`);
     router.push(
       `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(sub.name)}`
     );
@@ -34,19 +46,25 @@ export default function ProductPageSidebar({
   if (showOnlyRelatedCategories) {
     return (
       <div className="space-y-1">
-        {subcategories.slice(0, visibleCount).map((sub) => (
-          <button
-            key={sub._id}
-            onClick={() => handleSubCategoryClick(sub)}
-            className={`block w-full text-left px-3 py-1 rounded-lg transition ${
-              sub.name === currentSubCategoryName
-                ? "bg-blue-700 text-white font-semibold"
-                : "hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            {sub.name}
-          </button>
-        ))}
+        {subcategories.slice(0, visibleCount).map((sub) => {
+          const isActive = sub.name === currentSubCategoryName;
+          if (isActive) {
+            console.log('✅ Sidebar - Active subcategory:', sub.name);
+          }
+          return (
+            <button
+              key={sub._id}
+              onClick={() => handleSubCategoryClick(sub)}
+              className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                isActive
+                  ? "bg-blue-700 text-white font-semibold"
+                  : "hover:bg-gray-100 text-gray-700"
+              }`}
+            >
+              {sub.name}
+            </button>
+          );
+        })}
         {/* Show more / less button */}
         {hasMore && (
           <button
@@ -71,19 +89,22 @@ export default function ProductPageSidebar({
           <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
 
           <div className="space-y-1">
-            {subcategories.slice(0, visibleCount).map((sub) => (
-              <button
-                key={sub._id}
-                onClick={() => handleSubCategoryClick(sub)}
-                className={`block w-full text-left px-3 py-1 rounded-lg transition ${
-                  sub.name === currentSubCategoryName
-                    ? "bg-blue-700 text-white font-semibold"
-                    : "hover:bg-gray-100 text-gray-700"
-                }`}
-              >
-                {sub.name}
-              </button>
-            ))}
+            {subcategories.slice(0, visibleCount).map((sub) => {
+              const isActive = sub.name === currentSubCategoryName;
+              return (
+                <button
+                  key={sub._id}
+                  onClick={() => handleSubCategoryClick(sub)}
+                  className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                    isActive
+                      ? "bg-blue-700 text-white font-semibold"
+                      : "hover:bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {sub.name}
+                </button>
+              );
+            })}
           </div>
 
           {/* Show more / less button */}

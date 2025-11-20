@@ -19,9 +19,14 @@ function ProductByCategoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const mainCategoryName = params?.mainCategory;
-  const subCategoryName = params?.subCategory;
+  // Decode URL params (Next.js usually decodes them, but let's be explicit)
+  const mainCategoryName = params?.mainCategory ? decodeURIComponent(params.mainCategory) : null;
+  const subCategoryName = params?.subCategory ? decodeURIComponent(params.subCategory) : null;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
+
+  console.log('🔍 ProductByCategory - Raw params:', params);
+  console.log('🔍 ProductByCategory - mainCategoryName:', mainCategoryName);
+  console.log('🔍 ProductByCategory - subCategoryName:', subCategoryName);
 
   // Compute date values once to avoid hydration mismatch
   const currentMonth = useMemo(() => new Date().toLocaleString("default", { month: "long" }), []);
