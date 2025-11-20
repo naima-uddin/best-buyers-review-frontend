@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 // Generate metadata function
 export async function generateMetadata({ params }) {
-  const { mainCategory, subCategory } = params;
+  const { mainCategory, subCategory } = await params;
   const mainName = decodeURIComponent(mainCategory);
   const subName = decodeURIComponent(subCategory);
 
@@ -23,8 +23,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function Page({ params }) {
-  const { mainCategory, subCategory } = params;
+export default async function Page({ params }) {
+  const { mainCategory, subCategory } = await params;
   const mainName = decodeURIComponent(mainCategory);
   const subName = decodeURIComponent(subCategory);
 

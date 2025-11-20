@@ -54,10 +54,15 @@ function ProductByCategoryContent() {
         const apiUrl =
           process.env.NEXT_PUBLIC_API_URL ||
           "https://api.bestbuyersview.com/api";
-        const res = await fetch(
-          `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`
-        );
+
+        const url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
+        console.log('Fetching products from:', url);
+        console.log('Main Category:', mainCategoryName);
+        console.log('Sub Category:', subCategoryName);
+
+        const res = await fetch(url);
         const data = await res.json();
+        console.log('API Response:', data);
 
         if (data.success && data.data) {
           setProducts(data.data.products || []);

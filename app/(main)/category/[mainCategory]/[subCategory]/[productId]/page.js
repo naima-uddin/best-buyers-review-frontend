@@ -4,8 +4,8 @@ import ProductStructuredData from '@/components/seo/ProductStructuredData';
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params, searchParams }) {
-  const { mainCategory, subCategory, productId } = params;
+export async function generateMetadata({ params }) {
+  const { mainCategory, subCategory, productId } = await params;
 
   // Format category names
   const formatName = (name) => {
@@ -16,8 +16,8 @@ export async function generateMetadata({ params, searchParams }) {
       .join(' ');
   };
 
-  const mainName = searchParams?.mainName || formatName(mainCategory);
-  const subName = searchParams?.subName || formatName(subCategory);
+  const mainName = formatName(mainCategory);
+  const subName = formatName(subCategory);
 
   // Fetch product data server-side for SEO
   let productData = null;
@@ -99,7 +99,7 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 export default async function Page({ params }) {
-  const { productId } = params;
+  const { productId } = await params;
 
   // Fetch product data server-side
   let productData = null;
