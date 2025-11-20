@@ -1,28 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useCategories } from "@/context/CategoryContext";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function ProductPageSidebar({
-  mainCategory,
-  currentSubCategory,
+  mainCategoryName,
+  currentSubCategoryName,
   showOnlyRelatedCategories = false,
 }) {
   const { categories } = useCategories();
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const mainName = searchParams.get("mainName");
-  const subName = searchParams.get("subName");
 
   const [visibleCount, setVisibleCount] = useState(7);
 
   useEffect(() => {
     setVisibleCount(7);
-  }, [mainCategory]);
+  }, [mainCategoryName]);
 
-  const mainCat = categories?.find((cat) => cat._id === mainCategory);
+  const mainCat = categories?.find((cat) => cat.name === mainCategoryName);
   if (!mainCat) return <aside className="hidden md:block w-72"></aside>;
 
   const subcategories = mainCat.children || [];
@@ -30,9 +26,7 @@ export default function ProductPageSidebar({
 
   const handleSubCategoryClick = (sub) => {
     router.push(
-      `/category/${mainCategory}/${sub._id}?mainName=${encodeURIComponent(
-        mainName
-      )}&subName=${encodeURIComponent(sub.name)}`
+      `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(sub.name)}`
     );
   };
 
@@ -45,7 +39,7 @@ export default function ProductPageSidebar({
             key={sub._id}
             onClick={() => handleSubCategoryClick(sub)}
             className={`block w-full text-left px-3 py-1 rounded-lg transition ${
-              sub._id === currentSubCategory
+              sub.name === currentSubCategoryName
                 ? "bg-blue-700 text-white font-semibold"
                 : "hover:bg-gray-100 text-gray-700"
             }`}
@@ -82,7 +76,7 @@ export default function ProductPageSidebar({
                 key={sub._id}
                 onClick={() => handleSubCategoryClick(sub)}
                 className={`block w-full text-left px-3 py-1 rounded-lg transition ${
-                  sub._id === currentSubCategory
+                  sub.name === currentSubCategoryName
                     ? "bg-blue-700 text-white font-semibold"
                     : "hover:bg-gray-100 text-gray-700"
                 }`}

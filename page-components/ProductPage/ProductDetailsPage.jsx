@@ -42,7 +42,7 @@ function ProductDetailsContent() {
 
         // Fetch ALL products first to find the specific one
         const res = await fetch(
-          `${apiUrl}/products?mainCategory=${mainCategory}&subCategory=${subCategory}`
+          `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategory)}&subCategoryName=${encodeURIComponent(subCategory)}`
         );
         const data = await res.json();
 
