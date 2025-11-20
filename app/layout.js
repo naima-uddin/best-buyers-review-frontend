@@ -33,11 +33,13 @@ export const metadata = {
   authors: [{ name: "Best Buyers View" }],
   creator: "Best Buyers View",
   publisher: "Best Buyers View",
+
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
+
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -45,7 +47,7 @@ export const metadata = {
     siteName: "Best Buyers View",
     title: "Best Buyers View | Product Reviews & Comparisons",
     description:
-      "Your trusted source for product reviews, comparisons, and buying guides. Make informed purchase decisions with expert recommendations.",
+      "Your trusted source for product reviews, comparisons, and buying guides.",
     images: [
       {
         url: "https://bestbuyersview.com/og-image.jpg",
@@ -55,6 +57,7 @@ export const metadata = {
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
     title: "Best Buyers View | Product Reviews & Comparisons",
@@ -63,6 +66,7 @@ export const metadata = {
     creator: "@bestbuyersview",
     images: ["https://bestbuyersview.com/og-image.jpg"],
   },
+
   robots: {
     index: true,
     follow: true,
@@ -74,24 +78,71 @@ export const metadata = {
       "max-snippet": -1,
     },
   },
+
   verification: {
-    google: "your-google-verification-code", // Replace with actual Google Search Console verification code
+    google: "your-google-verification-code",
   },
 };
 
 export default function RootLayout({ children }) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://bestbuyersview.com/#organization",
+        name: "Best Buyers View",
+        url: "https://bestbuyersview.com",
+        logo: "https://bestbuyersview.com/logo.png",
+        sameAs: [
+          "https://www.facebook.com/yourprofile",
+          "https://www.instagram.com/yourprofile",
+          "https://twitter.com/yourprofile",
+          "https://www.youtube.com/yourchannel",
+        ],
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://bestbuyersview.com/#website",
+        url: "https://bestbuyersview.com",
+        name: "Best Buyers View",
+        description:
+          "Expert product reviews, comparisons and buying guides.",
+        publisher: {
+          "@id": "https://bestbuyersview.com/#organization",
+        },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: "https://bestbuyersview.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://bestbuyersview.com/#webpage",
+        url: "https://bestbuyersview.com",
+        name: "Best Buyers View",
+        isPartOf: {
+          "@id": "https://bestbuyersview.com/#website",
+        },
+      },
+    ],
+  };
+
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <head />
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning={true}
-      >
+    <html lang="en">
+      <head>
+        {/* Organization + Website + WebPage + SearchAction JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      </head>
+
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <CategoryProvider>
-            <CompareProvider>
-              {children}
-            </CompareProvider>
+            <CompareProvider>{children}</CompareProvider>
           </CategoryProvider>
         </AuthProvider>
       </body>

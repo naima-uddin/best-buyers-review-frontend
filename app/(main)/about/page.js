@@ -7,7 +7,7 @@ import React from "react";
 export const metadata = {
   title: "About Us | Best Buyers View",
   description:
-    "Learn more about Best Buyers View, our mission to help consumers make informed purchase decisions, and how we provide unbiased product reviews, comparisons, and buying guides.",
+    "Learn more about Best Buyers View, our mission to help consumers make informed purchase decisions through unbiased reviews, comparisons, and buying guides.",
   keywords: [
     "about Best Buyers View",
     "our mission",
@@ -22,16 +22,16 @@ export const metadata = {
   openGraph: {
     title: "About Us | Best Buyers View",
     description:
-      "Discover the mission behind Best Buyers View and how we help consumers make informed purchase decisions through expert product reviews and comparisons.",
+      "Discover the mission behind Best Buyers View and how we help consumers make informed purchase decisions through expert product reviews.",
     url: "https://bestbuyersview.com/about",
     siteName: "Best Buyers View",
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "About Us | Best Buyers View",
     description:
-      "Learn about our mission to help consumers make informed purchase decisions through expert product reviews.",
+      "Learn about our mission to help consumers make informed and confident purchase decisions.",
   },
   robots: {
     index: true,
@@ -39,9 +39,86 @@ export const metadata = {
   },
 };
 
-export default function page() {
+// ORGANIZATION STRUCTURED DATA
+function OrganizationJsonLD() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Best Buyers View",
+    url: "https://bestbuyersview.com",
+    logo: "https://bestbuyersview.com/logo.png",
+    sameAs: [
+      "https://www.facebook.com/bestbuyersview",
+      "https://www.linkedin.com/company/bestbuyersview",
+      "https://www.youtube.com/@bestbuyersview",
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+// WEBPAGE SCHEMA
+function WebPageJsonLD() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "About Us | Best Buyers View",
+    description:
+      "Learn more about our mission to provide unbiased product reviews and buying guides.",
+    url: "https://bestbuyersview.com/about",
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+// BREADCRUMB SCHEMA
+function BreadcrumbJsonLD() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://bestbuyersview.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "About",
+        item: "https://bestbuyersview.com/about",
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+export default function Page() {
   return (
     <>
+      {/* JSON-LD SCHEMAS */}
+      <OrganizationJsonLD />
+      <WebPageJsonLD />
+      <BreadcrumbJsonLD />
+
+      {/* PAGE CONTENT */}
       <Navbar />
       <AboutUs />
       <Footer />

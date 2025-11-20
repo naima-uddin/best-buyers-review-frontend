@@ -40,14 +40,71 @@ export const metadata = {
   },
 };
 
-export default function page() {
+function WebPageJsonLD() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Contact Us | Best Buyers View",
+    description:
+      "Get in touch with the Best Buyers View team for questions, support, feedback, or partnership opportunities.",
+    url: "https://bestbuyersview.com/contact",
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+/* ────────────────────────────────────────────
+   BREADCRUMB JSON-LD
+────────────────────────────────────────────── */
+function BreadcrumbJsonLD() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://bestbuyersview.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Contact",
+        item: "https://bestbuyersview.com/contact",
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+/* ────────────────────────────────────────────
+   PAGE COMPONENT
+────────────────────────────────────────────── */
+export default function Page() {
   return (
     <>
+      {/* JSON-LD Schemas */}
+      <WebPageJsonLD />
+      <BreadcrumbJsonLD />
+
+      {/* Page Content */}
       <Navbar />
       <ContactPage />
       <Footer />
       <ScrollToTopButton />
-
     </>
   );
 }
+

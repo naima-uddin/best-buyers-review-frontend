@@ -1,4 +1,6 @@
-import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage'
+// app/(main)/category/[mainCategory]/[subCategory]/[productId]/page.jsx
+import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
+import ProductStructuredData from '@/components/seo/ProductStructuredData';
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +19,7 @@ export async function generateMetadata({ params, searchParams }) {
   const mainName = searchParams?.mainName || formatName(mainCategory);
   const subName = searchParams?.subName || formatName(subCategory);
 
-  // Fetch product data for SEO
+  // Fetch product data server-side for SEO
   let productData = null;
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
@@ -31,10 +33,8 @@ export async function generateMetadata({ params, searchParams }) {
     console.error('Error fetching product for SEO:', error);
   }
 
-  // Use product data if available, otherwise use category-based defaults
   const title = productData?.seo?.title || productData?.title || `Best ${subName} (${mainName})`;
-  const description = productData?.seo?.description ||
-    productData?.description ||
+  const description = productData?.seo?.description || productData?.description || 
     `Detailed review and specifications for ${subName.toLowerCase()} in ${mainName.toLowerCase()}. Expert analysis, features, and buying recommendations.`;
   const keywords = productData?.seo?.keywords || [
     `${subName}`,
@@ -98,6 +98,25 @@ export async function generateMetadata({ params, searchParams }) {
   };
 }
 
-export default function Page() {
-  return <ProductDetailsPage />;
+export default async function Page({ params }) {
+  const { productId } = params;
+
+  // Fetch product data server-side
+  let productData = null;
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, { cache: 'no-store' });
+    if (response.ok) {
+      const data = await response.json();
+      productData = data.data;
+    }
+  } catch (err) {
+    console.error('Error fetching product:', err);
+  }
+
+  return (
+    <>
+      {productData && <ProductStructuredData product={productData} />}
+      <ProductDetailsPage product={productData} />
+    </>
+  );
 }

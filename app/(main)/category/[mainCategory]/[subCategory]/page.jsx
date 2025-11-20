@@ -1,4 +1,5 @@
 import ProductByCategory from "@/page-components/ProductPage/ProductByCategory";
+import CategoryStructuredData from "@/components/seo/CategoryStructuredData";
 
 // Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
@@ -9,7 +10,6 @@ export async function generateMetadata({ params, searchParams }) {
   const mainName = searchParams.mainName || decodeURIComponent(mainCategory);
   const subName = searchParams.subName || decodeURIComponent(subCategory);
   
-  // Format names for display
   const formatName = (name) => {
     return name
       .split('-')
@@ -33,6 +33,29 @@ export async function generateMetadata({ params, searchParams }) {
   };
 }
 
-export default function Page() {
-  return <ProductByCategory />;
+export default function Page({ params, searchParams }) {
+  const { mainCategory, subCategory } = params;
+  const mainName = searchParams?.mainName || decodeURIComponent(mainCategory);
+  const subName = searchParams?.subName || decodeURIComponent(subCategory);
+
+  const formatName = (name) => {
+    return name
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  const formattedMainName = formatName(mainName);
+  const formattedSubName = formatName(subName);
+
+  return (
+    <>
+      <CategoryStructuredData
+        mainCategoryName={formattedMainName}
+        subCategoryName={formattedSubName}
+        products={[]} 
+      />
+      <ProductByCategory />
+    </>
+  );
 }
