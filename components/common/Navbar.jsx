@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCategories } from "@/context/CategoryContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,16 +9,18 @@ import Image from "next/image";
 // Icons
 import { Menu, X, Search } from "lucide-react";
 import Button from "@/ui/Button";
-// Button Component
 
 export default function Navbar() {
   const router = useRouter();
   const { categories } = useCategories();
 
   const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
+  const mobileSearchRef = useRef(null);
 
   // -----------------------------------------------------
   // 🔥 Flatten Only Subcategories
@@ -44,10 +46,11 @@ export default function Navbar() {
   };
 
   // -----------------------------------------------------
-  // 🔥 Handle Desktop Search Typing
+  // 🔥 Handle Search Typing (Desktop & Mobile)
   // -----------------------------------------------------
   const handleSearch = (text) => {
     setQuery(text);
+    setSearchQuery(text);
 
     const allSubs = flattenSubCategories();
     if (!text.trim()) {
@@ -55,7 +58,6 @@ export default function Navbar() {
       return;
     }
 
-    // Case-insensitive matching
     const filtered = allSubs.filter((item) =>
       item.subName.toLowerCase().includes(text.toLowerCase())
     );
@@ -68,7 +70,9 @@ export default function Navbar() {
   // -----------------------------------------------------
   const handleSuggestionClick = (item) => {
     setQuery("");
+    setSearchQuery("");
     setSuggestions([]);
+    setIsMobileSearchOpen(false);
 
     router.push(
       `/category/${item.mainId}/${item.subId}?mainName=${encodeURIComponent(
@@ -77,9 +81,28 @@ export default function Navbar() {
     );
   };
 
+  // -----------------------------------------------------
+  // 🔥 Close Mobile Search on Click Outside
+  // -----------------------------------------------------
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        mobileSearchRef.current &&
+        !mobileSearchRef.current.contains(event.target)
+      ) {
+        setIsMobileSearchOpen(false);
+        setSearchQuery("");
+        setSuggestions([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <nav className="bg-white/95 backdrop-blur-md py-4 border-b border-gray-200/60 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto flex items-center justify-between relative">
+      <div className="max-w-7xl mx-auto flex items-center justify-between relative px-4 lg:px-0">
         
         {/* -------------------------------------- */}
         {/* LOGO */}
@@ -97,14 +120,22 @@ export default function Navbar() {
         </Link>
 
         {/* -------------------------------------- */}
-        {/* MOBILE MENU BUTTON */}
+        {/* MOBILE RIGHT ICONS */}
         {/* -------------------------------------- */}
-        <button
-          className="lg:hidden p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex lg:hidden items-center space-x-2">
+          <button
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+            onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+          >
+            <Search className="w-5 h-5" />
+          </button>
+          <button
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
 
         {/* -------------------------------------- */}
         {/* DESKTOP SEARCH BAR */}
@@ -136,9 +167,6 @@ export default function Navbar() {
             </div>
           </form>
 
-          {/* -------------------------------------- */}
-          {/* 🔥 DESKTOP SUGGESTION DROPDOWN */}
-          {/* -------------------------------------- */}
           {suggestions.length > 0 && (
             <div className="absolute top-full mt-2 w-full bg-white border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
               {suggestions.map((item) => (
@@ -148,10 +176,7 @@ export default function Navbar() {
                   onClick={() => handleSuggestionClick(item)}
                 >
                   <span className="font-medium text-gray-800">{item.subName}</span>
-                  <span className="text-gray-500 text-sm">
-                    {" "}
-                    — {item.mainName}
-                  </span>
+                  <span className="text-gray-500 text-sm"> — {item.mainName}</span>
                 </div>
               ))}
             </div>
@@ -189,30 +214,55 @@ export default function Navbar() {
       </div>
 
       {/* -------------------------------------- */}
+      {/* MOBILE FLOATING SEARCH */}
+      {/* -------------------------------------- */}
+      {isMobileSearchOpen && (
+        <div
+          ref={mobileSearchRef}
+          className="lg:hidden absolute top-full left-0 right-0 mt-2 px-4"
+        >
+          <form onSubmit={(e) => e.preventDefault()} className="relative">
+            <div className="flex rounded-lg overflow-hidden shadow-md bg-white ">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                placeholder="Search subcategories..."
+                className="flex-1 px-4 py-3 text-gray-900 focus:outline-none"
+                autoFocus
+              />
+              <Button
+                variant="secondary"
+                size="small"
+                className="rounded-l-none"
+                leftIcon={<Search className="w-4 h-4" />}
+              />
+            </div>
+
+            {suggestions.length > 0 && searchQuery.length > 0 && (
+              <div className="absolute top-full left-0 right-0 bg-white border rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto mt-1">
+                {suggestions.map((item) => (
+                  <div
+                    key={item.subId}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleSuggestionClick(item)}
+                  >
+                    <span className="font-medium text-gray-800">{item.subName}</span>
+                    <span className="text-gray-500 text-sm"> — {item.mainName}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </form>
+        </div>
+      )}
+
+      {/* -------------------------------------- */}
       {/* MOBILE MENU */}
       {/* -------------------------------------- */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-lg">
-          <div className="p-4 space-y-4">
-            {/* MOBILE SEARCH */}
-            <form onSubmit={(e) => e.preventDefault()} className="mb-4">
-              <div className="flex rounded-lg overflow-hidden shadow-md">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="flex-1 px-4 py-3 text-gray-900 bg-gray-50 focus:outline-none"
-                />
-                <Button
-                  variant="secondary"
-                  size="small"
-                  className="rounded-l-none"
-                  leftIcon={<Search className="w-4 h-4" />}
-                />
-              </div>
-            </form>
-
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-lg z-40">
+          <div className="p-4 space-y-0">
             <Link
               href="/about"
               className="block text-gray-700 hover:text-[#0313ff] font-semibold py-1 px-4 rounded-lg hover:bg-blue-50"
@@ -237,7 +287,7 @@ export default function Navbar() {
               Categories
             </Link>
 
-            <div className="pt-2">
+            <div className="pt-1">
               <Link href="/">
                 <Button variant="primary" size="medium" className="w-full justify-center">
                   Get Started

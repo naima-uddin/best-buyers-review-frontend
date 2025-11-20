@@ -93,17 +93,17 @@ function ReviewsSection() {
   );
 
   return (
-    <section ref={sectionRef} className="max-w-7xl mx-auto relative overflow-hidden py-10 ">
+    <section ref={sectionRef} className="max-w-7xl mx-auto relative overflow-hidden py-4 md:py-8">
       {/* Background decorative elements */}
       
       <div className="container mx-auto relative z-10">
-        <div className="text-center mb-5">
+        <div className="text-center mb-3">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0215A6]/10 border border-[#0215A6]/20 mb-6">
             <div className="w-2 h-2 bg-[#0215A6] rounded-full animate-pulse"></div>
             <span className="text-sm font-medium text-[#0215A6]">Real Customer Stories</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#0215A6] to-[#667eea] bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-[#0215A6] to-[#667eea] bg-clip-text text-transparent">
             Why Shoppers Trust Us
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">

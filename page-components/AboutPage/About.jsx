@@ -81,7 +81,7 @@ export default function AboutUs() {
               </span>
             </div>
             
-            <h1 className="text-6xl font-bold md:text-8xl mb-6">
+            <h1 className="text-3xl font-bold md:text-4xl mb-6">
               About <Highlight>Best Buyers View</Highlight>
             </h1>
             

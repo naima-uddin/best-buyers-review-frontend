@@ -68,7 +68,7 @@ function TrustSection() {
   };
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-white py-6 lg:py-10">
+    <section ref={sectionRef} className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-white py-4 lg:py-6">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-[0.03]">
         <div className="absolute inset-0" style={{
@@ -78,8 +78,8 @@ function TrustSection() {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 shadow-sm mb-8">
+        <div className="text-center mb-4">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 shadow-sm mb-4">
             <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
             <span className="text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Trust & Reliability
@@ -87,7 +87,7 @@ function TrustSection() {
             
           </div>
 
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-4xl  font-bold text-gray-900 mb-2">
             Trusted by Millions
           </h2>
           

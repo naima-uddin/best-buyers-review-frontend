@@ -31,30 +31,32 @@ export default function BannerSlider() {
   };
 
   return (
+    
     <div
-      className="relative max-w-7xl mx-auto sm:h-[500px] h-[280px] rounded-2xl overflow-hidden mt-6 mb-4 shadow-2xl group"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+  className="relative max-w-7xl mx-auto aspect-[16/6] sm:aspect-[16/5] md:aspect-[16/4] 
+             rounded-2xl overflow-hidden mt-3 mb-4 shadow-2xl group lg:h-[420px] lg:w-full"
+  onMouseEnter={() => setIsPaused(true)}
+  onMouseLeave={() => setIsPaused(false)}
+>
+  {images.map((src, i) => (
+    <div
+      key={i}
+      className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+        i === index ? "opacity-100 scale-100" : "opacity-0 scale-105"
+      }`}
     >
-      {/* Images */}
-      {images.map((src, i) => (
-        <div
-          key={i}
-          className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
-            i === index ? "opacity-100 scale-100" : "opacity-0 scale-105"
-          }`}
-        >
-          <Image
-            src={src}
-            alt={`Banner ${i + 1}`}
-            fill
-            className="object-cover"
-            priority={i === 0}
-          />
-          {/* Gradient Overlay for better text visibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        </div>
-      ))}
+      <Image
+        src={src}
+        alt={`Banner ${i + 1}`}
+        fill
+        className="object-cover rounded-2xl"
+        priority={i === 0}
+        sizes="90vw"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+    </div>
+  ))}
 
       {/* Navigation Arrows */}
       <button

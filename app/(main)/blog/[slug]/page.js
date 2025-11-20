@@ -4,7 +4,7 @@ export async function generateMetadata({ params }) {
   const { slug } = params;
   
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/slug/${slug}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`);
     const data = await res.json();
     const blog = data.data;
 

@@ -62,8 +62,8 @@ function CategoryPageContent() {
         {/* Category List */}
         <div className="space-y-10">
           {categories
-  .filter((main) => main.name.toLowerCase() !== "uncategorized")   // 👈 filter added
-  .map((main) => (
+          .filter((main) => main.name.toLowerCase() !== "uncategorized")   // 👈 filter added
+          .map((main) => (
             <div
               key={main._id}
               ref={(el) => (categoryRefs.current[main.name] = el)}
@@ -76,7 +76,7 @@ function CategoryPageContent() {
 
               {/* Subcategories */}
               {main.children && main.children.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-2 gap-y-4">
+                <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-2 gap-y-4">
                   {main.children.map((sub) => {
                     const imageSrc = sub.image
                       ? sub.image.startsWith("http")

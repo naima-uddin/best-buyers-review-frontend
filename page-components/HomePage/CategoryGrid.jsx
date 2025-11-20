@@ -83,7 +83,7 @@ const CategoryGrid = () => {
         </div>
 
         {/* Category Grid */}
-        <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-4">
           {displayCategories.map((category, index) => (
             <div
               key={index}
