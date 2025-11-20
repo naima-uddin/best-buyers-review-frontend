@@ -557,6 +557,124 @@ function ProductDetailsContent() {
         )}
       </div>
     </div>
+
+    {/* JSON-LD Structured Data for Product */}
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.title,
+          image: product.images?.map((img) => img.url) || [],
+          description: product.description || product.seo?.description,
+          brand: {
+            "@type": "Brand",
+            name: product.brand || "Unknown",
+          },
+          offers: {
+            "@type": "Offer",
+            url: `https://bestbuyersview.com/category/${mainCategory}/${subCategory}/${productId}`,
+            priceCurrency: product.price?.currency || "USD",
+            price: product.price?.amount || 0,
+            priceValidUntil: new Date(
+              new Date().setFullYear(new Date().getFullYear() + 1)
+            )
+              .toISOString()
+              .split("T")[0],
+            availability: "https://schema.org/InStock",
+            seller: {
+              "@type": "Organization",
+              name: "Best Buyers View",
+            },
+          },
+          aggregateRating: product.customRating?.reviewCount
+            ? {
+                "@type": "AggregateRating",
+                ratingValue: product.customRating?.rating || 0,
+                reviewCount: product.customRating?.reviewCount || 0,
+                bestRating: 5,
+                worstRating: 1,
+              }
+            : undefined,
+          review:
+            product.customReviews?.map((review) => ({
+              "@type": "Review",
+              author: {
+                "@type": "Person",
+                name: review.username || review.author || "Customer",
+              },
+              datePublished: review.date,
+              reviewBody: review.content || review.reviewText,
+              reviewRating: {
+                "@type": "Rating",
+                ratingValue: review.rating,
+                bestRating: 5,
+                worstRating: 1,
+              },
+            })) || [],
+        }),
+      }}
+    />
+
+    {/* FAQ Structured Data */}
+    {product.commonQuestions && product.commonQuestions.length > 0 && (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: product.commonQuestions.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.answer,
+              },
+            })),
+          }),
+        }}
+      />
+    )}
+
+    {/* BreadcrumbList Structured Data */}
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              name: "Home",
+              item: "https://bestbuyersview.com",
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: product.mainCategory?.name || mainCategory,
+              item: `https://bestbuyersview.com/category/${mainCategory}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: product.subCategory?.name || subCategory,
+              item: `https://bestbuyersview.com/category/${mainCategory}/${subCategory}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 4,
+              name: product.title,
+              item: `https://bestbuyersview.com/category/${mainCategory}/${subCategory}/${productId}`,
+            },
+          ],
+        }),
+      }}
+    />
+
     <Footer />
     </>
   );

@@ -6,14 +6,43 @@ import React from "react";
 // export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Category",
-  description: "Discover, Compare & Pick the Best from Baby,Beauty,Fashion,Fitness,Tech,Garden,Gifts,Home,Health,Money,Office,Outdoor,Pets,Sports,Tools,Food & more categories",
-  twitter:{
+  title: "Product Categories | Best Buyers View",
+  description:
+    "Explore all product categories at Best Buyers View. Find expert reviews and comparisons for Baby, Beauty, Fashion, Fitness, Tech, Garden, Gifts, Home, Health, Money, Office, Outdoor, Pets, Sports, Tools, Food & more.",
+  keywords: [
+    "product categories",
+    "baby products",
+    "beauty products",
+    "fashion",
+    "fitness equipment",
+    "tech gadgets",
+    "home products",
+    "outdoor gear",
+    "pet supplies",
+    "sports equipment",
+    "product reviews by category",
+  ],
+  alternates: {
+    canonical: "https://bestbuyersview.com/category",
+  },
+  openGraph: {
+    title: "Product Categories | Best Buyers View",
+    description:
+      "Browse all product categories and find the best items across Baby, Beauty, Fashion, Fitness, Tech, and more. Expert reviews and comparisons to help you decide.",
+    url: "https://bestbuyersview.com/category",
+    siteName: "Best Buyers View",
+    type: "website",
+  },
+  twitter: {
     card: "summary_large_image",
-    title: "Best Buyers View",
-    description: "Discover, Compare & Pick the Best",
-    site: "https://bestbuyersview.com"
-  }
+    title: "Product Categories | Best Buyers View",
+    description: "Discover, Compare & Pick the Best across all categories",
+    site: "@bestbuyersview",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function Page() {
