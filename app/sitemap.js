@@ -1,3 +1,5 @@
+import { slugify, createProductSlug } from "@/lib/slugify";
+
 export default async function sitemap() {
   const baseUrl = "https://bestbuyersview.com";
 
@@ -44,18 +46,20 @@ export default async function sitemap() {
         const main = p.mainCategory?.name;
         const sub = p.subCategory?.name;
         const id = p._id;
+        const title = p.title;
 
         if (!main || !sub || !id) return;
 
-        const mainSlug = main.toLowerCase().replace(/\s+/g, "-");
-        const subSlug = sub.toLowerCase().replace(/\s+/g, "-");
+        const mainSlug = slugify(main);
+        const subSlug = slugify(sub);
+        const productSlug = createProductSlug(title, id);
 
         categoriesSet.add(mainSlug);
         subCategoriesSet.add(`${mainSlug}/${subSlug}`);
 
         // Product Page
         productPages.push({
-          url: `${baseUrl}/category/${mainSlug}/${subSlug}/${id}`,
+          url: `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`,
           lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
           changeFrequency: "weekly",
           priority: 0.8,

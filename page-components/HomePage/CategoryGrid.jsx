@@ -2,6 +2,7 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { slugify } from "@/lib/slugify";
 
 const CategoryGrid = () => {
   const categories = [
@@ -90,7 +91,7 @@ const CategoryGrid = () => {
               className="flex flex-col items-center text-center cursor-pointer group"
               onClick={() =>
                 router.push(
-                  `/category?scrollTo=${encodeURIComponent(category.name)}`
+                  `/category?scrollTo=${slugify(category.name)}`
                 )
               }
             >

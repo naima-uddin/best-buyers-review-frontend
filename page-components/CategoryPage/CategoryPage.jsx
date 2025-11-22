@@ -7,6 +7,7 @@ import Breadcrumbs from "@/ui/Breadcrumbs";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, Suspense } from "react";
+import { slugify, unslugify } from "@/lib/slugify";
 
 function CategoryPageContent() {
   const { categories, loading } = useCategories();
@@ -19,11 +20,15 @@ function CategoryPageContent() {
 
   // Auto scroll to specific category
   useEffect(() => {
-    if (!loading && scrollTo && categoryRefs.current[scrollTo]) {
-      categoryRefs.current[scrollTo].scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (!loading && scrollTo) {
+      // Convert the slug back to Title Case to match category name
+      const categoryName = unslugify(scrollTo);
+      if (categoryRefs.current[categoryName]) {
+        categoryRefs.current[categoryName].scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
   }, [loading, scrollTo]);
 
@@ -89,7 +94,7 @@ function CategoryPageContent() {
                         key={sub._id}
                         className="flex flex-col items-center text-center group cursor-pointer hover:scale-105 transition-transform duration-200"
                         onClick={() =>
-                          router.push(`/category/${encodeURIComponent(main.name)}/${encodeURIComponent(sub.name)}`)
+                          router.push(`/category/${slugify(main.name)}/${slugify(sub.name)}`)
                         }
                       >
                         <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg shadow-sm overflow-hidden">

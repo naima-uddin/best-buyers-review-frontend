@@ -13,15 +13,16 @@ import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import Breadcrumbs from "@/ui/Breadcrumbs";
 import ProductListSkeleton from "@/components/skeletons/ProductListSkeleton";
+import { slugify, unslugify, createProductSlug } from "@/lib/slugify";
 
 function ProductByCategoryContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Decode URL params (Next.js usually decodes them, but let's be explicit)
-  const mainCategoryName = params?.mainCategory ? decodeURIComponent(params.mainCategory) : null;
-  const subCategoryName = params?.subCategory ? decodeURIComponent(params.subCategory) : null;
+  // Decode URL params
+  const mainCategoryName = params?.mainCategory ? unslugify(params.mainCategory) : null;
+  const subCategoryName = params?.subCategory ? unslugify(params.subCategory) : null;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
 
   console.log('🔍 ProductByCategory - Raw params:', params);
@@ -97,7 +98,7 @@ function ProductByCategoryContent() {
 
   const handlePageChange = (newPage) => {
     router.push(
-      `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}?page=${newPage}`,
+      `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?page=${newPage}`,
       { scroll: false }
     );
   };
@@ -174,7 +175,7 @@ function ProductByCategoryContent() {
   const handleSortChange = (e) => {
     const newSort = e.target.value;
     router.push(
-      `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}?page=${pageParam}&sort=${newSort}`
+      `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?page=${pageParam}&sort=${newSort}`
     );
   };
 
@@ -455,7 +456,7 @@ function ProductByCategoryContent() {
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}/${product._id}`}
+                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(product.title, product._id)}`}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
@@ -620,7 +621,7 @@ function ProductByCategoryContent() {
 
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}/${topProduct._id}`}
+                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(topProduct.title)}`}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →

@@ -106,8 +106,7 @@ export default function RootLayout({ children }) {
         "@id": "https://bestbuyersview.com/#website",
         url: "https://bestbuyersview.com",
         name: "Best Buyers View",
-        description:
-          "Expert product reviews, comparisons and buying guides.",
+        description: "Expert product reviews, comparisons and buying guides.",
         publisher: {
           "@id": "https://bestbuyersview.com/#organization",
         },
@@ -130,7 +129,7 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Organization + Website + WebPage + SearchAction JSON-LD */}
         <script
@@ -139,7 +138,10 @@ export default function RootLayout({ children }) {
         />
       </head>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <AuthProvider>
           <CategoryProvider>
             <CompareProvider>{children}</CompareProvider>
