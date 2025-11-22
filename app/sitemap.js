@@ -32,7 +32,7 @@ export default async function sitemap() {
   try {
     const productRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products/all`,
-      { cache: "no-store" }
+      { next: { revalidate: 3600 } } // Revalidate every hour
     );
 
     if (productRes.ok) {
@@ -93,7 +93,7 @@ export default async function sitemap() {
   try {
     const blogRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/blog`,
-      { cache: "no-store" }
+      { next: { revalidate: 3600 } } // Revalidate every hour
     );
 
     if (blogRes.ok) {
