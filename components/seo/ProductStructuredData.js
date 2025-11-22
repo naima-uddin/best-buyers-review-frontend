@@ -1,6 +1,7 @@
 // app/components/seo/ProductStructuredData.js
 "use server"; // server component
 import React from "react";
+import { slugify, createProductSlug } from "@/lib/slugify";
 
 export default async function ProductStructuredData({ product }) {
   if (!product) return null;
@@ -23,7 +24,7 @@ export default async function ProductStructuredData({ product }) {
     },
     offers: {
       "@type": "Offer",
-      url: `https://bestbuyersview.com/category/${encodeURIComponent(product.mainCategory?.name || "").toLowerCase().replace(/\s+/g,'-')}/${encodeURIComponent(product.subCategory?.name || "").toLowerCase().replace(/\s+/g,'-')}/${product._id}`,
+      url: `https://bestbuyersview.com/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`,
       priceCurrency: (priceObj.currency || "USD"),
       price: (priceObj.amount != null ? String(priceObj.amount) : undefined),
       availability: product.availability ? (product.availability.includes("In Stock") ? "https://schema.org/InStock" : "https://schema.org/OutOfStock") : undefined,
