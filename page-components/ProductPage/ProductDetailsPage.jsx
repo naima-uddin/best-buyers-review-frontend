@@ -21,7 +21,7 @@ import ProductInfoTabs from "./ProductInfoTabs";
 import BackButton from "@/ui/BackButton";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
-import { slugify, unslugify } from "@/lib/slugify";
+import { slugify, unslugify, extractProductId } from "@/lib/slugify";
 
 function ProductDetailsContent({ initialProduct }) {
   const params = useParams();
@@ -30,7 +30,7 @@ function ProductDetailsContent({ initialProduct }) {
   // Decode URL params
   const mainCategory = params?.mainCategory ? unslugify(params.mainCategory) : null;
   const subCategory = params?.subCategory ? unslugify(params.subCategory) : null;
-  const productId = params?.productId;
+  const productId = params?.productId ? extractProductId(params.productId) : null;
 
   console.log('🔍 ProductDetails - mainCategory:', mainCategory);
   console.log('🔍 ProductDetails - subCategory:', subCategory);

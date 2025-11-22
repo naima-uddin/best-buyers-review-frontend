@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { slugify } from "@/lib/slugify";
+import { slugify, createProductSlug } from "@/lib/slugify";
 
 export default function RelatedProducts({
   mainCategory,
@@ -100,7 +100,7 @@ export default function RelatedProducts({
                 className="p-3 min-w-[50%] sm:min-w-[33.33%] md:min-w-[25%] lg:min-w-[16.66%]"
               >
                 <Link
-                  href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}/${product._id}`}
+                  href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}/${createProductSlug(product.title, product._id)}`}
                   className="block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
                 >
                   <div className="relative w-full h-48">

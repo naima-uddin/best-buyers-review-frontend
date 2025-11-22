@@ -13,7 +13,7 @@ import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import Breadcrumbs from "@/ui/Breadcrumbs";
 import ProductListSkeleton from "@/components/skeletons/ProductListSkeleton";
-import { slugify, unslugify } from "@/lib/slugify";
+import { slugify, unslugify, createProductSlug } from "@/lib/slugify";
 
 function ProductByCategoryContent() {
   const params = useParams();
@@ -456,7 +456,7 @@ function ProductByCategoryContent() {
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${product._id}`}
+                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(product.title, product._id)}`}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>

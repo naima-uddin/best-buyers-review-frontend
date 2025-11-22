@@ -1,28 +1,21 @@
 // app/(main)/category/[mainCategory]/[subCategory]/[productId]/page.jsx
 import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
+import { unslugify, extractProductId } from '@/lib/slugify';
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }) {
   const { mainCategory, subCategory, productId } = await params;
 
-  // Format category names
-  const formatName = (name) => {
-    if (!name) return '';
-    return name
-      .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-  };
-
-  const mainName = formatName(mainCategory);
-  const subName = formatName(subCategory);
+  const mainName = unslugify(mainCategory);
+  const subName = unslugify(subCategory);
+  const actualProductId = extractProductId(productId);
 
   // Fetch product data server-side for SEO
   let productData = null;
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${actualProductId}`, {
       cache: 'no-store'
     });
     if (response.ok) {
@@ -100,11 +93,12 @@ export async function generateMetadata({ params }) {
 
 export default async function Page({ params }) {
   const { productId } = await params;
+  const actualProductId = extractProductId(productId);
 
   // Fetch product data server-side
   let productData = null;
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`, { cache: 'no-store' });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${actualProductId}`, { cache: 'no-store' });
     if (response.ok) {
       const data = await response.json();
       productData = data.data;
