@@ -35,8 +35,8 @@ async function verifySitemap() {
   try {
     // Fetch all products from API
     console.log("1. Fetching products from API...");
-    const productsData = await fetchData(`${apiUrl}/api/products/all`);
-    const products = productsData.data || [];
+    const productsData = await fetchData(`${apiUrl}/api/products`);
+    const products = productsData.data?.products || [];
     console.log(`   ✓ Found ${products.length} products in database`);
 
     // Fetch sitemap

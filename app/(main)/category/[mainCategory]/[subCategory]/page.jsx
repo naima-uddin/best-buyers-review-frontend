@@ -11,7 +11,7 @@ export const revalidate = 1800;
 export async function generateStaticParams() {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/all`,
+      `${process.env.NEXT_PUBLIC_API_URL}/products`,
       { next: { revalidate: 3600 } }
     );
 
@@ -21,7 +21,7 @@ export async function generateStaticParams() {
     }
 
     const data = await response.json();
-    const products = data.data || [];
+    const products = data.data?.products || [];
 
     // Create unique combinations of mainCategory and subCategory
     const categoryPairs = new Set();

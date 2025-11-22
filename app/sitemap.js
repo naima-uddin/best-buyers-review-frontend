@@ -31,13 +31,13 @@ export default async function sitemap() {
 
   try {
     const productRes = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/all`,
+      `${process.env.NEXT_PUBLIC_API_URL}/products`,
       { next: { revalidate: 3600 } } // Revalidate every hour
     );
 
     if (productRes.ok) {
       const productData = await productRes.json();
-      const products = productData.data || [];
+      const products = productData.data?.products || [];
 
       const categoriesSet = new Set();
       const subCategoriesSet = new Set();
