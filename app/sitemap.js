@@ -1,7 +1,7 @@
 import { slugify, createProductSlug } from "@/lib/slugify";
 
 export default async function sitemap() {
-  const baseUrl = "https://bestbuyersview.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
 
   // --------------------------------------------
   // Static pages

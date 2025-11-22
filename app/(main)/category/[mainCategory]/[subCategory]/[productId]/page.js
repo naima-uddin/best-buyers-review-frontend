@@ -3,6 +3,8 @@ import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
 import { unslugify, extractProductId, createProductSlug, slugify } from '@/lib/slugify';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+
 // Use ISR to revalidate product pages every 30 minutes
 export const revalidate = 1800;
 
@@ -77,8 +79,8 @@ export async function generateMetadata({ params }) {
     'buying guide',
   ];
 
-  const productUrl = `https://bestbuyersview.com/category/${mainCategory}/${subCategory}/${productId}`;
-  const imageUrl = productData?.images?.[0]?.url || 'https://bestbuyersview.com/og-image.jpg';
+  const productUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}/${productId}`;
+  const imageUrl = productData?.images?.[0]?.url || `${SITE_URL}/og-image.jpg`;
 
   return {
     title,
