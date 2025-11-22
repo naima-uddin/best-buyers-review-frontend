@@ -621,7 +621,7 @@ function ProductByCategoryContent() {
 
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(subCategoryName)}/${topProduct._id}`}
+                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(topProduct.title)}`}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →
