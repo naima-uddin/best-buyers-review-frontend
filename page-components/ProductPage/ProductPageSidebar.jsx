@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useCategories } from "@/context/CategoryContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { slugify } from "@/lib/slugify";
 
 export default function ProductPageSidebar({
   mainCategoryName,
@@ -36,9 +37,9 @@ export default function ProductPageSidebar({
 
   const handleSubCategoryClick = (sub) => {
     console.log('🔍 Sidebar - Clicking on subcategory:', sub.name);
-    console.log('🔍 Sidebar - Navigating to:', `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(sub.name)}`);
+    console.log('🔍 Sidebar - Navigating to:', `/category/${slugify(mainCategoryName)}/${slugify(sub.name)}`);
     router.push(
-      `/category/${encodeURIComponent(mainCategoryName)}/${encodeURIComponent(sub.name)}`
+      `/category/${slugify(mainCategoryName)}/${slugify(sub.name)}`
     );
   };
 

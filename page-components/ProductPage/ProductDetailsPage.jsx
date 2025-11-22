@@ -21,14 +21,15 @@ import ProductInfoTabs from "./ProductInfoTabs";
 import BackButton from "@/ui/BackButton";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
+import { slugify, unslugify } from "@/lib/slugify";
 
 function ProductDetailsContent({ initialProduct }) {
   const params = useParams();
   const router = useRouter();
 
   // Decode URL params
-  const mainCategory = params?.mainCategory ? decodeURIComponent(params.mainCategory) : null;
-  const subCategory = params?.subCategory ? decodeURIComponent(params.subCategory) : null;
+  const mainCategory = params?.mainCategory ? unslugify(params.mainCategory) : null;
+  const subCategory = params?.subCategory ? unslugify(params.subCategory) : null;
   const productId = params?.productId;
 
   console.log('🔍 ProductDetails - mainCategory:', mainCategory);
@@ -153,7 +154,7 @@ function ProductDetailsContent({ initialProduct }) {
             Product not found
           </h2>
           <Link
-            href={`/category/${mainCategory}/${subCategory}`}
+            href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}`}
             className="text-blue-600 hover:text-blue-700"
           >
             Back to Products
@@ -185,7 +186,7 @@ function ProductDetailsContent({ initialProduct }) {
             <li>/</li>
             <li>
               <Link
-                href={`/category/${mainCategory}`}
+                href={`/category?scrollTo=${slugify(mainCategory)}`}
                 className="hover:text-blue-600 transition-colors"
               >
                 {product.mainCategory?.name || mainCategory}
@@ -194,7 +195,7 @@ function ProductDetailsContent({ initialProduct }) {
             <li>/</li>
             <li>
               <Link
-                href={`/category/${mainCategory}/${subCategory}`}
+                href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}`}
                 className="hover:text-blue-600 transition-colors"
               >
                 {product.subCategory?.name || subCategory}

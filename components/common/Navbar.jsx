@@ -5,6 +5,7 @@ import { useCategories } from "@/context/CategoryContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { slugify } from "@/lib/slugify";
 
 // Icons
 import { Menu, X, Search } from "lucide-react";
@@ -75,7 +76,7 @@ export default function Navbar() {
     setIsMobileSearchOpen(false);
 
     router.push(
-      `/category/${encodeURIComponent(item.mainName)}/${encodeURIComponent(item.subName)}`
+      `/category/${slugify(item.mainName)}/${slugify(item.subName)}`
     );
   };
 

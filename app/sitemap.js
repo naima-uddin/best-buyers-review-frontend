@@ -1,3 +1,5 @@
+import { slugify } from "@/lib/slugify";
+
 export default async function sitemap() {
   const baseUrl = "https://bestbuyersview.com";
 
@@ -47,8 +49,8 @@ export default async function sitemap() {
 
         if (!main || !sub || !id) return;
 
-        const mainSlug = main.toLowerCase().replace(/\s+/g, "-");
-        const subSlug = sub.toLowerCase().replace(/\s+/g, "-");
+        const mainSlug = slugify(main);
+        const subSlug = slugify(sub);
 
         categoriesSet.add(mainSlug);
         subCategoriesSet.add(`${mainSlug}/${subSlug}`);
