@@ -1,9 +1,45 @@
 // app/(main)/category/[mainCategory]/[subCategory]/[productId]/page.jsx
 import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
-import { unslugify, extractProductId, createProductSlug } from '@/lib/slugify';
+import { unslugify, extractProductId, createProductSlug, slugify } from '@/lib/slugify';
 
-export const dynamic = "force-dynamic";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+
+// Use ISR to revalidate product pages every 30 minutes
+export const revalidate = 1800;
+
+// Generate static params for all products at build time
+export async function generateStaticParams() {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/all`,
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to fetch products for static generation');
+      return [];
+    }
+
+    const data = await response.json();
+    const products = data.data || [];
+
+    return products.map((product) => {
+      const mainSlug = slugify(product.mainCategory?.name || '');
+      const subSlug = slugify(product.subCategory?.name || '');
+      const productSlug = createProductSlug(product.title, product._id);
+
+      return {
+        mainCategory: mainSlug,
+        subCategory: subSlug,
+        productId: productSlug,
+      };
+    }).filter(param => param.mainCategory && param.subCategory && param.productId);
+  } catch (error) {
+    console.error('Error in generateStaticParams:', error);
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { mainCategory, subCategory, productId } = await params;
@@ -17,7 +53,7 @@ export async function generateMetadata({ params }) {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
-      { cache: 'no-store' }
+      { next: { revalidate: 1800 } } // Cache for 30 minutes
     );
     if (response.ok) {
       const data = await response.json();
@@ -43,8 +79,8 @@ export async function generateMetadata({ params }) {
     'buying guide',
   ];
 
-  const productUrl = `https://bestbuyersview.com/category/${mainCategory}/${subCategory}/${productId}`;
-  const imageUrl = productData?.images?.[0]?.url || 'https://bestbuyersview.com/og-image.jpg';
+  const productUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}/${productId}`;
+  const imageUrl = productData?.images?.[0]?.url || `${SITE_URL}/og-image.jpg`;
 
   return {
     title,
@@ -106,7 +142,7 @@ export default async function Page({ params }) {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
-      { cache: 'no-store' }
+      { next: { revalidate: 1800 } } // Cache for 30 minutes
     );
     if (response.ok) {
       const data = await response.json();

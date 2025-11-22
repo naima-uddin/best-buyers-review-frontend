@@ -1,6 +1,8 @@
 import ArticleStructuredData from "@/components/seo/ArticleStructuredData";
 import BlogDetails from "@/page-components/BlogPage/BlogDetails";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+
 // Revalidate every 60 seconds (SEO + speed)
 export const revalidate = 60;
 
@@ -30,12 +32,12 @@ export async function generateMetadata({ params }) {
     description: blog.seo?.description || blog.excerpt,
     keywords: blog.seo?.keywords || blog.tags,
     alternates: {
-      canonical: `https://bestbuyersview.com/blog/${blog.slug}`,
+      canonical: `${SITE_URL}/blog/${blog.slug}`,
     },
     openGraph: {
       title: blog.title,
       description: blog.description || blog.excerpt,
-      url: `https://bestbuyersview.com/blog/${blog.slug}`,
+      url: `${SITE_URL}/blog/${blog.slug}`,
       type: "article",
       publishedTime: blog.datePublished,
       modifiedTime: blog.dateModified,
@@ -74,14 +76,14 @@ export default async function BlogPostPage({ params }) {
       name: "Best Buyers View",
       logo: {
         "@type": "ImageObject",
-        url: "https://bestbuyersview.com/logo.png",
+        url: `${SITE_URL}/logo.png`,
       },
     },
     datePublished: blog.datePublished,
     dateModified: blog.dateModified,
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `https://bestbuyersview.com/blog/${blog.slug}`,
+      "@id": `${SITE_URL}/blog/${blog.slug}`,
     },
   };
 
@@ -94,13 +96,13 @@ export default async function BlogPostPage({ params }) {
         "@type": "ListItem",
         position: 1,
         name: "Blog",
-        item: "https://bestbuyersview.com/blog",
+        item: `${SITE_URL}/blog`,
       },
       {
         "@type": "ListItem",
         position: 2,
         name: blog.title,
-        item: `https://bestbuyersview.com/blog/${blog.slug}`,
+        item: `${SITE_URL}/blog/${blog.slug}`,
       },
     ],
   };

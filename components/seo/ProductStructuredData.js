@@ -3,6 +3,8 @@
 import React from "react";
 import { slugify, createProductSlug } from "@/lib/slugify";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+
 export default async function ProductStructuredData({ product }) {
   if (!product) return null;
 
@@ -15,7 +17,7 @@ export default async function ProductStructuredData({ product }) {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: product.title || product.seo?.title || "",
-    image: images.length ? images : ["https://bestbuyersview.com/og-image.jpg"],
+    image: images.length ? images : [`${SITE_URL}/og-image.jpg`],
     description: product.seo?.description || product.description || "",
     sku: product.asin || product._id,
     brand: {
@@ -24,7 +26,7 @@ export default async function ProductStructuredData({ product }) {
     },
     offers: {
       "@type": "Offer",
-      url: `https://bestbuyersview.com/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`,
+      url: `${SITE_URL}/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`,
       priceCurrency: (priceObj.currency || "USD"),
       price: (priceObj.amount != null ? String(priceObj.amount) : undefined),
       availability: product.availability ? (product.availability.includes("In Stock") ? "https://schema.org/InStock" : "https://schema.org/OutOfStock") : undefined,
