@@ -8,7 +8,8 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(rm:*)",
-      "Bash(node verify-sitemap.js:*)"
+      "Bash(node verify-sitemap.js:*)",
+      "Bash(node check-production-api.js:*)"
     ],
     "deny": [],
     "ask": []
