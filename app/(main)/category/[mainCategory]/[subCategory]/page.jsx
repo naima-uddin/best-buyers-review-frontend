@@ -1,9 +1,47 @@
 import ProductByCategory from "@/page-components/ProductPage/ProductByCategory";
 import CategoryStructuredData from "@/components/seo/CategoryStructuredData";
-import { unslugify } from "@/lib/slugify";
+import { unslugify, slugify } from "@/lib/slugify";
 
-// Force dynamic rendering for this page
-export const dynamic = "force-dynamic";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+
+// Use ISR to revalidate subcategory pages every 30 minutes
+export const revalidate = 1800;
+
+// Generate static params for all subcategories at build time
+export async function generateStaticParams() {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/all`,
+      { next: { revalidate: 3600 } }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to fetch products for subcategory static generation');
+      return [];
+    }
+
+    const data = await response.json();
+    const products = data.data || [];
+
+    // Create unique combinations of mainCategory and subCategory
+    const categoryPairs = new Set();
+    products.forEach((product) => {
+      if (product.mainCategory?.name && product.subCategory?.name) {
+        const mainSlug = slugify(product.mainCategory.name);
+        const subSlug = slugify(product.subCategory.name);
+        categoryPairs.add(`${mainSlug}|${subSlug}`);
+      }
+    });
+
+    return Array.from(categoryPairs).map((pair) => {
+      const [mainCategory, subCategory] = pair.split('|');
+      return { mainCategory, subCategory };
+    });
+  } catch (error) {
+    console.error('Error in subcategory generateStaticParams:', error);
+    return [];
+  }
+}
 
 // Generate metadata function
 export async function generateMetadata({ params }) {
@@ -13,7 +51,7 @@ export async function generateMetadata({ params }) {
 
   const title = `Best ${subName} - ${mainName} Reviews & Buying Guide ${new Date().getFullYear()}`;
   const description = `Find the best ${subName.toLowerCase()} in ${mainName.toLowerCase()}. Expert reviews, detailed comparisons, and comprehensive buying guide. Updated ${new Date().toLocaleString('default', { month: 'long' })} ${new Date().getFullYear()}.`;
-  const categoryUrl = `https://bestbuyersview.com/category/${mainCategory}/${subCategory}`;
+  const categoryUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}`;
 
   const keywords = [
     `best ${subName.toLowerCase()}`,
@@ -40,7 +78,7 @@ export async function generateMetadata({ params }) {
       type: 'website',
       images: [
         {
-          url: 'https://bestbuyersview.com/og-image.jpg',
+          url: `${SITE_URL}/og-image.jpg`,
           width: 1200,
           height: 630,
           alt: `${subName} - ${mainName}`,
@@ -51,7 +89,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title,
       description,
-      images: ['https://bestbuyersview.com/og-image.jpg'],
+      images: [`${SITE_URL}/og-image.jpg`],
     },
     robots: {
       index: true,

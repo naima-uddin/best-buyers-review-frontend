@@ -1,4 +1,6 @@
 export default function robots() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+
   return {
     rules: [
       {
@@ -7,6 +9,6 @@ export default function robots() {
         disallow: ["/dashboard/", "/login/", "/api/"],
       },
     ],
-    sitemap: "https://bestbuyersview.com/sitemap.xml",
+    sitemap: `${siteUrl}/sitemap.xml`,
   };
 }

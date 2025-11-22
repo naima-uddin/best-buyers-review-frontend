@@ -2,8 +2,7 @@ import CategoryPage from "@/page-components/CategoryPage/CategoryPage";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
 import React from "react";
 
-// // Force dynamic rendering for this page
-// export const dynamic = "force-dynamic";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
 
 export const metadata = {
   title: "Product Categories | Best Buyers View",
@@ -23,13 +22,13 @@ export const metadata = {
     "product reviews by category",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/category",
+    canonical: `${SITE_URL}/category`,
   },
   openGraph: {
     title: "Product Categories | Best Buyers View",
     description:
       "Browse all product categories and find the best items across Baby, Beauty, Fashion, Fitness, Tech, and more. Expert reviews and comparisons to help you decide.",
-    url: "https://bestbuyersview.com/category",
+    url: `${SITE_URL}/category`,
     siteName: "Best Buyers View",
     type: "website",
   },
