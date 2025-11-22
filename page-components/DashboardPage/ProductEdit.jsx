@@ -1053,6 +1053,8 @@ export default function ProductEdit({
                       src={formData.mainImage}
                       alt="Main product"
                       className="w-24 h-24 object-cover rounded-lg border"
+                      width={96}
+                      height={96}
                       onError={(e) => {
                         e.target.src = "/placeholder-image.jpg";
                       }}
@@ -1205,6 +1207,8 @@ export default function ProductEdit({
                       <Image
                         src={url}
                         alt={`Sub image ${index + 1}`}
+                        width={400}
+                        height={400}
                         className="w-full h-24 object-cover rounded border"
                         onError={(e) => {
                           e.target.src = "/placeholder-image.jpg";
