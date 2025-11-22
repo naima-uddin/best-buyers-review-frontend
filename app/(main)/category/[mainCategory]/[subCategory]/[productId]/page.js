@@ -1,7 +1,7 @@
 // app/(main)/category/[mainCategory]/[subCategory]/[productId]/page.jsx
 import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
-import { unslugify, extractProductId } from '@/lib/slugify';
+import { unslugify, extractProductId, createProductSlug } from '@/lib/slugify';
 
 export const dynamic = "force-dynamic";
 
@@ -10,17 +10,20 @@ export async function generateMetadata({ params }) {
 
   const mainName = unslugify(mainCategory);
   const subName = unslugify(subCategory);
-  const actualProductId = extractProductId(productId);
+  const productSlug = extractProductId(productId);
 
-  // Fetch product data server-side for SEO
+  // Fetch products by category and find matching product by slug
   let productData = null;
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${actualProductId}`, {
-      cache: 'no-store'
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
+      { cache: 'no-store' }
+    );
     if (response.ok) {
       const data = await response.json();
-      productData = data.data;
+      // Find product matching the slug
+      const products = data.data?.products || [];
+      productData = products.find(p => createProductSlug(p.title) === productSlug);
     }
   } catch (error) {
     console.error('Error fetching product for SEO:', error);
@@ -92,16 +95,24 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const { productId } = await params;
-  const actualProductId = extractProductId(productId);
+  const { mainCategory, subCategory, productId } = await params;
 
-  // Fetch product data server-side
+  const mainName = unslugify(mainCategory);
+  const subName = unslugify(subCategory);
+  const productSlug = extractProductId(productId);
+
+  // Fetch products by category and find matching product by slug
   let productData = null;
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${actualProductId}`, { cache: 'no-store' });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
+      { cache: 'no-store' }
+    );
     if (response.ok) {
       const data = await response.json();
-      productData = data.data;
+      // Find product matching the slug
+      const products = data.data?.products || [];
+      productData = products.find(p => createProductSlug(p.title) === productSlug);
     }
   } catch (err) {
     console.error('Error fetching product:', err);
