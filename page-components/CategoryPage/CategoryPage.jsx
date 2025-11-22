@@ -7,7 +7,7 @@ import Breadcrumbs from "@/ui/Breadcrumbs";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, Suspense } from "react";
-import { slugify } from "@/lib/slugify";
+import { slugify, unslugify } from "@/lib/slugify";
 
 function CategoryPageContent() {
   const { categories, loading } = useCategories();
@@ -20,11 +20,15 @@ function CategoryPageContent() {
 
   // Auto scroll to specific category
   useEffect(() => {
-    if (!loading && scrollTo && categoryRefs.current[scrollTo]) {
-      categoryRefs.current[scrollTo].scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (!loading && scrollTo) {
+      // Convert the slug back to Title Case to match category name
+      const categoryName = unslugify(scrollTo);
+      if (categoryRefs.current[categoryName]) {
+        categoryRefs.current[categoryName].scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
   }, [loading, scrollTo]);
 
