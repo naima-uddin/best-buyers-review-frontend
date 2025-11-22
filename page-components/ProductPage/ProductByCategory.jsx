@@ -646,7 +646,7 @@ function ProductByCategoryContent() {
                             <Image
                               src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
                               alt="Amazon"
-                              width={24}
+                              width={44}
                               height={24}
                               className="h-6 mt-2 mx-auto opacity-80"
                             />
