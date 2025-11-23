@@ -424,8 +424,18 @@ function ProductByCategoryContent() {
                               </h2>
 
                               <div className="space-y-1.5 sm:space-y-1 mb-3 sm:mb-4">
-                                {product.features?.feature &&
-                                product.features.feature.length > 0 ? (
+                                {product.specifications && product.specifications.length > 0 ? (
+                                  product.specifications
+                                    .slice(0, 5)
+                                    .map((spec, i) => (
+                                      <div key={i} className="flex items-start gap-2">
+                                        <div className="w-1.5 h-1.5 mt-2 rounded-full bg-gray-400 "></div>
+                                        <span className="text-gray-700 text-xs sm:text-sm leading-relaxed tracking-[0.2px]">
+                                          <span className="font-bold">{spec.key}:</span> {truncateFeature(spec.value, 40)}
+                                        </span>
+                                      </div>
+                                    ))
+                                ) : product.features?.feature && product.features.feature.length > 0 ? (
                                   product.features.feature
                                     .slice(0, 4)
                                     .map((feature, i) => (
@@ -611,14 +621,21 @@ function ProductByCategoryContent() {
                             </h2>
 
                             <ul className="space-y-1.5 mb-4 text-gray-700 text-xs sm:text-sm">
-                              {topProduct.features?.feature?.slice(0, 4)?.map((f, i) => (
+                              {topProduct.specifications?.slice(0, 4)?.map((spec, i) => (
+                                <li key={i} className="flex gap-2 items-start">
+                                  <span className="text-yellow-500 mt-0.5">•</span>
+                                  <span>
+                                    <span className="font-bold">{spec.key}:</span> {truncateFeature(spec.value, 60)}
+                                  </span>
+                                </li>
+                              )) ?? 
+                              topProduct.features?.feature?.slice(0, 4)?.map((f, i) => (
                                 <li key={i} className="flex gap-2 items-start">
                                   <span className="text-yellow-500 mt-0.5">•</span>
                                   {truncateFeature(f, 60)}
                                 </li>
                               ))}
                             </ul>
-
                             {topProduct?.isFullReview && (
                               <Link
                                 href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(topProduct.title)}`}

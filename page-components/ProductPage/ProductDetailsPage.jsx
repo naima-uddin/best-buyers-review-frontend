@@ -27,6 +27,15 @@ import {
   extractProductId,
   createProductSlug,
 } from "@/lib/slugify";
+import {
+  ColorsSection,
+  StylesSection,
+  FactorsToConsiderSection,
+  MostImportantFactorsSection,
+  ConclusionSection,
+  AllCommonQuestionsSection,
+  AllCustomReviewsSection
+} from "./ProductDetailsSections";
 
 function ProductDetailsContent({ initialProduct }) {
   const params = useParams();
@@ -517,13 +526,35 @@ function ProductDetailsContent({ initialProduct }) {
             </div>
           </div>
 
-          <ProductInfoTabs product={product} />
-
           <RelatedProducts
             mainCategory={mainCategory}
             subCategory={subCategory}
             currentProductId={product?._id}
           />
+          <ProductInfoTabs product={product} />
+
+
+          {/* Add this after ProductInfoTabs and before RelatedProducts */}
+
+          {/* All Additional Sections */}
+          <div className="space-y-6">
+            {/* Available Colors */}
+            <ColorsSection colors={product.colors} />
+
+            {/* Available Styles */}
+            <StylesSection styles={product.styles} />
+
+            {/* Factors to Consider */}
+            <FactorsToConsiderSection factors={product.factorsToConsider} />
+
+            {/* Most Important Factors */}
+            <MostImportantFactorsSection factors={product.mostImportantFactors} />
+
+            {/* Conclusion */}
+
+          </div>
+
+          
 
           {/* Customer Reviews Section */}
           {product.customReviews && product.customReviews.length > 0 && (
@@ -625,6 +656,10 @@ function ProductDetailsContent({ initialProduct }) {
             </div>
           )}
         </div>
+        <div className="max-w-7xl mx-auto mt-6 px-6">
+          <ConclusionSection conclusion={product.conclusion} />
+        </div>
+
       </div>
 
       {/* JSON-LD Structured Data for Product */}
