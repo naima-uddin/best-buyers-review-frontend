@@ -100,16 +100,27 @@ export default function ProductForm({ onSubmit, onCancel, categories, categories
       const result = await response.json();
 
       if (response.ok) {
+  
+  // 👉 Sort according to the ASIN input order
+        if (result.data?.products?.length) {
+          const sorted = result.data.products.sort((a, b) => 
+            validAsins.indexOf(a.asin) - validAsins.indexOf(b.asin)
+          );
+          result.data.products = sorted;
+        }
+
         alert(
           `✅ Successfully added ${result.data?.added?.length || 0} products!`
         );
+
         setAsins([""]);
         setSelectedMain("");
         setSelectedSub("");
         setSelectedSubSub("");
         setSeo({ title: "", description: "", keywords: "" });
-        if (onSubmit) onSubmit();
-      } else {
+
+        if (onSubmit) onSubmit(result.data.products);
+      }else {
         setError(result.message || "Failed to fetch products");
       }
     } catch (err) {
