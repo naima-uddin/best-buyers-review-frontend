@@ -1041,6 +1041,11 @@ export default function ProductEdit({
                 <option value="amazon-choice">Amazon's choice</option>
                 <option value="popular">Popular</option>
                 <option value="top-pick">Top Picks</option>
+                <option value="best-value">Best Value</option>
+                <option value="black-friday-deal">Black Friday Deal</option>
+                <option value="editor-choice">Editor Choice</option>
+                <option value="black-friday-deal">Black Friday Deal</option>
+                <option value="flash-sale">Flash Sale</option>
               </select>
 
               <div>
