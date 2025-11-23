@@ -596,7 +596,7 @@ function ProductDetailsContent({ initialProduct }) {
                     </div>
 
                     <p className="text-gray-600 mb-3 text-sm leading-relaxed bg-gray-50 p-3 rounded-lg">
-                      {review.reviewText || review.text}
+                      {review.content || review.text}
                     </p>
 
                     <div className="flex items-center justify-between">
@@ -605,7 +605,7 @@ function ProductDetailsContent({ initialProduct }) {
                           {(review.username || "User").charAt(0).toUpperCase()}
                         </div>
                         <span className="text-sm font-medium text-gray-700">
-                          {review.username || "Customer"}
+                          {review.author || "Customer"}
                         </span>
                       </div>
 
