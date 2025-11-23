@@ -25,10 +25,15 @@ export const ColorsSection = ({ colors }) => {
               }}
             ></div>
             <span className="text-sm font-medium text-gray-700">
-              {color.name || color}
+              {color.name || color} 
             </span>
+          
           </div>
         ))}
+        <span className="text-sm font-medium text-gray-500 flex justify-center items-center">
+
+          + more
+        </span>
       </div>
     </div>
   );
