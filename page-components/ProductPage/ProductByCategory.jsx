@@ -290,7 +290,7 @@ const handlePageChange = (newPage) => {
         )[0]
       : null;
   const displayTitle = subSubCategoryParam  
-    ? `Best ${unslugify(subSubCategoryParam)})`
+    ? `Best ${unslugify(subSubCategoryParam)}`
     : `Best ${subCategoryName} (${mainCategoryName})`;
   return (
     <>
@@ -372,39 +372,34 @@ const handlePageChange = (newPage) => {
                   return (
                     <div key={product._id} className="relative">
                       {/* Product Number */}
-                      <div className="absolute -left-2 sm:left-0 md:left-4 top-6 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base transform sm:-translate-y-1/2 shadow-lg">
-                        {productNumber}
-                      </div>
+                      <div className="absolute left-4 top-4 sm:-left-2 sm:left-0 md:left-4 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white w-8 h-8 md:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base sm:transform sm:-translate-y-1/2 shadow-lg">
+  {productNumber}
+</div>
 
                       {/* Product Card */}
-                      <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-400 ml-6 sm:ml-8 md:ml-10">
+                      <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-400 ml-4 md:ml-8">
                         <div className="p-3 sm:p-4 md:p-6">
                           <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                             {/* Image Block */}
                             <div className="flex flex-col items-center w-full md:w-40 lg:w-48 relative mx-auto md:mx-0">
                               {/* Main Label - Shows first label above image like "Bestseller" */}
-                              {product.labels && product.labels.length > 0 && (
-                                <div className="absolute -top-2 left-0 z-10">
-                                  <span className="bg-gradient-to-r from-red-600 to-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-md uppercase">
-                                    {product.labels[0]}
-                                  </span>
-                                </div>
-                              )}
-
-                              {/* Additional Labels - Shows remaining labels inside image area */}
-                              {product.labels && product.labels.length > 1 && (
-                                <div className="absolute left-0 top-2 z-10 flex flex-wrap gap-1">
-                                  {product.labels.slice(1, 3).map((label, i) => (
-                                    <span
-                                      key={i}
-                                      className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow-md uppercase"
-                                    >
-                                      {label}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-
+                              {/* Labels Section - Flex row for all devices */}
+{(product.labels && product.labels.length > 0) && (
+  <div className="flex flex-row flex-wrap gap-2 mb-2 justify-center md:justify-start">
+    {product.labels.map((label, i) => (
+      <span
+        key={i}
+        className={`px-2 py-1 rounded text-xs font-bold shadow-md uppercase whitespace-nowrap ${
+          i === 0 && label.includes("AMAZON") 
+            ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white"
+            : "bg-gradient-to-r from-red-600 to-red-500 text-white"
+        }`}
+      >
+        {label}
+      </span>
+    ))}
+  </div>
+                            )}
                               <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-1 md:mb-2 mt-2">
                                 <Image
                                   src={currentImage || "/placeholder-image.jpg"}
@@ -764,11 +759,11 @@ const handlePageChange = (newPage) => {
           <CompareModal />
         </div>
 
-        <CouponPopup
+        {/* <CouponPopup
           show={showCoupon}
           onClose={handleCloseCoupon}
           couponProduct={couponProduct}
-        />
+        /> */}
       </div>
 
       <Footer />

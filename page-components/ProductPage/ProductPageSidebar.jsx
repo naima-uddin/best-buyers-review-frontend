@@ -156,7 +156,6 @@ export default function ProductPageSidebar({
           {/* Show sub-subcategories if available */}
           {subSubCategories.length > 0 ? (
             <>
-              <p className="text-sm font-medium text-gray-600 mb-2">Sub-categories of {currentSubCategoryName}:</p>
               <div className="space-y-1">
                 {subSubCategories.slice(0, visibleCount).map((subSubCat) => {
                   const isActive = subSubCat.name === activeSubSubCategoryName;
