@@ -289,8 +289,8 @@ const handlePageChange = (newPage) => {
             (b.customRating?.rating || 0) - (a.customRating?.rating || 0)
         )[0]
       : null;
-  const displayTitle = subSubCategoryParam 
-    ? `Best ${unslugify(subSubCategoryParam)} - ${subCategoryName} (${mainCategoryName})`
+  const displayTitle = subSubCategoryParam  
+    ? `Best ${unslugify(subSubCategoryParam)})`
     : `Best ${subCategoryName} (${mainCategoryName})`;
   return (
     <>

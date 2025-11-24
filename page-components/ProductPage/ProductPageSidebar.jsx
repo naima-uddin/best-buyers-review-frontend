@@ -1,9 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useCategories } from "@/context/CategoryContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { slugify } from "@/lib/slugify";
+import { slugify, unslugify } from "@/lib/slugify";
 
 export default function ProductPageSidebar({
   mainCategoryName,
@@ -12,6 +12,7 @@ export default function ProductPageSidebar({
 }) {
   const { categories } = useCategories();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [visibleCount, setVisibleCount] = useState(7);
 
@@ -38,8 +39,16 @@ export default function ProductPageSidebar({
   const subSubCategories = currentSubCat?.children || [];
   const hasMore = subSubCategories.length > visibleCount;
 
+  // Get current active sub-subcategory from query params
+  const allParams = Object.fromEntries(searchParams?.entries() || []);
+  const activeSubSubCategoryParam = Object.keys(allParams).find(key => 
+    key !== 'page' && key !== 'sort'
+  );
+  const activeSubSubCategoryName = activeSubSubCategoryParam ? unslugify(activeSubSubCategoryParam) : null;
+
   console.log('🔍 Sidebar - Current Subcategory:', currentSubCat?.name);
   console.log('🔍 Sidebar - Sub-subcategories:', subSubCategories.map(s => s.name));
+  console.log('🔍 Sidebar - Active Sub-subcategory:', activeSubSubCategoryName);
 
   const handleSubCategoryClick = (sub) => {
     console.log('🔍 Sidebar - Clicking on subcategory:', sub.name);
@@ -53,10 +62,17 @@ export default function ProductPageSidebar({
     console.log('🔍 Sidebar - Clicking on sub-subcategory:', subSubCat.name);
     
     // Navigate to the same subcategory page but with subSubCategory parameter
-    // This will trigger the product filtering in your existing ProductByCategory component
     router.push(
-    `/category/${slugify(mainCategoryName)}/${slugify(currentSubCategoryName)}?${slugify(subSubCat.name)}`
-  );
+      `/category/${slugify(mainCategoryName)}/${slugify(currentSubCategoryName)}?${slugify(subSubCat.name)}`
+    );
+  };
+
+  const handleShowMoreLess = () => {
+    if (visibleCount === 7) {
+      setVisibleCount(subSubCategories.length);
+    } else {
+      setVisibleCount(7);
+    }
   };
 
   // If showOnlyRelatedCategories is true, only render the related categories section
@@ -68,11 +84,16 @@ export default function ProductPageSidebar({
           <>
             <p className="text-sm font-semibold text-gray-700 mb-2">Sub-categories:</p>
             {subSubCategories.slice(0, visibleCount).map((subSubCat) => {
+              const isActive = subSubCat.name === activeSubSubCategoryName;
               return (
                 <button
                   key={subSubCat._id}
                   onClick={() => handleSubSubCategoryClick(subSubCat)}
-                  className="block w-full text-left px-3 py-1 rounded-lg transition hover:bg-gray-100 text-gray-700 text-sm"
+                  className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                    isActive
+                      ? "bg-blue-700 text-white font-semibold"
+                      : "hover:bg-gray-100 text-gray-700"
+                  } text-sm`}
                 >
                   {subSubCat.name}
                 </button>
@@ -81,12 +102,10 @@ export default function ProductPageSidebar({
             {/* Show more / less button */}
             {hasMore && (
               <button
-                onClick={() =>
-                  setVisibleCount(visibleCount === 7 ? subSubCategories.length : 7)
-                }
-                className="text-blue-600 mt-3 text-sm hover:underline"
+                onClick={handleShowMoreLess}
+                className="text-blue-600 mt-3 text-sm hover:underline font-medium"
               >
-                {visibleCount === 7 ? "Show more" : "Show less"}
+                {visibleCount === 7 ? `Show more (${subSubCategories.length - 7} more)` : "Show less"}
               </button>
             )}
           </>
@@ -95,9 +114,6 @@ export default function ProductPageSidebar({
           <>
             {mainCat.children?.slice(0, visibleCount).map((sub) => {
               const isActive = sub.name === currentSubCategoryName;
-              if (isActive) {
-                console.log('✅ Sidebar - Active subcategory:', sub.name);
-              }
               return (
                 <button
                   key={sub._id}
@@ -120,7 +136,7 @@ export default function ProductPageSidebar({
                 }
                 className="text-blue-600 mt-3 text-sm hover:underline"
               >
-                {visibleCount === 7 ? "Show more" : "Show less"}
+                {visibleCount === 7 ? `Show more (${mainCat.children.length - 7} more)` : "Show less"}
               </button>
             )}
           </>
@@ -142,26 +158,31 @@ export default function ProductPageSidebar({
             <>
               <p className="text-sm font-medium text-gray-600 mb-2">Sub-categories of {currentSubCategoryName}:</p>
               <div className="space-y-1">
-                {subSubCategories.slice(0, visibleCount).map((subSubCat) => (
-                  <button
-                    key={subSubCat._id}
-                    onClick={() => handleSubSubCategoryClick(subSubCat)}
-                    className="block w-full text-left px-3 py-1 rounded-lg transition hover:bg-gray-100 text-gray-700 text-sm"
-                  >
-                    {subSubCat.name}
-                  </button>
-                ))}
+                {subSubCategories.slice(0, visibleCount).map((subSubCat) => {
+                  const isActive = subSubCat.name === activeSubSubCategoryName;
+                  return (
+                    <button
+                      key={subSubCat._id}
+                      onClick={() => handleSubSubCategoryClick(subSubCat)}
+                      className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                        isActive
+                          ? "bg-blue-700 text-white font-semibold"
+                          : "hover:bg-gray-100 text-gray-700"
+                      } text-sm`}
+                    >
+                      {subSubCat.name}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Show more / less button */}
               {hasMore && (
                 <button
-                  onClick={() =>
-                    setVisibleCount(visibleCount === 7 ? subSubCategories.length : 7)
-                  }
-                  className="text-blue-600 mt-3 text-sm hover:underline"
+                  onClick={handleShowMoreLess}
+                  className="text-blue-600 mt-3 text-sm hover:underline font-medium"
                 >
-                  {visibleCount === 7 ? "Show more" : "Show less"}
+                  {visibleCount === 7 ? `Show more (${subSubCategories.length - 7} more)` : "Show less"}
                 </button>
               )}
             </>
@@ -195,7 +216,7 @@ export default function ProductPageSidebar({
                   }
                   className="text-blue-600 mt-3 text-sm hover:underline"
                 >
-                  {visibleCount === 7 ? "Show more" : "Show less"}
+                  {visibleCount === 7 ? `Show more (${mainCat.children.length - 7} more)` : "Show less"}
                 </button>
               )}
             </>
