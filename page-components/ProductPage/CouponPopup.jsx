@@ -32,7 +32,7 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
         {/* ❌ Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl font-bold"
+          className="absolute top-3 right-3 text-white md:text-blue-600 hover:text-black text-xl font-bold"
         >
           ✕
         </button>
@@ -43,21 +43,23 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
             <h2 className="text-2xl font-bold mb-3">
               Best {couponProduct.subCategory?.name || "Deal"}
             </h2>
-            <div className="bg-white text-blue-700 font-bold px-4 py-1 rounded mb-3">
+            <div className="bg-white text-blue-700 font-bold px-4 py-1 rounded mb-2">
               {discountPercentage ? (
                 <span className="text-lg">{discountPercentage}% OFF</span>
               ) : (
                 "Exclusive Savings"
               )}
             </div>
-            <p className="text-sm mb-4 text-white/90">
+            <p className="text-sm mb-1 text-white/90">
               {couponProduct.title.slice(0, 100)}...
             </p>
+            <div className="hidden md:block mt-4">
+
             <a
               href={couponProduct.affiliateUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center w-full max-w-xs"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center w-full max-w-xs "
             >
               View
               <Image
@@ -69,20 +71,21 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               />
               Deal
             </a>
+            </div>
           </div>
 
           {/* 🟨 Right Side - Product Images */}
-          <div className="flex flex-col items-center justify-center p-6">
+          <div className="flex flex-col items-center justify-center p-3">
             {/* Rating */}
             <div className="text-xl font-bold mb-1 text-yellow-600">
               {couponProduct.customRating?.rating || "9.8"} ⭐
             </div>
-            <div className="text-gray-500 mb-4">
+            <div className="text-gray-500 mb-2">
               {couponProduct.customRating?.reviewCount || 50}+ reviewed in past month
             </div>
 
             {/* 🖼️ Main Image */}
-            <div className="relative w-48 h-48 mb-4">
+            <div className="relative w-34 h-34 md:w-48 md:h-48 mb-4">
               <Image
                 src={activeImage || "/placeholder-image.jpg"}
                 alt={couponProduct.title}
@@ -114,7 +117,27 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
                 ))}
               </div>
             )}
+          {/* 📱 Mobile Only: View Deal Button Below Images */}
+<div className="block md:hidden w-full mt-4">
+  <a
+    href={couponProduct.affiliateUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center w-full"
+  >
+    View
+    <Image
+      src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+      alt="Amazon"
+      width={60}
+      height={20}
+      className="h-5 ml-2 mr-2 flex items-center justify-center"
+    />
+    Deal
+  </a>
+</div>
           </div>
+
         </div>
       </div>
     </div>
