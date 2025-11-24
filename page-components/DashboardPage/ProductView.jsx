@@ -79,6 +79,8 @@ export default function ProductView({ product, onClose }) {
                   <Image
                     src={getMainImage(product)}
                     alt={product.title}
+                    width={600}
+                    height={400}
                     className="w-full h-96 object-cover rounded-xl"
                   />
                    
@@ -89,6 +91,8 @@ export default function ProductView({ product, onClose }) {
                           key={idx}
                           src={img.url}
                           alt={`Variant ${idx}`}
+                          width={80}
+                          height={80}
                           className="w-20 h-20 object-cover rounded-md border"
                         />
                       ))}

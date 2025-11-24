@@ -39,10 +39,13 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState("");
   const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [selectedSubSubCategory, setSelectedSubSubCategory] = useState("");
   const [mainCategorySearch, setMainCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
+  const [subSubCategorySearch, setSubSubCategorySearch] = useState("");
   const [showMainDropdown, setShowMainDropdown] = useState(false);
   const [showSubDropdown, setShowSubDropdown] = useState(false);
+  const [showSubSubDropdown, setShowSubSubDropdown] = useState(false);
 
   // Helper functions to get categories
   const getMainCategories = () => {
@@ -54,6 +57,21 @@ export default function ProductsPage() {
     const mainCategory = categories.find((cat) => cat._id === mainCategoryId);
     return mainCategory?.children || [];
   };
+
+const getSubSubCategories = (subCategoryId) => {
+  if (!subCategoryId) return [];
+  
+  // First, find the main category that contains this sub category
+  const mainCategory = categories.find(mainCat => 
+    mainCat.children?.some(subCat => subCat._id === subCategoryId)
+  );
+  
+  if (!mainCategory) return [];
+  
+  // Then find the specific sub category
+  const subCategory = mainCategory.children?.find(subCat => subCat._id === subCategoryId);
+  return subCategory?.children || [];
+};
 
   // Fetch categories
   useEffect(() => {
@@ -84,7 +102,8 @@ export default function ProductsPage() {
     pageNum = 1,
     search = "",
     mainCat = "",
-    subCat = ""
+    subCat = "",
+    subSubCat = ""
   ) => {
     setLoading(true);
     try {
@@ -94,6 +113,7 @@ export default function ProductsPage() {
       if (search) url += `&search=${encodeURIComponent(search)}`;
       if (mainCat) url += `&mainCategory=${mainCat}`;
       if (subCat) url += `&subCategory=${subCat}`;
+      if (subSubCat) url += `&subSubCategory=${subSubCat}`;
 
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,7 +133,13 @@ export default function ProductsPage() {
   };
 
   useEffect(() => {
-    fetchProducts(page, searchQuery, selectedMainCategory, selectedSubCategory);
+    fetchProducts(
+      page, 
+      searchQuery, 
+      selectedMainCategory, 
+      selectedSubCategory, 
+      selectedSubSubCategory
+    );
   }, [page]);
 
   // Close dropdowns when clicking outside
@@ -122,6 +148,7 @@ export default function ProductsPage() {
       if (!event.target.closest(".category-dropdown")) {
         setShowMainDropdown(false);
         setShowSubDropdown(false);
+        setShowSubSubDropdown(false);
       }
     };
 
@@ -149,7 +176,8 @@ export default function ProductsPage() {
           page,
           searchQuery,
           selectedMainCategory,
-          selectedSubCategory
+          selectedSubCategory,
+          selectedSubSubCategory
         );
       } else {
         alert("Failed to delete product");
@@ -164,7 +192,13 @@ export default function ProductsPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchProducts(1, searchQuery, selectedMainCategory, selectedSubCategory);
+    fetchProducts(
+      1, 
+      searchQuery, 
+      selectedMainCategory, 
+      selectedSubCategory, 
+      selectedSubSubCategory
+    );
   };
 
   // Handle main category selection
@@ -172,10 +206,15 @@ export default function ProductsPage() {
     setSelectedMainCategory(category._id);
     setMainCategorySearch(category.name);
     setShowMainDropdown(false);
+    
+    // Reset sub and sub-sub categories
     setSelectedSubCategory("");
     setSubCategorySearch("");
+    setSelectedSubSubCategory("");
+    setSubSubCategorySearch("");
+    
     setPage(1);
-    fetchProducts(1, searchQuery, category._id, "");
+    fetchProducts(1, searchQuery, category._id, "", "");
   };
 
   // Handle sub category selection
@@ -183,8 +222,22 @@ export default function ProductsPage() {
     setSelectedSubCategory(category._id);
     setSubCategorySearch(category.name);
     setShowSubDropdown(false);
+    
+    // Reset sub-sub category
+    setSelectedSubSubCategory("");
+    setSubSubCategorySearch("");
+    
     setPage(1);
-    fetchProducts(1, searchQuery, selectedMainCategory, category._id);
+    fetchProducts(1, searchQuery, selectedMainCategory, category._id, "");
+  };
+
+  // Handle sub-sub category selection
+  const selectSubSubCategory = (category) => {
+    setSelectedSubSubCategory(category._id);
+    setSubSubCategorySearch(category.name);
+    setShowSubSubDropdown(false);
+    setPage(1);
+    fetchProducts(1, searchQuery, selectedMainCategory, selectedSubCategory, category._id);
   };
 
   // Clear main category filter
@@ -193,16 +246,28 @@ export default function ProductsPage() {
     setMainCategorySearch("");
     setSelectedSubCategory("");
     setSubCategorySearch("");
+    setSelectedSubSubCategory("");
+    setSubSubCategorySearch("");
     setPage(1);
-    fetchProducts(1, searchQuery, "", "");
+    fetchProducts(1, searchQuery, "", "", "");
   };
 
   // Clear sub category filter
   const clearSubCategory = () => {
     setSelectedSubCategory("");
     setSubCategorySearch("");
+    setSelectedSubSubCategory("");
+    setSubSubCategorySearch("");
     setPage(1);
-    fetchProducts(1, searchQuery, selectedMainCategory, "");
+    fetchProducts(1, searchQuery, selectedMainCategory, "", "");
+  };
+
+  // Clear sub-sub category filter
+  const clearSubSubCategory = () => {
+    setSelectedSubSubCategory("");
+    setSubSubCategorySearch("");
+    setPage(1);
+    fetchProducts(1, searchQuery, selectedMainCategory, selectedSubCategory, "");
   };
 
   // Filter categories based on search
@@ -212,6 +277,10 @@ export default function ProductsPage() {
 
   const filteredSubCategories = getSubCategories(selectedMainCategory).filter(
     (cat) => cat.name.toLowerCase().includes(subCategorySearch.toLowerCase())
+  );
+
+  const filteredSubSubCategories = getSubSubCategories(selectedSubCategory).filter(
+    (cat) => cat.name.toLowerCase().includes(subSubCategorySearch.toLowerCase())
   );
 
   return (
@@ -244,6 +313,7 @@ export default function ProductsPage() {
         <Card className="mb-6">
           <CardContent className="p-6">
             <form onSubmit={handleSearch} className="space-y-4">
+              {/* Search input (commented out as per your original code) */}
               {/* <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
@@ -266,7 +336,7 @@ export default function ProductsPage() {
               </div> */}
 
               {/* Category Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Main Category Dropdown */}
                 <div className="relative category-dropdown">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -381,18 +451,75 @@ export default function ProductsPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Sub-Sub Category Dropdown */}
+                <div className="relative category-dropdown">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sub-Sub Category
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder={
+                        selectedSubCategory
+                          ? "Search sub-sub category..."
+                          : "Select sub category first"
+                      }
+                      value={subSubCategorySearch}
+                      onChange={(e) => setSubSubCategorySearch(e.target.value)}
+                      onFocus={() =>
+                        selectedSubCategory && setShowSubSubDropdown(true)
+                      }
+                      disabled={!selectedSubCategory}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-20 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    />
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                      {selectedSubSubCategory && (
+                        <button
+                          type="button"
+                          onClick={clearSubSubCategory}
+                          className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                          title="Clear selection"
+                        >
+                          <X size={16} className="text-gray-500" />
+                        </button>
+                      )}
+                      <ChevronDown size={20} className="text-gray-400" />
+                    </div>
+
+                    {/* Dropdown */}
+                    {showSubSubDropdown && selectedSubCategory && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        {filteredSubSubCategories.length > 0 ? (
+                          filteredSubSubCategories.map((category) => (
+                            <button
+                              key={category._id}
+                              type="button"
+                              onClick={() => selectSubSubCategory(category)}
+                              className="w-full text-left px-4 py-2 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-b-0"
+                            >
+                              <span className="font-medium text-gray-900">
+                                {category.name}
+                              </span>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-3 text-sm text-gray-500">
+                            No sub-sub categories found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </form>
           </CardContent>
         </Card>
 
+        {/* Rest of your component remains exactly the same */}
         {/* Products Table */}
         <Card>
-          {/* <CardHeader>
-            <div className="text-xl font-semibold text-gray-900">
-              All Products ({products.length})
-            </div>
-          </CardHeader> */}
           <CardContent>
             {loading ? (
               <div className="flex justify-center items-center py-12">
