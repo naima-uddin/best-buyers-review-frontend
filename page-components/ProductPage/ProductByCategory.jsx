@@ -14,6 +14,7 @@ import { Footer } from "@/components/common/Footer";
 import Breadcrumbs from "@/ui/Breadcrumbs";
 import ProductListSkeleton from "@/components/skeletons/ProductListSkeleton";
 import { slugify, unslugify, createProductSlug } from "@/lib/slugify";
+import { Home, HomeIcon } from "lucide-react";
 
 function ProductByCategoryContent() {
   const params = useParams();
@@ -295,9 +296,87 @@ const handlePageChange = (newPage) => {
   return (
     <>
       <Navbar />
-      <div className="max-w-7xl mx-auto px-4">
-        <Breadcrumbs mainName={mainCategoryName} subName={subCategoryName} />
-      </div>
+ 
+          <div className="max-w-7xl mx-auto px-4">
+            <nav className="flex items-center text-sm text-gray-600 space-x-1 py-3" aria-label="Breadcrumb">
+              {/* Home */}
+              <Link href="/" className="text-gray-700 hover:text-blue-600 flex items-center" aria-label="Home">
+                <Home size={16} />
+              </Link>
+
+              {mainCategoryName && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  
+                  {/* Main Category - Link to category page with smooth scroll */}
+                  <Link 
+                    href={`/category?scrollTo=${slugify(mainCategoryName)}`}
+                    className="font-medium text-gray-800 hover:text-blue-700 hover:underline"
+                  >
+                    {mainCategoryName}
+                  </Link>
+                </>
+              )}
+
+              {subCategoryName && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  
+                  {/* Sub Category - Current page (no link) */}
+                  <span className="text-gray-600 font-semibold truncate max-w-[150px] md:max-w-[200px]" aria-current="page">
+                    {subCategoryName}
+                  </span>
+                </>
+              )}
+
+              {/* Optional: Sub-Sub Category */}
+              {subSubCategoryParam && (
+                <>
+                  <span className="text-gray-400">/</span>
+                  <span className="text-gray-600 font-semibold truncate max-w-[150px] md:max-w-[200px]">
+                    {unslugify(subSubCategoryParam)}
+                  </span>
+                </>
+              )}
+            </nav>
+
+            {/* JSON-LD Structured Data for Breadcrumbs */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "BreadcrumbList",
+                  itemListElement: [
+                    {
+                      "@type": "ListItem",
+                      position: 1,
+                      name: "Home",
+                      item: "https://bestbuyersview.com",
+                    },
+                    {
+                      "@type": "ListItem",
+                      position: 2,
+                      name: mainCategoryName,
+                      item: `https://bestbuyersview.com/category?scrollTo=${slugify(mainCategoryName)}`,
+                    },
+                    {
+                      "@type": "ListItem",
+                      position: 3,
+                      name: subCategoryName,
+                      item: `https://bestbuyersview.com/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}`,
+                    },
+                    ...(subSubCategoryParam ? [{
+                      "@type": "ListItem",
+                      position: 4,
+                      name: unslugify(subSubCategoryParam),
+                      item: `https://bestbuyersview.com/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${subSubCategoryParam}`,
+                    }] : [])
+                  ],
+                }),
+              }}
+            />
+          </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
         {/* Header */}
