@@ -17,11 +17,12 @@ export default function ProductPageSidebar({
 
   useEffect(() => {
     setVisibleCount(7);
-  }, [mainCategoryName]);
+  }, [mainCategoryName, currentSubCategoryName]);
 
   console.log('🔍 Sidebar - mainCategoryName:', mainCategoryName);
   console.log('🔍 Sidebar - currentSubCategoryName:', currentSubCategoryName);
 
+  // Find main category
   const mainCat = categories?.find((cat) => cat.name === mainCategoryName);
   if (!mainCat) {
     console.log('❌ Sidebar - Main category not found:', mainCategoryName);
@@ -30,10 +31,15 @@ export default function ProductPageSidebar({
 
   console.log('✅ Sidebar - Found main category:', mainCat.name);
 
-  const subcategories = mainCat.children || [];
-  const hasMore = subcategories.length > visibleCount;
+  // Find current subcategory within main category
+  const currentSubCat = mainCat.children?.find((sub) => sub.name === currentSubCategoryName);
+  
+  // Get sub-subcategories (level 3) from the current subcategory
+  const subSubCategories = currentSubCat?.children || [];
+  const hasMore = subSubCategories.length > visibleCount;
 
-  console.log('🔍 Sidebar - Subcategories:', subcategories.map(s => s.name));
+  console.log('🔍 Sidebar - Current Subcategory:', currentSubCat?.name);
+  console.log('🔍 Sidebar - Sub-subcategories:', subSubCategories.map(s => s.name));
 
   const handleSubCategoryClick = (sub) => {
     console.log('🔍 Sidebar - Clicking on subcategory:', sub.name);
@@ -43,55 +49,55 @@ export default function ProductPageSidebar({
     );
   };
 
+  const handleSubSubCategoryClick = (subSubCat) => {
+    console.log('🔍 Sidebar - Clicking on sub-subcategory:', subSubCat.name);
+    
+    // Navigate to the same subcategory page but with subSubCategory parameter
+    // This will trigger the product filtering in your existing ProductByCategory component
+    router.push(
+    `/category/${slugify(mainCategoryName)}/${slugify(currentSubCategoryName)}?${slugify(subSubCat.name)}`
+  );
+  };
+
   // If showOnlyRelatedCategories is true, only render the related categories section
   if (showOnlyRelatedCategories) {
     return (
       <div className="space-y-1">
-        {subcategories.slice(0, visibleCount).map((sub) => {
-          const isActive = sub.name === currentSubCategoryName;
-          if (isActive) {
-            console.log('✅ Sidebar - Active subcategory:', sub.name);
-          }
-          return (
-            <button
-              key={sub._id}
-              onClick={() => handleSubCategoryClick(sub)}
-              className={`block w-full text-left px-3 py-1 rounded-lg transition ${
-                isActive
-                  ? "bg-blue-700 text-white font-semibold"
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
-            >
-              {sub.name}
-            </button>
-          );
-        })}
-        {/* Show more / less button */}
-        {hasMore && (
-          <button
-            onClick={() =>
-              setVisibleCount(visibleCount === 7 ? subcategories.length : 7)
-            }
-            className="text-blue-600 mt-3 text-sm hover:underline"
-          >
-            {visibleCount === 7 ? "Show more" : "Show less"}
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // Full sidebar for desktop
-  return (
-    <aside className="w-full md:w-72 lg:w-80 border-l border-gray-200 pl-6 mt-10 md:mt-0">
-      <div className="sticky top-20 space-y-6">
-        {/* Related Categories */}
-        <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
-          <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
-
-          <div className="space-y-1">
-            {subcategories.slice(0, visibleCount).map((sub) => {
+        {/* Show sub-subcategories if available */}
+        {subSubCategories.length > 0 ? (
+          <>
+            <p className="text-sm font-semibold text-gray-700 mb-2">Sub-categories:</p>
+            {subSubCategories.slice(0, visibleCount).map((subSubCat) => {
+              return (
+                <button
+                  key={subSubCat._id}
+                  onClick={() => handleSubSubCategoryClick(subSubCat)}
+                  className="block w-full text-left px-3 py-1 rounded-lg transition hover:bg-gray-100 text-gray-700 text-sm"
+                >
+                  {subSubCat.name}
+                </button>
+              );
+            })}
+            {/* Show more / less button */}
+            {hasMore && (
+              <button
+                onClick={() =>
+                  setVisibleCount(visibleCount === 7 ? subSubCategories.length : 7)
+                }
+                className="text-blue-600 mt-3 text-sm hover:underline"
+              >
+                {visibleCount === 7 ? "Show more" : "Show less"}
+              </button>
+            )}
+          </>
+        ) : (
+          // If no sub-subcategories, show sibling subcategories (original behavior)
+          <>
+            {mainCat.children?.slice(0, visibleCount).map((sub) => {
               const isActive = sub.name === currentSubCategoryName;
+              if (isActive) {
+                console.log('✅ Sidebar - Active subcategory:', sub.name);
+              }
               return (
                 <button
                   key={sub._id}
@@ -106,18 +112,93 @@ export default function ProductPageSidebar({
                 </button>
               );
             })}
-          </div>
+            {/* Show more / less button */}
+            {mainCat.children && mainCat.children.length > visibleCount && (
+              <button
+                onClick={() =>
+                  setVisibleCount(visibleCount === 7 ? mainCat.children.length : 7)
+                }
+                className="text-blue-600 mt-3 text-sm hover:underline"
+              >
+                {visibleCount === 7 ? "Show more" : "Show less"}
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
 
-          {/* Show more / less button */}
-          {hasMore && (
-            <button
-              onClick={() =>
-                setVisibleCount(visibleCount === 7 ? subcategories.length : 7)
-              }
-              className="text-blue-600 mt-3 text-sm hover:underline"
-            >
-              {visibleCount === 7 ? "Show more" : "Show less"}
-            </button>
+  // Full sidebar for desktop
+  return (
+    <aside className="w-full md:w-72 lg:w-80 border-l border-gray-200 pl-6 mt-10 md:mt-0">
+      <div className="sticky top-20 space-y-6">
+        {/* Related Categories */}
+        <div className="border border-gray-200 rounded-xl shadow-sm p-4 bg-white">
+          <h3 className="text-lg font-semibold mb-3">Related Categories</h3>
+
+          {/* Show sub-subcategories if available */}
+          {subSubCategories.length > 0 ? (
+            <>
+              <p className="text-sm font-medium text-gray-600 mb-2">Sub-categories of {currentSubCategoryName}:</p>
+              <div className="space-y-1">
+                {subSubCategories.slice(0, visibleCount).map((subSubCat) => (
+                  <button
+                    key={subSubCat._id}
+                    onClick={() => handleSubSubCategoryClick(subSubCat)}
+                    className="block w-full text-left px-3 py-1 rounded-lg transition hover:bg-gray-100 text-gray-700 text-sm"
+                  >
+                    {subSubCat.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Show more / less button */}
+              {hasMore && (
+                <button
+                  onClick={() =>
+                    setVisibleCount(visibleCount === 7 ? subSubCategories.length : 7)
+                  }
+                  className="text-blue-600 mt-3 text-sm hover:underline"
+                >
+                  {visibleCount === 7 ? "Show more" : "Show less"}
+                </button>
+              )}
+            </>
+          ) : (
+            // If no sub-subcategories, show sibling subcategories (original behavior)
+            <>
+              <div className="space-y-1">
+                {mainCat.children?.slice(0, visibleCount).map((sub) => {
+                  const isActive = sub.name === currentSubCategoryName;
+                  return (
+                    <button
+                      key={sub._id}
+                      onClick={() => handleSubCategoryClick(sub)}
+                      className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                        isActive
+                          ? "bg-blue-700 text-white font-semibold"
+                          : "hover:bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {sub.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Show more / less button */}
+              {mainCat.children && mainCat.children.length > visibleCount && (
+                <button
+                  onClick={() =>
+                    setVisibleCount(visibleCount === 7 ? mainCat.children.length : 7)
+                  }
+                  className="text-blue-600 mt-3 text-sm hover:underline"
+                >
+                  {visibleCount === 7 ? "Show more" : "Show less"}
+                </button>
+              )}
+            </>
           )}
         </div>
 

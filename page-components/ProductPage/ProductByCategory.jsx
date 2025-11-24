@@ -24,10 +24,15 @@ function ProductByCategoryContent() {
   const mainCategoryName = params?.mainCategory ? unslugify(params.mainCategory) : null;
   const subCategoryName = params?.subCategory ? unslugify(params.subCategory) : null;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
+  const allParams = Object.fromEntries(searchParams?.entries() || []);
+const subSubCategoryParam = Object.keys(allParams).find(key => 
+  key !== 'page' && key !== 'sort'
+);
 
   console.log('🔍 ProductByCategory - Raw params:', params);
   console.log('🔍 ProductByCategory - mainCategoryName:', mainCategoryName);
   console.log('🔍 ProductByCategory - subCategoryName:', subCategoryName);
+  console.log('🔍 ProductByCategory - subSubCategoryParam:', subSubCategoryParam); 
 
   // Compute date values once to avoid hydration mismatch
   const currentMonth = useMemo(() => new Date().toLocaleString("default", { month: "long" }), []);
@@ -61,10 +66,19 @@ function ProductByCategoryContent() {
           process.env.NEXT_PUBLIC_API_URL ||
           "https://api.bestbuyersview.com/api";
 
-        const url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
+        // Build URL with optional subSubCategoryName
+        let url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
+        
+        // Add subSubCategoryName if provided
+        if (subSubCategoryParam) {
+          const subSubCategoryName = unslugify(subSubCategoryParam);
+          url += `&subSubCategoryName=${encodeURIComponent(subSubCategoryName)}`;
+        }
+
         console.log('Fetching products from:', url);
         console.log('Main Category:', mainCategoryName);
         console.log('Sub Category:', subCategoryName);
+        console.log('Sub-Sub Category:', subSubCategoryParam ? unslugify(subSubCategoryParam) : 'None');
 
         const res = await fetch(url);
         const data = await res.json();
@@ -94,14 +108,28 @@ function ProductByCategoryContent() {
     }
 
     fetchProducts();
-  }, [mainCategoryName, subCategoryName, pageParam, sortParam]);
+  }, [mainCategoryName, subCategoryName, pageParam, sortParam, subSubCategoryParam]); 
 
-  const handlePageChange = (newPage) => {
-    router.push(
-      `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?page=${newPage}`,
-      { scroll: false }
-    );
-  };
+ // Update page change handler to preserve subSubCategory
+const handlePageChange = (newPage) => {
+  const queryParams = new URLSearchParams();
+  queryParams.set('page', newPage);
+  
+  // Preserve the sub-subcategory if it exists
+  if (subSubCategoryParam) {
+    queryParams.set(subSubCategoryParam, ''); // Key with empty value
+  }
+  
+  if (sortParam && sortParam !== 'default') {
+    queryParams.set('sort', sortParam);
+  }
+
+  router.push(
+    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryParams.toString()}`,
+    { scroll: false }
+  );
+};
+
 
   const getStarRating = (rating) => {
     const fullStars = Math.floor(rating);
@@ -172,12 +200,22 @@ function ProductByCategoryContent() {
     }, 15000);
   };
 
-  const handleSortChange = (e) => {
-    const newSort = e.target.value;
-    router.push(
-      `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?page=${pageParam}&sort=${newSort}`
-    );
-  };
+// Update sort handler to preserve subSubCategory
+ const handleSortChange = (e) => {
+  const newSort = e.target.value;
+  const queryParams = new URLSearchParams();
+  queryParams.set('page', pageParam);
+  queryParams.set('sort', newSort);
+  
+  // Preserve the sub-subcategory if it exists
+  if (subSubCategoryParam) {
+    queryParams.set(subSubCategoryParam, ''); // Key with empty value
+  }
+
+  router.push(
+    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryParams.toString()}`
+  );
+};
 
   if (loading) {
     return (
@@ -251,7 +289,9 @@ function ProductByCategoryContent() {
             (b.customRating?.rating || 0) - (a.customRating?.rating || 0)
         )[0]
       : null;
-
+  const displayTitle = subSubCategoryParam 
+    ? `Best ${unslugify(subSubCategoryParam)} - ${subCategoryName} (${mainCategoryName})`
+    : `Best ${subCategoryName} (${mainCategoryName})`;
   return (
     <>
       <Navbar />
@@ -264,8 +304,8 @@ function ProductByCategoryContent() {
         <div className="text-center mb-6 md:mb-8">
           <BackButton className="-mb-2" />
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Best {subCategoryName} ({mainCategoryName})
-          </h1>
+          {displayTitle}
+        </h1>
           <h2 className="text-xs sm:text-sm md:text-base px-4 sm:px-8 md:px-16 lg:px-40 text-gray-700 mb-2 leading-relaxed">
             Home, Food, Fashion, Beauty, Baby, Electronics, Sports, Health,
             Automotive, Pets and so many more. Explore our expertly curated
