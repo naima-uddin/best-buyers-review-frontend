@@ -425,14 +425,34 @@ export default function ProductEdit({
     }));
   };
 
-  const addSpecification = (e) => {
+const addSpecification = (e) => {
   if (e) {
     e.preventDefault();
     e.stopPropagation();
   }
 
-  // Create an empty specification row
-  const newSpec = {
+  // Case 1: If user typed something → save it
+  if (newSpecKey.trim() || newSpecValue.trim()) {
+    const newSpec = {
+      key: newSpecKey.trim(),
+      value: newSpecValue.trim(),
+      _tempId: Date.now() + Math.random(),
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      specifications: [...prev.specifications, newSpec],
+    }));
+
+    // Clear input fields after saving
+    setNewSpecKey("");
+    setNewSpecValue("");
+
+    return; // stop here
+  }
+
+  // Case 2: If fields are empty → create empty row
+  const emptySpec = {
     key: "",
     value: "",
     _tempId: Date.now() + Math.random(),
@@ -440,9 +460,10 @@ export default function ProductEdit({
 
   setFormData((prev) => ({
     ...prev,
-    specifications: [...prev.specifications, newSpec],
+    specifications: [...prev.specifications, emptySpec],
   }));
 };
+
 
 
   const updateSpecification = (index, field, value) => {
