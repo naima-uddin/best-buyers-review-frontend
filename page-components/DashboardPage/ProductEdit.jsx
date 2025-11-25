@@ -426,54 +426,24 @@ export default function ProductEdit({
   };
 
   const addSpecification = (e) => {
-    // Prevent form submission if called from Enter key
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 
-    console.log("🔵 Add button clicked!");
-    console.log("🔵 newSpecKey:", newSpecKey);
-    console.log("🔵 newSpecValue:", newSpecValue);
-    console.log(
-      "🔵 Current specifications count BEFORE add:",
-      formData.specifications.length
-    );
-
-    if (newSpecKey.trim() && newSpecValue.trim()) {
-      const newSpec = {
-        key: newSpecKey.trim(),
-        value: newSpecValue.trim(),
-        _tempId: Date.now() + Math.random(), // Temporary ID for React keys only
-      };
-
-      setFormData((prev) => {
-        const updatedSpecs = [...prev.specifications, newSpec];
-        console.log("✅ Adding specification:", newSpec);
-        console.log("📋 Updated specifications array:", updatedSpecs);
-        console.log(
-          "📋 Total specifications count AFTER add:",
-          updatedSpecs.length
-        );
-
-        // Force a re-render by creating a completely new object
-        return {
-          ...prev,
-          specifications: updatedSpecs,
-          _lastUpdate: Date.now(), // Force re-render
-        };
-      });
-
-      setNewSpecKey("");
-      setNewSpecValue("");
-      console.log(
-        "✅ Specification added successfully! Count should update above."
-      );
-    } else {
-      console.warn("⚠️ Cannot add specification: Key or Value is empty");
-      alert("Please fill in both Key and Value fields");
-    }
+  // Create an empty specification row
+  const newSpec = {
+    key: "",
+    value: "",
+    _tempId: Date.now() + Math.random(),
   };
+
+  setFormData((prev) => ({
+    ...prev,
+    specifications: [...prev.specifications, newSpec],
+  }));
+};
+
 
   const updateSpecification = (index, field, value) => {
     setFormData((prev) => ({
