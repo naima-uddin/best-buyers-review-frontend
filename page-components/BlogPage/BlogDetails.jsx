@@ -349,23 +349,17 @@ export default function BlogDetails({ slug }) {
                 {/* Meta Information */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
-                    {blog.author?.avatar ? (
+                    
                       <div className="w-14 h-14 rounded-2xl border-2 border-white/30 overflow-hidden shadow-lg">
                         <Image 
-                          src={blog.author.avatar.trim()} 
-                          alt={blog.author.name} 
+                          src="/logoWithBG.png"
+                          alt="Best Buyers View"
                           width={56}
                           height={56}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                       </div>
-                    ) : (
-                      <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl border-2 border-white/30 flex items-center justify-center shadow-lg">
-                        <span className="text-white font-bold text-lg">
-                          {blog.author?.name?.charAt(0) || 'B'}
-                        </span>
-                      </div>
-                    )}
+                    
                     <div>
                       <p className="font-semibold text-white/95 text-lg">Best Buyers View</p>
                       <p className="text-white/70 flex items-center gap-3 text-sm">
@@ -480,21 +474,15 @@ export default function BlogDetails({ slug }) {
               {/* Author Bio */}
               <div className="mt-16 pt-12 border-t border-gray-200">
                 <div className="flex flex-col md:flex-row items-start gap-6 bg-gray-50 rounded-2xl p-8">
-                  {blog.author?.avatar ? (
                     <Image 
-                      src={blog.author.avatar.trim()} 
-                      alt={blog.author.name}
+                      src="/logoWithBG.png"
+                      alt="Best Buyers View"
                       width={80}
                       height={80}
-                      className="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg flex-shrink-0"
+                      className="w-20 h-20 rounded-2xl object-contain border-4 border-white shadow-lg flex-shrink-0"
                     />
-                  ) : (
-                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center border-4 border-white shadow-lg flex-shrink-0">
-                      <span className="text-white font-bold text-xl">
-                        {blog.author?.name?.charAt(0) || 'B'}
-                      </span>
-                    </div>
-                  )}
+                 
+                    
                   <div className="flex-1">
                     <h4 className="text-xl font-bold text-gray-900 mb-2">
                       Best Buyers View Team
