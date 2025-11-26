@@ -9,6 +9,7 @@ export default function ProductPageSidebar({
   mainCategoryName,
   currentSubCategoryName,
   showOnlyRelatedCategories = false,
+  findExactSubSubCategoryName 
 }) {
   const { categories } = useCategories();
   const router = useRouter();
@@ -40,32 +41,37 @@ export default function ProductPageSidebar({
   const hasMore = subSubCategories.length > visibleCount;
 
   // Get current active sub-subcategory from query params
-  const allParams = Object.fromEntries(searchParams?.entries() || []);
-  const activeSubSubCategoryParam = Object.keys(allParams).find(key => 
-    key !== 'page' && key !== 'sort'
-  );
-  const activeSubSubCategoryName = activeSubSubCategoryParam ? unslugify(activeSubSubCategoryParam) : null;
+const allParams = Object.fromEntries(searchParams?.entries() || []);
+const activeSubSubCategoryParam = Object.keys(allParams).find(key => 
+  key !== 'page' && key !== 'sort'
+);
+  const activeSubSubCategoryName = activeSubSubCategoryParam ? 
+    (findExactSubSubCategoryName ? findExactSubSubCategoryName(activeSubSubCategoryParam) : null) : null;
 
   console.log('🔍 Sidebar - Current Subcategory:', currentSubCat?.name);
   console.log('🔍 Sidebar - Sub-subcategories:', subSubCategories.map(s => s.name));
   console.log('🔍 Sidebar - Active Sub-subcategory:', activeSubSubCategoryName);
 
-  const handleSubCategoryClick = (sub) => {
-    console.log('🔍 Sidebar - Clicking on subcategory:', sub.name);
-    console.log('🔍 Sidebar - Navigating to:', `/category/${slugify(mainCategoryName)}/${slugify(sub.name)}`);
-    router.push(
-      `/category/${slugify(mainCategoryName)}/${slugify(sub.name)}`
-    );
-  };
+const handleSubSubCategoryClick = (subSubCat) => {
+  // Use the exact slugified name from the category data
+  const slugifiedName = slugify(subSubCat.name);
+  
+  const queryParams = new URLSearchParams();
+  
+  // Preserve other parameters
+  const currentPage = searchParams?.get('page');
+  const currentSort = searchParams?.get('sort');
 
-  const handleSubSubCategoryClick = (subSubCat) => {
-    console.log('🔍 Sidebar - Clicking on sub-subcategory:', subSubCat.name);
-    
-    // Navigate to the same subcategory page but with subSubCategory parameter
-    router.push(
-      `/category/${slugify(mainCategoryName)}/${slugify(currentSubCategoryName)}?${slugify(subSubCat.name)}`
-    );
-  };
+    let queryString = `${slugifiedName}`; // Just the key, no value
+  
+  if (currentPage) queryString += `&page=${currentPage}`;
+  if (currentSort && currentSort !== 'default') queryString += `&sort=${currentSort}`;
+
+  router.push(
+    `/category/${slugify(mainCategoryName)}/${slugify(currentSubCategoryName)}?${queryString}`
+  );
+};
+
 
   const handleShowMoreLess = () => {
     if (visibleCount === 7) {

@@ -15,11 +15,13 @@ import Breadcrumbs from "@/ui/Breadcrumbs";
 import ProductListSkeleton from "@/components/skeletons/ProductListSkeleton";
 import { slugify, unslugify, createProductSlug } from "@/lib/slugify";
 import { Home, HomeIcon } from "lucide-react";
+import { useCategories } from "@/context/CategoryContext";
 
 function ProductByCategoryContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { categories } = useCategories(); 
 
   // Decode URL params
   const mainCategoryName = params?.mainCategory ? unslugify(params.mainCategory) : null;
@@ -54,6 +56,25 @@ const subSubCategoryParam = Object.keys(allParams).find(key =>
   const [couponIndex, setCouponIndex] = useState(0);
   const timerRef = useRef(null);
 
+   const findExactSubSubCategoryName = (slugifiedName) => {
+    if (!categories || !mainCategoryName || !subCategoryName) return null;
+    
+    // Find main category
+    const mainCat = categories.find(cat => cat.name === mainCategoryName);
+    if (!mainCat) return null;
+    
+    // Find sub category
+    const subCat = mainCat.children?.find(sub => sub.name === subCategoryName);
+    if (!subCat) return null;
+    
+    // Find sub-sub category by comparing slugified names
+    const subSubCat = subCat.children?.find(subSub => 
+      slugify(subSub.name) === slugifiedName
+    );
+    
+    return subSubCat ? subSubCat.name : null;
+  };
+
   useEffect(() => {
     if (!mainCategoryName || !subCategoryName) {
       setLoading(false);
@@ -71,10 +92,15 @@ const subSubCategoryParam = Object.keys(allParams).find(key =>
         let url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
         
         // Add subSubCategoryName if provided
-        if (subSubCategoryParam) {
-          const subSubCategoryName = unslugify(subSubCategoryParam);
-          url += `&subSubCategoryName=${encodeURIComponent(subSubCategoryName)}`;
-        }
+if (subSubCategoryParam) {
+  // Find the exact sub-subcategory name from your categories data
+  const exactSubSubCategoryName = findExactSubSubCategoryName(subSubCategoryParam);
+  if (exactSubSubCategoryName) {
+    url += `&subSubCategoryName=${encodeURIComponent(exactSubSubCategoryName)}`;
+  }
+}
+
+
 
         console.log('Fetching products from:', url);
         console.log('Main Category:', mainCategoryName);
@@ -113,20 +139,21 @@ const subSubCategoryParam = Object.keys(allParams).find(key =>
 
  // Update page change handler to preserve subSubCategory
 const handlePageChange = (newPage) => {
-  const queryParams = new URLSearchParams();
-  queryParams.set('page', newPage);
+  // Build query string manually to avoid "=" for sub-subcategory
+  let queryString = '';
   
-  // Preserve the sub-subcategory if it exists
   if (subSubCategoryParam) {
-    queryParams.set(subSubCategoryParam, ''); // Key with empty value
+    queryString += `${subSubCategoryParam}`;
   }
   
   if (sortParam && sortParam !== 'default') {
-    queryParams.set('sort', sortParam);
+    queryString += `${queryString ? '&' : ''}sort=${sortParam}`;
   }
+  
+  queryString += `${queryString ? '&' : ''}page=${newPage}`;
 
   router.push(
-    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryParams.toString()}`,
+    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryString}`,
     { scroll: false }
   );
 };
@@ -258,6 +285,7 @@ const handlePageChange = (newPage) => {
               <ProductPageSidebar
                 mainCategoryName={mainCategoryName}
                 currentSubCategoryName={subCategoryName}
+                findExactSubSubCategoryName={findExactSubSubCategoryName} 
                 showOnlyRelatedCategories={true}
               />
             </div>
@@ -271,6 +299,7 @@ const handlePageChange = (newPage) => {
             <div className="w-full lg:w-80 lg:sticky lg:top-24 lg:self-start">
               <ProductPageSidebar
                 mainCategoryName={mainCategoryName}
+                findExactSubSubCategoryName={findExactSubSubCategoryName} 
                 currentSubCategoryName={subCategoryName}
               />
             </div>
@@ -290,9 +319,9 @@ const handlePageChange = (newPage) => {
             (b.customRating?.rating || 0) - (a.customRating?.rating || 0)
         )[0]
       : null;
-  const displayTitle = subSubCategoryParam  
-    ? `Best ${unslugify(subSubCategoryParam)}`
-    : `Best ${subCategoryName} (${mainCategoryName})`;
+const displayTitle = subSubCategoryParam  
+  ? `Best ${findExactSubSubCategoryName(subSubCategoryParam) || unslugify(subSubCategoryParam)}`
+  : `Best ${subCategoryName} (${mainCategoryName})`;
   return (
     <>
       <Navbar />
