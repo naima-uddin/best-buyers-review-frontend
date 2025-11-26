@@ -187,6 +187,8 @@ export default function ProductViewPage() {
                     <Image
                       src={displayImages[activeImage]?.url || "/placeholder-image.jpg"}
                       alt={product.title}
+                      width={600}
+                      height={600}
                       className="w-full h-full object-contain"
                       onError={(e) => {
                         e.target.src = "/placeholder-image.jpg";
@@ -216,6 +218,8 @@ export default function ProductViewPage() {
                           src={img.url}
                           alt={`${product.title} ${index + 1}`}
                           className="w-full h-full object-cover"
+                          width={100}
+                          height={100}
                           onError={(e) => {
                             e.target.src = "/placeholder-image.jpg";
                           }}

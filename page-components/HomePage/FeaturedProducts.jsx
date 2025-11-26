@@ -6,7 +6,7 @@ import api from "@/lib/api/axios";
 
 export default function FeaturedProducts() {
   const [featured, setFeatured] = useState([]);
-  const [activeTab, setActiveTab] = useState("#1 Best Seller");
+  const [activeTab, setActiveTab] = useState("Amazon's Choice");
   const [currentPage, setCurrentPage] = useState(1);
 
   const tabs = ["#1 Best Seller", "Trending", "Amazon's Choice", "Featured", "Hot"];
