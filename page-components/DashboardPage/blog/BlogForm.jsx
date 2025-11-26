@@ -1,5 +1,5 @@
 "use client";
-import { LinkIcon, Trash2 } from "lucide-react";
+import { LinkIcon, Trash2, Upload } from "lucide-react";
 import { useState } from "react";
 
 export default function CreateBlog({onSubmit, onCancel}) {
@@ -340,7 +340,7 @@ const handleSubmit = async (e) => {
   {/* Upload Button */}
   <label className="flex flex-col items-center justify-center w-full p-3 rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200 transition">
     <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-      📁 Upload Image
+      <Upload /> Upload Image
     </span>
 
     <input
@@ -425,7 +425,7 @@ const handleSubmit = async (e) => {
     {/* Upload Button */}
     <label className="flex flex-col items-center justify-center w-full p-3 rounded-lg cursor-pointer bg-gray-100 hover:bg-gray-200 transition">
       <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-        📁 Upload Image
+        <Upload /> Upload Image
       </span>
 
       <input

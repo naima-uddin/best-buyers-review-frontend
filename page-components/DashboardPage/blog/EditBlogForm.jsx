@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import api from "@/lib/api/axios";
+import { Upload } from "lucide-react";
 
 export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
   const categoriesList = [
@@ -435,7 +436,7 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
     bg-gray-50 hover:bg-gray-100 border border-gray-200 transition shadow-sm hover:shadow">
 
     <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-      📁 Upload Image
+      <Upload/> Upload Image
     </span>
 
     <input
@@ -554,7 +555,7 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
     <label className="flex flex-col items-center justify-center w-full p-4 rounded-xl cursor-pointer 
       bg-gray-50 hover:bg-gray-100 border border-gray-200 transition shadow-sm hover:shadow">
       <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
-        📁 Upload Image
+        <Upload /> Upload Image
       </span>
       <input
         type="file"

@@ -14,7 +14,7 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
           <thead className="bg-gray-100">
             <tr>
               <th className="p-2 border">Title</th>
-              <th className="p-2 border">Published</th>
+              <th className="p-2 border">Featured</th>
               <th className="p-2 border">Actions</th>
             </tr>
           </thead>
@@ -23,7 +23,7 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
               <tr key={blog._id}>
                 <td className="p-2 border">{blog.title}</td>
                 <td className="p-2 border">
-                  {blog.published ? (
+                  {blog.isFeatured ? (
                     <span className="text-green-600 font-medium">Yes</span>
                   ) : (
                     <span className="text-red-600 font-medium">No</span>
