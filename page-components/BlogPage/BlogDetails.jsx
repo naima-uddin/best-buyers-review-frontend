@@ -481,7 +481,6 @@ export default function BlogDetails({ slug }) {
                       height={80}
                       className="w-20 h-20 rounded-2xl object-contain border-4 border-white shadow-lg flex-shrink-0"
                     />
-                 
                     
                   <div className="flex-1">
                     <h4 className="text-xl font-bold text-gray-900 mb-2">
