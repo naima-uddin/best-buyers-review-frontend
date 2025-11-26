@@ -170,7 +170,7 @@ function Sidebar({ recentPosts, categories }) {
               <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-gray-100">
                 {post.featuredImage?.url ? (
                   <Image
-                    src={post.featuredImage.url}
+                    src={post.featuredImage.url?.trim()}
                     alt={post.featuredImage.alt || post.title}
                     width={64}
                     height={64}
@@ -319,7 +319,7 @@ function BlogCard({ blog }) {
       <div className="relative h-40 sm:h-48 overflow-hidden">
         {blog.featuredImage?.url ? (
           <Image
-            src={blog.featuredImage.url}
+            src={blog.featuredImage.url?.trim()}
             alt={blog.featuredImage.alt || blog.title}
             width={320}
             height={240}
