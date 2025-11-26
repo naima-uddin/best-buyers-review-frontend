@@ -347,22 +347,14 @@ function BlogCard({ blog }) {
         {/* Author & CTA */}
         <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2 sm:gap-3">
-            {blog.author?.avatar ? (
-              <Image 
-                src={blog.author.avatar} 
-                alt={blog.author.name}
+           <Image 
+                src="/logoWIthBG.png"
+                alt="Best Buyers View"
                 className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full object-cover border-2 border-white shadow-sm"
               />
-            ) : (
-              <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                <span className="text-white text-xs font-semibold">
-                  {blog.author?.name?.charAt(0) || 'B'}
-                </span>
-              </div>
-            )}
             <div>
               <p className="text-xs sm:text-sm font-semibold text-gray-900">
-                {blog.author?.name || 'Best Buyers View'}
+                Best Buyers View
               </p>
             </div>
           </div>

@@ -14,7 +14,6 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
           <thead className="bg-gray-100">
             <tr>
               <th className="p-2 border">Title</th>
-              <th className="p-2 border">Author</th>
               <th className="p-2 border">Published</th>
               <th className="p-2 border">Actions</th>
             </tr>
@@ -23,7 +22,6 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
             {blogs.map((blog) => (
               <tr key={blog._id}>
                 <td className="p-2 border">{blog.title}</td>
-                <td className="p-2 border">{blog.author?.name}</td>
                 <td className="p-2 border">
                   {blog.published ? (
                     <span className="text-green-600 font-medium">Yes</span>

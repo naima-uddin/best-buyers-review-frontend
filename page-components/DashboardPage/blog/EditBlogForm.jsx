@@ -13,7 +13,6 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
     slug: "",
     description: "",
     excerpt: "",
-    author: { name: "", avatar: "", bio: "" },
     categories: [],
     tags: [],
     seo: { title: "", description: "", keywords: [], canonicalUrl: "" },
@@ -36,11 +35,6 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
         slug: editingData.slug || "",
         description: editingData.description || "",
         excerpt: editingData.excerpt || "",
-        author: {
-          name: editingData.author?.name || "",
-          avatar: editingData.author?.avatar || "",
-          bio: editingData.author?.bio || ""
-        },
         categories: editingData.categories?.map(cat => cat.name) || [],
         tags: editingData.tags || [],
         seo: {
@@ -85,14 +79,6 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
     setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleAuthorInput = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({
-      ...prev,
-      author: { ...prev.author, [name]: value }
     }));
   };
 
@@ -392,31 +378,6 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
           </div>
         </div>
 
-        {/* Author */}
-        <div className="border p-3 rounded space-y-2">
-          <h2 className="font-semibold">Author Information</h2>
-          <input 
-            name="name" 
-            value={form.author.name}
-            placeholder="our name or writer's name" 
-            className="w-full border p-2 rounded" 
-            onChange={handleAuthorInput} 
-          />
-          <input 
-            name="avatar" 
-            value={form.author.avatar}
-            placeholder="Profile picture link" 
-            className="w-full border p-2 rounded" 
-            onChange={handleAuthorInput} 
-          />
-          <textarea 
-            name="bio" 
-            value={form.author.bio}
-            placeholder="Author Bio" 
-            className="w-full border p-2 rounded" 
-            onChange={handleAuthorInput} 
-          />
-        </div>
 
         {/* SEO */}
         <div className="border p-3 rounded space-y-2">
@@ -452,31 +413,52 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
         </div>
 
         {/* Featured Image */}
-        <div className="border p-3 rounded space-y-2">
-          <h2 className="font-semibold">Featured Image</h2>
-          <p className="text-sm opacity-70">Upload OR enter URL</p>
+<div className="border p-4 rounded-lg space-y-4 bg-white shadow-sm">
 
-          <input type="file" accept="image/*" onChange={handleFeaturedImageUpload} />
-          <input 
-            type="text" 
-            placeholder="Or paste image URL" 
-            className="w-full border p-2 rounded" 
-            value={featuredImageUrl} 
-            onChange={handleFeaturedImageUrl} 
-          />
+  <h2 className="font-semibold text-lg">Featured Image</h2>
+  <p className="text-sm text-gray-500">Upload an image or paste an image URL</p>
 
-          {featuredPreview && (
-            <div className="mt-2">
-              {/* Fixed: Using regular img tag instead of Image component */}
-              <img 
-                src={featuredPreview} 
-                alt="Featured preview" 
-                className="w-40 h-40 object-cover rounded border" 
-              />
-              <p className="text-sm text-gray-600 mt-1">Current preview</p>
-            </div>
-          )}
-        </div>
+  {/* Preview */}
+  {featuredPreview && (
+    <div className="flex flex-col items-center gap-2">
+      <img
+        src={featuredPreview}
+        alt="Featured preview"
+        className="w-20 h-20 object-cover rounded-lg border shadow-sm"
+      />
+      <p className="text-sm text-gray-600">Current Preview</p>
+    </div>
+  )}
+
+  {/* Upload Button */}
+  <label className="flex flex-col items-center justify-center w-full p-4 rounded-xl cursor-pointer 
+    bg-gray-50 hover:bg-gray-100 border border-gray-200 transition shadow-sm hover:shadow">
+
+    <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+      📁 Upload Image
+    </span>
+
+    <input
+      type="file"
+      accept="image/*"
+      className="hidden"
+      onChange={handleFeaturedImageUpload}
+    />
+  </label>
+
+  <div className="text-center text-xs text-gray-500">— OR —</div>
+
+  {/* URL Input */}
+  <input
+    type="text"
+    placeholder="Paste image URL here"
+    className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none"
+    value={featuredImageUrl}
+    onChange={handleFeaturedImageUrl}
+  />
+
+</div>
+
 
         {/* Content Blocks */}
         <div className="border p-3 rounded space-y-2">
@@ -553,34 +535,52 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
                 />
               )}
 
-              {block.type === "image" && (
-                <div className="mt-2 space-y-2">
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        handleBlockImageUpload(index, file);
-                      }
-                    }} 
-                  />
-                  <input 
-                    placeholder="Or paste image URL" 
-                    className="w-full border p-2 rounded"
-                    value={block.data.url || ""}
-                    onChange={(e) => updateBlockData(index, "url", e.target.value)} 
-                  />
-                  {block.data.url && (
-                    // Fixed: Using regular img tag instead of Image component
-                    <img 
-                      src={block.data.url} 
-                      alt="Content image" 
-                      className="w-32 h-32 object-cover rounded border mt-2" 
-                    />
-                  )}
-                </div>
-              )}
+{block.type === "image" && (
+  <div className="mt-3 space-y-4 p-3 border rounded-lg bg-white shadow-sm">
+
+    {/* Preview */}
+    {block.data.url && (
+      <div className="flex flex-col items-center gap-2">
+        <img
+          src={block.data.url}
+          alt="Content image"
+          className="w-20 h-20 object-cover rounded-lg border shadow-sm"
+        />
+        <p className="text-sm text-gray-600">Current Preview</p>
+      </div>
+    )}
+
+    {/* Upload Button */}
+    <label className="flex flex-col items-center justify-center w-full p-4 rounded-xl cursor-pointer 
+      bg-gray-50 hover:bg-gray-100 border border-gray-200 transition shadow-sm hover:shadow">
+      <span className="text-sm font-medium text-gray-700 flex items-center gap-2">
+        📁 Upload Image
+      </span>
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files[0];
+          if (file) handleBlockImageUpload(index, file);
+        }}
+      />
+    </label>
+
+    <div className="text-center text-xs text-gray-500">— OR —</div>
+
+    {/* URL Input */}
+    <input
+      type="text"
+      placeholder="Paste image URL here"
+      className="w-full border p-2 rounded-lg focus:ring focus:ring-blue-200 focus:outline-none"
+      value={block.data.url || ""}
+      onChange={(e) => updateBlockData(index, "url", e.target.value)}
+    />
+
+  </div>
+)}
+
             </div>
           ))}
         </div>

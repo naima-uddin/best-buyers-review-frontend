@@ -267,21 +267,13 @@ function FeaturedSection({ blog }) {
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0">
             <div className="flex items-center gap-2 sm:gap-3">
-              {blog.author?.avatar ? (
-                <Image 
-                  src={blog.author.avatar} 
-                  alt={blog.author.name}
-                  width={40}
-                  height={40}
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white shadow-lg"
-                />
-              ) : (
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg">
-                  <span className="text-white font-semibold text-xs sm:text-sm">
-                    {blog.author?.name?.charAt(0) || 'B'}
-                  </span>
-                </div>
-              )}
+              <Image 
+                src="/logoWIthBG.png"
+                alt="Best Buyers View"
+                width={24}
+                height={24}
+                className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full object-contain border-2 border-white shadow-sm"
+              />
               <div>
                 <p className="text-xs sm:text-sm font-semibold text-gray-900">
                   Best Buyers View
