@@ -185,6 +185,14 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
     setContentBlocks(updated);
   };
 
+  // Handle block image upload
+  const handleBlockImageUpload = (index, file) => {
+    const updated = [...contentBlocks];
+    updated[index].data.file = file;
+    updated[index].data.url = URL.createObjectURL(file);
+    setContentBlocks(updated);
+  };
+
   // ----------- Submit --------------
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -459,7 +467,12 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
 
           {featuredPreview && (
             <div className="mt-2">
-              <Image src={featuredPreview} className="w-40 h-40 object-cover rounded border" />
+              {/* Fixed: Using regular img tag instead of Image component */}
+              <img 
+                src={featuredPreview} 
+                alt="Featured preview" 
+                className="w-40 h-40 object-cover rounded border" 
+              />
               <p className="text-sm text-gray-600 mt-1">Current preview</p>
             </div>
           )}
@@ -548,10 +561,7 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
                     onChange={(e) => {
                       const file = e.target.files[0];
                       if (file) {
-                        const updated = [...contentBlocks];
-                        updated[index].data.file = file;
-                        updated[index].data.url = URL.createObjectURL(file);
-                        setContentBlocks(updated);
+                        handleBlockImageUpload(index, file);
                       }
                     }} 
                   />
@@ -562,7 +572,12 @@ export default function EditBlogForm({ editingData, onSubmit, onCancel }) {
                     onChange={(e) => updateBlockData(index, "url", e.target.value)} 
                   />
                   {block.data.url && (
-                    <Image src={block.data.url} className="w-32 h-32 object-cover rounded border" />
+                    // Fixed: Using regular img tag instead of Image component
+                    <img 
+                      src={block.data.url} 
+                      alt="Content image" 
+                      className="w-32 h-32 object-cover rounded border mt-2" 
+                    />
                   )}
                 </div>
               )}

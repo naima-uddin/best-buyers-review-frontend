@@ -8,37 +8,36 @@ export default function CreateBlog({onSubmit, onCancel}) {
     "Gifts", "Home", "Garden", "Tech", "Fitness", "Fashion", "Beauty", "Baby"
   ];
 
-const [form, setForm] = useState({
-  title: "",
-  slug: "",
-  description: "",
-  excerpt: "",
-  author: { name: "", avatar: "", bio: "" },
-  categories: [],
-  tags: [],
-  seo: { title: "", description: "", keywords: "", canonicalUrl: "" },
-  isFeatured: false,
-  published: false,
-  anchorTags: [] 
-});
+  const [form, setForm] = useState({
+    title: "",
+    slug: "",
+    description: "",
+    excerpt: "",
+    author: { name: "", avatar: "", bio: "" },
+    categories: [],
+    tags: [],
+    seo: { title: "", description: "", keywords: "", canonicalUrl: "" },
+    isFeatured: false,
+    published: false,
+    anchorTags: [] 
+  });
 
-const [newAnchorTag, setNewAnchorTag] = useState({
-  word: "",
-  link: "",
-  isExternal: false,
-});
+  const [newAnchorTag, setNewAnchorTag] = useState({
+    word: "",
+    link: "",
+    isExternal: false,
+  });
 
-const addAnchorTag = () => {
-  if (!newAnchorTag.word || !newAnchorTag.link) return;
+  const addAnchorTag = () => {
+    if (!newAnchorTag.word || !newAnchorTag.link) return;
 
-  setForm(prev => ({
-    ...prev,
-    anchorTags: [...prev.anchorTags, newAnchorTag]
-  }));
+    setForm(prev => ({
+      ...prev,
+      anchorTags: [...prev.anchorTags, newAnchorTag]
+    }));
 
-  setNewAnchorTag({ word: "", link: "", isExternal: false });
-};
-
+    setNewAnchorTag({ word: "", link: "", isExternal: false });
+  };
 
   const [featuredImage, setFeaturedImage] = useState(null);
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
@@ -134,92 +133,94 @@ const addAnchorTag = () => {
   };
 
   // ----------- Submit --------------
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const processImageFile = (file) => {
-      return new Promise((resolve) => {
-        if (!file) resolve(null);
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-      });
+  const processImageFile = (file) => {
+    return new Promise((resolve) => {
+      if (!file) resolve(null);
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  try {
+    let featuredImageBase64 = null;
+    if (featuredImage) {
+      featuredImageBase64 = await processImageFile(featuredImage);
+    }
+
+    const processedContentBlocks = await Promise.all(
+      contentBlocks.map(async (block) => {
+        if (block.type === "image" && block.data.file) {
+          const base64 = await processImageFile(block.data.file);
+          return {
+            ...block,
+            data: {
+              ...block.data,
+              url: base64
+            }
+          };
+        }
+        return block;
+      })
+    );
+
+    const blogData = {
+      title: form.title,
+      slug: form.slug,
+      description: form.description,
+      excerpt: form.excerpt,
+      author: form.author,
+      anchorTags: form.anchorTags,
+      categories: form.categories.map(cat => ({
+        name: cat,
+        slug: cat.toLowerCase().replace(/\s+/g, "-")
+      })),
+      tags: form.tags,
+      seo: {
+        ...form.seo,
+        keywords: form.seo.keywords.split(',').map(k => k.trim()).filter(k => k)
+      },
+      published: form.published,
+      isFeatured: form.isFeatured,
+      content: processedContentBlocks
     };
 
-    try {
-      let featuredImageBase64 = null;
-      if (featuredImage) {
-        featuredImageBase64 = await processImageFile(featuredImage);
-      }
-
-      const processedContentBlocks = await Promise.all(
-        contentBlocks.map(async (block) => {
-          if (block.type === "image" && block.data.file) {
-            const base64 = await processImageFile(block.data.file);
-            return {
-              ...block,
-              data: {
-                ...block.data,
-                url: base64
-              }
-            };
-          }
-          return block;
-        })
-      );
-
-      const blogData = {
-        title: form.title,
-        slug: form.slug,
-        description: form.description,
-        excerpt: form.excerpt,
-        author: form.author,
-        anchorTags: form.anchorTags,
-        categories: form.categories.map(cat => ({
-          name: cat,
-          slug: cat.toLowerCase().replace(/\s+/g, "-")
-        })),
-        tags: form.tags,
-        seo: {
-          ...form.seo,
-          keywords: form.seo.keywords.split(',').map(k => k.trim()).filter(k => k)
-        },
-        published: form.published,
-        isFeatured: form.isFeatured,
-        content: processedContentBlocks
+    if (featuredImageBase64) {
+      blogData.featuredImage = {
+        url: featuredImageBase64,
+        alt: form.title || ""
       };
-
-      if (featuredImageBase64) {
-        blogData.featuredImage = {
-          url: featuredImageBase64,
-          alt: form.title || ""
-        };
-      } else if (featuredImageUrl) {
-        blogData.featuredImage = {
-          url: featuredImageUrl,
-          alt: form.title || ""
-        };
-      }
-
-      // Use the onSubmit prop instead of calling API directly
-      await onSubmit(blogData);
-      
-    } catch (err) {
-      console.log("BLOG CREATE ERROR:", err.response?.data || err.message);
-      alert("Error creating blog.");
+    } else if (featuredImageUrl) {
+      blogData.featuredImage = {
+        url: featuredImageUrl,
+        alt: form.title || ""
+      };
     }
-  };
+
+    console.log("📝 Blog data being sent:", blogData);
+
+    // Use the onSubmit prop instead of calling API directly
+    await onSubmit(blogData);
+    
+  } catch (err) {
+    console.log("❌ BLOG CREATE ERROR:", err.response?.data || err.message);
+    alert(`Error creating blog: ${err.response?.data?.message || err.message}`);
+  }
+};
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <button
-      type="button"
-      onClick={onCancel}
-      className="absolute top-4 right-4 text-gray-600 hover:text-red-600 text-xl font-bold"
-      title="Cancel & Go Back"
-    >
-      ✕
-    </button>
+        type="button"
+        onClick={onCancel}
+        className="absolute top-4 right-4 text-gray-600 hover:text-red-600 text-xl font-bold"
+        title="Cancel & Go Back"
+      >
+        ✕
+      </button>
 
       <h1 className="text-2xl font-bold mb-4">Create New Blog</h1>
 
@@ -356,7 +357,7 @@ const addAnchorTag = () => {
           />
         </div>
 
-        {/* Featured Image */}
+        {/* Featured Image - FIXED */}
         <div className="border p-3 rounded space-y-2">
           <h2 className="font-semibold">Featured Image</h2>
           <p className="text-sm opacity-70">Upload OR enter URL</p>
@@ -368,10 +369,17 @@ const addAnchorTag = () => {
             value={featuredImageUrl} 
             onChange={handleFeaturedImageUrl} 
           />
-          {featuredPreview && (<Image src={featuredPreview} className="w-40 h-40 object-cover rounded border mt-2" />)}
+          {/* FIXED: Using img instead of Image */}
+          {featuredPreview && (
+            <img 
+              src={featuredPreview} 
+              alt="Featured preview" 
+              className="w-40 h-40 object-cover rounded border mt-2" 
+            />
+          )}
         </div>
 
-        {/* Content Blocks */}
+        {/* Content Blocks - FIXED */}
         <div className="border p-3 rounded space-y-2">
           <h2 className="font-semibold">Content Blocks</h2>
           <div className="flex gap-2 flex-wrap">
@@ -422,7 +430,14 @@ const addAnchorTag = () => {
                     value={block.data.url || ""}
                     onChange={(e)=>updateBlockData(index,"url",e.target.value)} 
                   />
-                  {block.data.url && <Image src={block.data.url} className="w-32 h-32 object-cover rounded border mt-2" />}
+                  {/* FIXED: Using img instead of Image */}
+                  {block.data.url && (
+                    <img 
+                      src={block.data.url} 
+                      alt="Content image" 
+                      className="w-32 h-32 object-cover rounded border mt-2" 
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -481,7 +496,6 @@ const addAnchorTag = () => {
                           anchorTags: prev.anchorTags.filter((_, i) => i !== index)
                         }));
                       }}
-
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     title="Remove anchor tag"
                   >

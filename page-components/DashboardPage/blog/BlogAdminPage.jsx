@@ -20,26 +20,30 @@ export default function BlogAdminPage() {
     loadBlogs();
   }, []);
 
-  const handleSubmit = async (data) => {
-    try {
-      if (editingBlog) {
-        // Update existing blog
-        await api.patch(`/blog/${editingBlog.slug}`, data);
-        alert("Blog updated successfully!");
-      } else {
-        // Create new blog
-        await api.post("/blog", data);
-        alert("Blog created successfully!");
-      }
-
-      setShowForm(false);
-      setEditingBlog(null);
-      loadBlogs(); // Refresh the list
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error occurred!");
+const handleSubmit = async (data) => {
+  try {
+    console.log("🔄 Submitting blog data:", data);
+    
+    if (editingBlog) {
+      // Update existing blog
+      await api.patch(`/blog/${editingBlog.slug}`, data);
+      alert("Blog updated successfully!");
+    } else {
+      // Create new blog
+      const response = await api.post("/blog", data);
+      console.log("✅ Blog created successfully:", response.data);
+      alert("Blog created successfully!");
     }
-  };
+
+    setShowForm(false);
+    setEditingBlog(null);
+    loadBlogs(); // Refresh the list
+  } catch (error) {
+    console.error("❌ Error submitting blog:", error);
+    console.error("❌ Error response:", error.response?.data);
+    alert(`Error: ${error.response?.data?.message || error.message}`);
+  }
+};
 
   const handleEdit = async (slug) => {
     try {
