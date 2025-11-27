@@ -1,5 +1,11 @@
 import { slugify, createProductSlug } from "@/lib/slugify";
 
+// Revalidate the sitemap every 1 hour (3600 seconds)
+export const revalidate = 3600;
+
+// Ensure dynamic rendering for fresh data
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
 
@@ -7,19 +13,19 @@ export default async function sitemap() {
   // Static pages
   // --------------------------------------------
   const staticPages = [
-    "",
-    "/about",
-    "/category",
-    "/blog",
-    "/contact",
-    "/privacy",
-    "/terms",
-    "/AdvertiserDisclosure",
-  ].map((path) => ({
+    { path: "", changeFreq: "daily", priority: 1 },
+    { path: "/about", changeFreq: "monthly", priority: 0.7 },
+    { path: "/category", changeFreq: "daily", priority: 0.9 },
+    { path: "/blog", changeFreq: "daily", priority: 0.9 },
+    { path: "/contact", changeFreq: "monthly", priority: 0.6 },
+    { path: "/privacy", changeFreq: "yearly", priority: 0.5 },
+    { path: "/terms", changeFreq: "yearly", priority: 0.5 },
+    { path: "/AdvertiserDisclosure", changeFreq: "monthly", priority: 0.6 },
+  ].map(({ path, changeFreq, priority }) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
-    changeFrequency: "monthly",
-    priority: path === "" ? 1 : 0.8,
+    changeFrequency: changeFreq,
+    priority: priority,
   }));
 
   // --------------------------------------------
@@ -32,7 +38,10 @@ export default async function sitemap() {
   try {
     const productRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/products`,
-      { next: { revalidate: 3600 } } // Revalidate every hour
+      { 
+        next: { revalidate: 3600 },
+        cache: 'no-store'
+      }
     );
 
     if (productRes.ok) {
@@ -61,7 +70,7 @@ export default async function sitemap() {
         productPages.push({
           url: `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`,
           lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
-          changeFrequency: "weekly",
+          changeFrequency: "daily",
           priority: 0.8,
         });
       });
@@ -70,7 +79,7 @@ export default async function sitemap() {
       categoryPages = [...categoriesSet].map((cat) => ({
         url: `${baseUrl}/category/${cat}`,
         lastModified: new Date(),
-        changeFrequency: "weekly",
+        changeFrequency: "daily",
         priority: 0.9,
       }));
 
@@ -78,8 +87,8 @@ export default async function sitemap() {
       subCategoryPages = [...subCategoriesSet].map((path) => ({
         url: `${baseUrl}/category/${path}`,
         lastModified: new Date(),
-        changeFrequency: "weekly",
-        priority: 0.85,
+        changeFrequency: "daily",
+        priority: 0.9,
       }));
     }
   } catch (err) {
@@ -93,7 +102,10 @@ export default async function sitemap() {
   try {
     const blogRes = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/blog`,
-      { next: { revalidate: 3600 } } // Revalidate every hour
+      { 
+        next: { revalidate: 3600 },
+        cache: 'no-store'
+      }
     );
 
     if (blogRes.ok) {
@@ -105,7 +117,7 @@ export default async function sitemap() {
         lastModified: blog.dateModified
           ? new Date(blog.dateModified)
           : new Date(blog.datePublished || new Date()),
-        changeFrequency: "monthly",
+        changeFrequency: "weekly",
         priority: 0.7,
       }));
     }
