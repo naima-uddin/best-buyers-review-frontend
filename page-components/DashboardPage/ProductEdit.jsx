@@ -1036,6 +1036,7 @@ const addSpecification = (e) => {
                 <option value="editor-choice">Editor Choice</option>
                 <option value="black-friday-deal">Black Friday Deal</option>
                 <option value="flash-sale">Flash Sale</option>
+                <option value="overall-pick">Overall Pick</option>
               </select>
 
               <div>
