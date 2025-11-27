@@ -350,12 +350,12 @@ export default function BlogDetails({ slug }) {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                     
-                      <div className="w-14 h-14 rounded-2xl border-2 border-white/30 overflow-hidden shadow-lg">
+                      <div className="w-14 h-14 rounded-full border-1 border-white/30 overflow-hidden shadow-lg">
                         <Image 
-                          src="/logoWithBG.png"
+                          src="/fullLogo.jpg"
                           alt="Best Buyers View"
                           width={56}
-                          height={56}
+                          height={100}
                           className="w-full h-full object-contain"
                         />
                       </div>
