@@ -24,6 +24,27 @@ export default function CompareModal() {
     );
   };
 
+  // Function to get specification value by key
+  const getSpecificationValue = (product, specKey) => {
+    const spec = product.specifications?.find(s => 
+      s.key.toLowerCase().includes(specKey.toLowerCase())
+    );
+    return spec?.value || "N/A";
+  };
+
+  // Get all unique specification keys from all products
+  const getAllSpecificationKeys = () => {
+    const allKeys = new Set();
+    compareItems.forEach(product => {
+      product.specifications?.forEach(spec => {
+        allKeys.add(spec.key);
+      });
+    });
+    return Array.from(allKeys).slice(0, 5); // Limit to 5 specifications
+  };
+
+  const specificationKeys = getAllSpecificationKeys();
+
   return (
     <>
       {/* 🔹 Compare Box at Bottom Right */}
@@ -71,10 +92,10 @@ export default function CompareModal() {
             {/* Content */}
             <div className="flex-1 overflow-auto p-3 sm:p-4 md:p-6">
               <div className="overflow-x-auto -mx-3 sm:-mx-4 md:-mx-6 px-3 sm:px-4 md:px-6">
-                <table className="table table-fixed w-full min-w-[600px]">
+                <table className="table table-fixed w-full min-w-[500px]">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="w-24 sm:w-32 md:w-40 p-2 sm:p-3 md:p-4 border-r sticky left-0 bg-gray-50 z-10 font-semibold text-gray-700 text-xs sm:text-sm">
+                      <th className="w-24 sm:w-32 md:w-40 p-2 sm:p-3 md:p-4 border-r sticky left-0 bg-gray-50 z-10 font-semibold text-gray-700 text-xs sm:text-sm text-left">
                         Features
                       </th>
                       {compareItems.map((product) => (
@@ -100,10 +121,7 @@ export default function CompareModal() {
                             <h4 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-3 leading-tight">
                               {product.title}
                             </h4>
-                            <div className="text-sm sm:text-base md:text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                              Save {product.discount?.percentage || 0}%
-                            </div>
-
+                            
                             <a
                               href={product.affiliateUrl}
                               target="_blank"
@@ -128,7 +146,7 @@ export default function CompareModal() {
                   </thead>
 
                   <tbody>
-                    {/* 🔹 Rating */}
+                    {/* 🔹 Rating Row */}
                     <tr className="border-b">
                       <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
                         Rating
@@ -138,36 +156,97 @@ export default function CompareModal() {
                           key={p._id}
                           className="p-2 sm:p-3 md:p-4 text-center border-r"
                         >
+                          <div className="flex justify-center items-center"> 
+
                           {getStarRating(p.customRating?.rating || 0)}
                           <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                            {p.customRating?.rating?.toFixed(1) || "—"} (
-                            {p.customRating?.reviewCount || 0} reviews)
+                            ({p.customRating?.rating?.toFixed(1) || "0"})
+                          </div>
                           </div>
                         </td>
                       ))}
                     </tr>
 
-                    {/* 🔹 Price */}
+                    {/* 🔹 Reviews Row */}
                     <tr className="border-b">
                       <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
-                        Price
+                        Reviews
                       </td>
                       {compareItems.map((p) => (
                         <td
                           key={p._id}
                           className="p-2 sm:p-3 md:p-4 text-center border-r"
                         >
-                          <div className="text-sm sm:text-base md:text-lg font-bold text-gray-800">
-                            {p.price?.displayAmount || "$0.00"}
+                          <div className="text-sm text-gray-700">
+                            {p.customRating?.reviewCount 
+                              ? `${p.customRating.reviewCount.toLocaleString()} people` 
+                              : "No reviews"}
                           </div>
-                          <div className="text-xs sm:text-sm text-gray-500 line-through">
-                            {p.listPrice?.displayAmount || ""}
-                          </div>
+                          
                         </td>
                       ))}
                     </tr>
 
-                    {/* 🔹 Features (first 2 only) */}
+
+
+                    {/* 🔹 Savings Row */}
+                    <tr className="border-b">
+                      <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
+                        Savings
+                      </td>
+                      {compareItems.map((p) => (
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 text-center border-r"
+                        >
+                          {p.discount?.displayAmount && (
+                            <div className="text-sm font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                              {p.discount.displayAmount} off
+                            </div>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+
+                    {/* 🔹 Brand */}
+                    <tr className="border-b">
+                      <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
+                        Brand
+                      </td>
+                      {compareItems.map((p) => (
+                        <td
+                          key={p._id}
+                          className="p-2 sm:p-3 md:p-4 text-center border-r text-xs sm:text-sm"
+                        >
+                          <span className="text-gray-700">
+                            {p.brand || "N/A"}
+                          </span>
+                        </td>
+                      ))}
+                    </tr>
+
+                    {/* 🔹 Individual Specification Rows */}
+                    {specificationKeys.map((specKey) => (
+                      <tr key={specKey} className="border-b">
+                        <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm capitalize">
+                          {specKey.toLowerCase()}
+                        </td>
+                        {compareItems.map((p) => (
+                          <td
+                            key={p._id}
+                            className="p-2 sm:p-3 md:p-4 text-center border-r text-xs sm:text-sm"
+                          >
+                            <span className="text-gray-700">
+                              {getSpecificationValue(p, specKey)}
+                            </span>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+
+                    
+
+                    {/* 🔹 Key Features */}
                     <tr className="border-b align-top">
                       <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
                         Key Features
@@ -183,57 +262,39 @@ export default function CompareModal() {
                                 {f}
                               </li>
                             ))}
+                            {(!p.features?.feature || p.features.feature.length === 0) && (
+                              <li className="text-gray-500">N/A</li>
+                            )}
                           </ul>
                         </td>
                       ))}
                     </tr>
 
-                    {/* 🔹 Specifications */}
-                    <tr className="border-b align-top">
+                    
+
+                    {/* 🔹 Availability */}
+                    <tr className="border-b">
                       <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
-                        Specifications
+                        Availability
                       </td>
                       {compareItems.map((p) => (
                         <td
                           key={p._id}
-                          className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm"
+                          className="p-2 sm:p-3 md:p-4 text-center border-r text-xs sm:text-sm"
                         >
-                          <ul className="text-gray-700 space-y-1">
-                            {p.specifications?.slice(0, 3).map((spec, i) => (
-                              <li key={i} className="leading-relaxed">
-                                <strong>{spec.key}:</strong> {spec.value}
-                              </li>
-                            ))}
-                          </ul>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            p.availability === "In Stock" 
+                              ? "bg-green-100 text-green-800"
+                              : p.availability === "Out of Stock"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}>
+                            {p.availability || "N/A"}
+                          </span>
                         </td>
                       ))}
                     </tr>
 
-                    {/* 🔹 Reviews */}
-                    <tr className="border-b align-top">
-                      <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
-                        Latest Review
-                      </td>
-                      {compareItems.map((p) => (
-                        <td
-                          key={p._id}
-                          className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm"
-                        >
-                          {p.customReviews && p.customReviews.length > 0 ? (
-                            <div className="text-gray-700">
-                              <div className="font-semibold mb-1">
-                                {p.customReviews[0].author}
-                              </div>
-                              <div className="italic text-gray-600 leading-relaxed">
-                                &ldquo;{p.customReviews[0].content}&rdquo;
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-gray-500">No reviews yet</div>
-                          )}
-                        </td>
-                      ))}
-                    </tr>
                   </tbody>
                 </table>
               </div>
