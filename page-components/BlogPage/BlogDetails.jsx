@@ -475,7 +475,7 @@ export default function BlogDetails({ slug }) {
               <div className="mt-16 pt-12 border-t border-gray-200">
                 <div className="flex flex-col md:flex-row items-start gap-6 bg-gray-50 rounded-2xl p-8">
                     <Image 
-                      src="/logoWithBG.png"
+                      src="/fullLogo.jpg"
                       alt="Best Buyers View"
                       width={80}
                       height={80}
