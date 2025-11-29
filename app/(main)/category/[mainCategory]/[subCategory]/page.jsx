@@ -1,8 +1,9 @@
 import ProductByCategory from "@/page-components/ProductPage/ProductByCategory";
 import CategoryStructuredData from "@/components/seo/CategoryStructuredData";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema";
 import { unslugify, slugify } from "@/lib/slugify";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
 // Use ISR to revalidate subcategory pages every 30 minutes
 export const revalidate = 1800;
@@ -110,8 +111,15 @@ export default async function Page({ params }) {
   const mainName = unslugify(mainCategory);
   const subName = unslugify(subCategory);
 
+  const breadcrumbItems = [
+    { name: "Categories", url: `${SITE_URL}/category` },
+    { name: mainName, url: `${SITE_URL}/category/${mainCategory}` },
+    { name: subName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}` }
+  ];
+
   return (
     <>
+      <BreadcrumbSchema items={breadcrumbItems} />
       <CategoryStructuredData
         mainCategoryName={mainName}
         subCategoryName={subName}

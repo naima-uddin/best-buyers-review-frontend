@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://bestbuyersview.com"),
+  metadataBase: new URL("https://www.bestbuyersview.com"),
   title: {
     default: "Best Buyers View | Product Reviews & Comparisons",
     template: "%s | Best Buyers View",
@@ -43,14 +43,14 @@ export const metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://bestbuyersview.com",
+    url: "https://www.bestbuyersview.com",
     siteName: "Best Buyers View",
     title: "Best Buyers View | Product Reviews & Comparisons",
     description:
       "Your trusted source for product reviews, comparisons, and buying guides.",
     images: [
       {
-        url: "https://bestbuyersview.com/og-image.jpg",
+        url: "https://www.bestbuyersview.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Best Buyers View",
@@ -64,7 +64,7 @@ export const metadata = {
     description: "Discover, Compare & Pick the Best products",
     site: "@bestbuyersview",
     creator: "@bestbuyersview",
-    images: ["https://bestbuyersview.com/og-image.jpg"],
+    images: ["https://www.bestbuyersview.com/og-image.jpg"],
   },
 
   robots: {
@@ -90,10 +90,10 @@ export default function RootLayout({ children }) {
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://bestbuyersview.com/#organization",
+        "@id": "https://www.bestbuyersview.com/#organization",
         name: "Best Buyers View",
-        url: "https://bestbuyersview.com",
-        logo: "https://bestbuyersview.com/logo.png",
+        url: "https://www.bestbuyersview.com",
+        logo: "https://www.bestbuyersview.com/logo.png",
         sameAs: [
           "https://www.facebook.com/yourprofile",
           "https://www.instagram.com/yourprofile",
@@ -103,26 +103,26 @@ export default function RootLayout({ children }) {
       },
       {
         "@type": "WebSite",
-        "@id": "https://bestbuyersview.com/#website",
-        url: "https://bestbuyersview.com",
+        "@id": "https://www.bestbuyersview.com/#website",
+        url: "https://www.bestbuyersview.com",
         name: "Best Buyers View",
         description: "Expert product reviews, comparisons and buying guides.",
         publisher: {
-          "@id": "https://bestbuyersview.com/#organization",
+          "@id": "https://www.bestbuyersview.com/#organization",
         },
         potentialAction: {
           "@type": "SearchAction",
-          target: "https://bestbuyersview.com/search?q={search_term_string}",
+          target: "https://www.bestbuyersview.com/search?q={search_term_string}",
           "query-input": "required name=search_term_string",
         },
       },
       {
         "@type": "WebPage",
-        "@id": "https://bestbuyersview.com/#webpage",
-        url: "https://bestbuyersview.com",
+        "@id": "https://www.bestbuyersview.com/#webpage",
+        url: "https://www.bestbuyersview.com",
         name: "Best Buyers View",
         isPartOf: {
-          "@id": "https://bestbuyersview.com/#website",
+          "@id": "https://www.bestbuyersview.com/#website",
         },
       },
     ],

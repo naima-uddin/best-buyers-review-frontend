@@ -18,13 +18,13 @@ export const metadata = {
     "user privacy",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/privacy",
+    canonical: "https://www.bestbuyersview.com/privacy",
   },
   openGraph: {
     title: "Privacy Policy | Best Buyers View",
     description:
       "Learn about Best Buyers View's privacy practices and how we protect your personal information.",
-    url: "https://bestbuyersview.com/privacy",
+    url: "https://www.bestbuyersview.com/privacy",
     siteName: "Best Buyers View",
     type: "website",
   },

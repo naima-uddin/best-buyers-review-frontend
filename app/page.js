@@ -2,6 +2,8 @@ import { Footer } from "@/components/common/Footer";
 import Navbar from "@/components/common/Navbar";
 import HomePage from "@/page-components/HomePage/HomePage";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
+import OrganizationSchema from "@/components/seo/OrganizationSchema";
+import WebsiteSchema from "@/components/seo/WebsiteSchema";
 
 export const metadata = {
   title: "Best Buyers View | Discover, Compare & Pick the Best Products",
@@ -25,17 +27,17 @@ export const metadata = {
     "best deals",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com",
+    canonical: "https://www.bestbuyersview.com",
   },
   openGraph: {
     title: "Best Buyers View | Discover, Compare & Pick the Best Products",
     description:
-      "Your trusted source for product reviews, comparisons, and buying guides. Expert recommendations across tech, home, baby, beauty, fitness, and more categories.",
-    url: "https://bestbuyersview.com",
+      "Your trusted source for product reviews, comparisons, and buying guides across multiple categories.",
+    url: "https://www.bestbuyersview.com",
     siteName: "Best Buyers View",
     images: [
       {
-        url: "https://bestbuyersview.com/og-image.jpg",
+        url: "https://www.bestbuyersview.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Best Buyers View - Product Reviews & Comparisons",
@@ -49,7 +51,7 @@ export const metadata = {
     title: "Best Buyers View | Discover, Compare & Pick the Best Products",
     description:
       "Your trusted source for product reviews, comparisons, and buying guides across multiple categories.",
-    images: ["https://bestbuyersview.com/og-image.jpg"],
+    images: ["https://www.bestbuyersview.com/og-image.jpg"],
     site: "@bestbuyersview",
   },
   robots: {
@@ -74,29 +76,8 @@ export default function Home() {
       <ScrollToTopButton />
 
       {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            name: "Best Buyers View",
-            url: "https://bestbuyersview.com",
-            logo: "https://bestbuyersview.com/logo.png",
-            description:
-              "Best Buyers View provides comprehensive product reviews, comparisons, and buying guides to help consumers make informed purchase decisions.",
-            sameAs: [
-              "https://twitter.com/bestbuyersview",
-              "https://facebook.com/bestbuyersview",
-            ],
-            contactPoint: {
-              "@type": "ContactPoint",
-              contactType: "Customer Service",
-              url: "https://bestbuyersview.com/contact",
-            },
-          }),
-        }}
-      />
+      <OrganizationSchema />
+      <WebsiteSchema />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -104,13 +85,13 @@ export default function Home() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: "Best Buyers View",
-            url: "https://bestbuyersview.com",
+            url: "https://www.bestbuyersview.com",
             potentialAction: {
               "@type": "SearchAction",
               target: {
                 "@type": "EntryPoint",
                 urlTemplate:
-                  "https://bestbuyersview.com/search?q={search_term_string}",
+                  "https://www.bestbuyersview.com/search?q={search_term_string}",
               },
               "query-input": "required name=search_term_string",
             },

@@ -18,13 +18,13 @@ export const metadata = {
     "legal terms",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/terms",
+    canonical: "https://www.bestbuyersview.com/terms",
   },
   openGraph: {
     title: "Terms of Service | Best Buyers View",
     description:
       "Read the terms of service for using Best Buyers View and our platform policies.",
-    url: "https://bestbuyersview.com/terms",
+    url: "https://www.bestbuyersview.com/terms",
     siteName: "Best Buyers View",
     type: "website",
   },

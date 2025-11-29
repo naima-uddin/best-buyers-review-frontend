@@ -2,7 +2,7 @@ import CategoryPage from "@/page-components/CategoryPage/CategoryPage";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
 import React from "react";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
 export const metadata = {
   title: "Product Categories | Best Buyers View",

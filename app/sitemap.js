@@ -7,20 +7,20 @@ export const revalidate = 3600;
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
   // --------------------------------------------
-  // Static pages
+  // Static pages with optimized priorities
   // --------------------------------------------
   const staticPages = [
-    { path: "", changeFreq: "daily", priority: 1 },
-    { path: "/about", changeFreq: "monthly", priority: 0.7 },
-    { path: "/category", changeFreq: "daily", priority: 0.9 },
+    { path: "", changeFreq: "daily", priority: 1.0 },
+    { path: "/about", changeFreq: "monthly", priority: 0.6 },
+    { path: "/category", changeFreq: "daily", priority: 0.95 },
     { path: "/blog", changeFreq: "daily", priority: 0.9 },
-    { path: "/contact", changeFreq: "monthly", priority: 0.6 },
-    { path: "/privacy", changeFreq: "yearly", priority: 0.5 },
-    { path: "/terms", changeFreq: "yearly", priority: 0.5 },
-    { path: "/AdvertiserDisclosure", changeFreq: "monthly", priority: 0.6 },
+    { path: "/contact", changeFreq: "monthly", priority: 0.5 },
+    { path: "/privacy", changeFreq: "yearly", priority: 0.3 },
+    { path: "/terms", changeFreq: "yearly", priority: 0.3 },
+    { path: "/AdvertiserDisclosure", changeFreq: "monthly", priority: 0.4 },
   ].map(({ path, changeFreq, priority }) => ({
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
@@ -66,29 +66,29 @@ export default async function sitemap() {
         categoriesSet.add(mainSlug);
         subCategoriesSet.add(`${mainSlug}/${subSlug}`);
 
-        // Product Page
+        // Product Page (important content pages)
         productPages.push({
           url: `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`,
           lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
-          changeFrequency: "daily",
-          priority: 0.8,
+          changeFrequency: "weekly",
+          priority: 0.75,
         });
       });
 
-      // Category pages
+      // Main Category pages (higher priority)
       categoryPages = [...categoriesSet].map((cat) => ({
         url: `${baseUrl}/category/${cat}`,
         lastModified: new Date(),
         changeFrequency: "daily",
-        priority: 0.9,
+        priority: 0.85,
       }));
 
-      // Subcategory pages
+      // Subcategory pages (important for SEO)
       subCategoryPages = [...subCategoriesSet].map((path) => ({
         url: `${baseUrl}/category/${path}`,
         lastModified: new Date(),
         changeFrequency: "daily",
-        priority: 0.9,
+        priority: 0.8,
       }));
     }
   } catch (err) {

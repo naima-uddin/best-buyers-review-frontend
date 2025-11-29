@@ -16,13 +16,13 @@ export const metadata = {
     "transparency",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/AdvertiserDisclosure",
+    canonical: "https://www.bestbuyersview.com/AdvertiserDisclosure",
   },
   openGraph: {
     title: "Advertiser Disclosure | Best Buyers View",
     description:
       "Learn about our advertiser disclosure and how we earn commissions through affiliate links.",
-    url: "https://bestbuyersview.com/AdvertiserDisclosure",
+    url: "https://www.bestbuyersview.com/AdvertiserDisclosure",
     siteName: "Best Buyers View",
     type: "website",
   },

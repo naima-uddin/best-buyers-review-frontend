@@ -22,13 +22,13 @@ export const metadata = {
     "Fitness Products",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/blog",
+    canonical: "https://www.bestbuyersview.com/blog",
   },
   openGraph: {
     title: "Blog | Best Buyers View",
     description:
       "Read the latest buying guides and product reviews from Best Buyers View.",
-    url: "https://bestbuyersview.com/blog",
+    url: "https://www.bestbuyersview.com/blog",
     siteName: "Best Buyers View",
     images: [
       {
@@ -76,7 +76,7 @@ export default async function Page() {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "Best Buyers View Blog",
-    url: "https://bestbuyersview.com/blog",
+    url: "https://www.bestbuyersview.com/blog",
     description:
       "Best Buyers View Blog delivers the latest buying guides, reviews, and product comparisons.",
     publisher: {
@@ -84,7 +84,7 @@ export default async function Page() {
       name: "Best Buyers View",
       logo: {
         "@type": "ImageObject",
-        url: "https://bestbuyersview.com/logo.png",
+        url: "https://www.bestbuyersview.com/logo.png",
       },
     },
   };

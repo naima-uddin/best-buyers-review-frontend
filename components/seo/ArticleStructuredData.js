@@ -12,7 +12,7 @@ export default function ArticleStructuredData({ blog }) {
     "@type": "BlogPosting",
     "headline": blog.title,
     "description": blog.seo?.description || blog.excerpt || "",
-    "image": blog.featuredImage?.url || "https://bestbuyersview.com/og-image.jpg",
+    "image": blog.featuredImage?.url || "https://www.bestbuyersview.com/og-image.jpg",
     "author": {
       "@type": "Person",
       "name": blog.author?.name || "Best Buyers View"
@@ -20,11 +20,11 @@ export default function ArticleStructuredData({ blog }) {
     "publisher": {
       "@type": "Organization",
       "name": "Best Buyers View",
-      "logo": { "@type": "ImageObject", url: "https://bestbuyersview.com/logo.png" }
+      "logo": { "@type": "ImageObject", url: "https://www.bestbuyersview.com/logo.png" }
     },
     "datePublished": blog.createdAt,
     "dateModified": blog.updatedAt || blog.createdAt,
-    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://bestbuyersview.com/blog/${blog.slug}` },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://www.bestbuyersview.com/blog/${blog.slug}` },
     "keywords": blog.tags || blog.seo?.keywords || []
   };
 

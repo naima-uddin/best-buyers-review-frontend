@@ -2,7 +2,7 @@ import ArticleStructuredData from "@/components/seo/ArticleStructuredData";
 import BlogDetails from "@/page-components/BlogPage/BlogDetails";
 import Link from "next/link";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
 // Aggressive static generation
 export const revalidate = 3600;

@@ -1,9 +1,10 @@
 // app/(main)/category/[mainCategory]/[subCategory]/[productId]/page.jsx
 import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
+import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
 import { unslugify, extractProductId, createProductSlug, slugify } from '@/lib/slugify';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
 // Use ISR to revalidate product pages every 30 minutes
 export const revalidate = 1800;
@@ -154,8 +155,22 @@ export default async function Page({ params }) {
     console.error('Error fetching product:', err);
   }
 
+  const breadcrumbItems = [
+    { name: "Categories", url: `${SITE_URL}/category` },
+    { name: mainName, url: `${SITE_URL}/category/${mainCategory}` },
+    { name: subName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}` },
+  ];
+
+  if (productData) {
+    breadcrumbItems.push({
+      name: productData.title,
+      url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${productId}`
+    });
+  }
+
   return (
     <>
+      <BreadcrumbSchema items={breadcrumbItems} />
       {productData && <ProductStructuredData product={productData} />}
       <ProductDetailsPage product={productData} />
     </>

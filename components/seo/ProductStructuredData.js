@@ -3,7 +3,7 @@
 import React from "react";
 import { slugify, createProductSlug } from "@/lib/slugify";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
 export default async function ProductStructuredData({ product }) {
   if (!product) return null;
@@ -12,40 +12,57 @@ export default async function ProductStructuredData({ product }) {
   const listPriceObj = product.listPrice || null;
   const rating = product.customRating || {};
   const images = (product.images || []).map(img => img.url).filter(Boolean);
+  const productUrl = `${SITE_URL}/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`;
 
   const schema = {
     "@context": "https://schema.org/",
     "@type": "Product",
+    "@id": `${productUrl}#product`,
     name: product.title || product.seo?.title || "",
     image: images.length ? images : [`${SITE_URL}/og-image.jpg`],
     description: product.seo?.description || product.description || "",
     sku: product.asin || product._id,
+    gtin: product.asin || undefined,
+    mpn: product.asin || undefined,
     brand: {
       "@type": "Brand",
-      name: product.brand || ""
+      name: product.brand || "Generic"
     },
+    category: product.mainCategory?.name || undefined,
     offers: {
       "@type": "Offer",
-      url: `${SITE_URL}/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`,
+      url: productUrl,
       priceCurrency: (priceObj.currency || "USD"),
       price: (priceObj.amount != null ? String(priceObj.amount) : undefined),
-      availability: product.availability ? (product.availability.includes("In Stock") ? "https://schema.org/InStock" : "https://schema.org/OutOfStock") : undefined,
-      priceValidUntil: undefined
+      availability: product.availability ? (product.availability.includes("In Stock") ? "https://schema.org/InStock" : "https://schema.org/OutOfStock") : "https://schema.org/InStock",
+      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      itemCondition: "https://schema.org/NewCondition",
+      seller: {
+        "@type": "Organization",
+        name: "Best Buyers View"
+      }
     },
     aggregateRating: rating && rating.reviewCount ? {
       "@type": "AggregateRating",
       ratingValue: rating.rating || 0,
-      reviewCount: rating.reviewCount || 0
+      reviewCount: rating.reviewCount || 0,
+      bestRating: 5,
+      worstRating: 1
     } : undefined,
     review: (product.customReviews || []).map(r => ({
       "@type": "Review",
-      author: r.author || "User",
+      author: {
+        "@type": "Person",
+        name: r.author || "Verified Buyer"
+      },
       datePublished: r.date,
       reviewBody: r.content,
       name: r.title,
       reviewRating: {
         "@type": "Rating",
-        ratingValue: r.rating != null ? r.rating : 0
+        ratingValue: r.rating != null ? r.rating : 5,
+        bestRating: 5,
+        worstRating: 1
       }
     })).slice(0,5).filter(Boolean)
   };

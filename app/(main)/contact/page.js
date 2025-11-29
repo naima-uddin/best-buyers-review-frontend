@@ -18,13 +18,13 @@ export const metadata = {
     "contact us",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/contact",
+    canonical: "https://www.bestbuyersview.com/contact",
   },
   openGraph: {
     title: "Contact Us | Best Buyers View",
     description:
       "Have questions about our product reviews? Get in touch with the Best Buyers View team for inquiries, support, or feedback.",
-    url: "https://bestbuyersview.com/contact",
+    url: "https://www.bestbuyersview.com/contact",
     siteName: "Best Buyers View",
     type: "website",
   },
@@ -47,7 +47,7 @@ function WebPageJsonLD() {
     name: "Contact Us | Best Buyers View",
     description:
       "Get in touch with the Best Buyers View team for questions, support, feedback, or partnership opportunities.",
-    url: "https://bestbuyersview.com/contact",
+    url: "https://www.bestbuyersview.com/contact",
   };
 
   return (
@@ -70,13 +70,13 @@ function BreadcrumbJsonLD() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://bestbuyersview.com/",
+        item: "https://www.bestbuyersview.com/",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Contact",
-        item: "https://bestbuyersview.com/contact",
+        item: "https://www.bestbuyersview.com/contact",
       },
     ],
   };

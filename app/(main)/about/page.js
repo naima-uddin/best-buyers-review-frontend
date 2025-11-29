@@ -17,13 +17,13 @@ export const metadata = {
     "about us",
   ],
   alternates: {
-    canonical: "https://bestbuyersview.com/about",
+    canonical: "https://www.bestbuyersview.com/about",
   },
   openGraph: {
     title: "About Us | Best Buyers View",
     description:
       "Discover the mission behind Best Buyers View and how we help consumers make informed purchase decisions through expert product reviews.",
-    url: "https://bestbuyersview.com/about",
+    url: "https://www.bestbuyersview.com/about",
     siteName: "Best Buyers View",
     type: "website",
   },
@@ -45,8 +45,8 @@ function OrganizationJsonLD() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Best Buyers View",
-    url: "https://bestbuyersview.com",
-    logo: "https://bestbuyersview.com/logo.png",
+    url: "https://www.bestbuyersview.com",
+    logo: "https://www.bestbuyersview.com/logo.png",
     sameAs: [
       "https://www.facebook.com/bestbuyersview",
       "https://www.linkedin.com/company/bestbuyersview",
@@ -70,7 +70,7 @@ function WebPageJsonLD() {
     name: "About Us | Best Buyers View",
     description:
       "Learn more about our mission to provide unbiased product reviews and buying guides.",
-    url: "https://bestbuyersview.com/about",
+    url: "https://www.bestbuyersview.com/about",
   };
 
   return (
@@ -91,13 +91,13 @@ function BreadcrumbJsonLD() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://bestbuyersview.com/",
+        item: "https://www.bestbuyersview.com/",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "About",
-        item: "https://bestbuyersview.com/about",
+        item: "https://www.bestbuyersview.com/about",
       },
     ],
   };
