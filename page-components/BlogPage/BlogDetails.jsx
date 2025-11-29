@@ -2,54 +2,83 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useBlogData } from "./BlogDataProvider";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Breadcrumbs from "@/ui/Breadcrumbs";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 
-export default function BlogDetails({ slug }) {
-  const { blogs } = useBlogData();
-  const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function BlogDetails({ slug, initialBlog = null }) {
+  const [blog, setBlog] = useState(initialBlog);
+  const [loading, setLoading] = useState(!initialBlog);
   const [readingProgress, setReadingProgress] = useState(0);
   const [showTableOfContents, setShowTableOfContents] = useState(() => {
-  // Check if the user has closed TOC before
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("tocClosed") !== "true";
-  }
-  return true; // default visible
-});
-  const [likes, setLikes] = useState(0);
-  const [hasLiked, setHasLiked] = useState(false);
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("tocClosed") !== "true";
+    }
+    return true;
+  });
+  const [likes, setLikes] = useState(() => {
+    if (typeof window !== "undefined" && slug) {
+      const cached = sessionStorage.getItem(`blog-likes-${slug}`);
+      return cached ? parseInt(cached) : Math.floor(Math.random() * 50) + 10;
+    }
+    return 10;
+  });
+  const [hasLiked, setHasLiked] = useState(() => {
+    if (typeof window !== "undefined" && slug) {
+      return localStorage.getItem(`blog-liked-${slug}`) === 'true';
+    }
+    return false;
+  });
   const router = useRouter();
 
-  
-
   useEffect(() => {
-    const cachedBlog = blogs.find(b => b.slug === slug);
-    
-    if (cachedBlog) {
-      setBlog(cachedBlog);
+    if (initialBlog) {
+      setBlog(initialBlog);
       setLoading(false);
-    } else {
-      async function fetchBlog() {
-        try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`);
-          const data = await res.json();
-          setBlog(data.data);
-          // Simulate initial likes count
-          setLikes(Math.floor(Math.random() * 50) + 10);
-        } catch (err) {
-          console.log("Error loading blog =>", err);
-          router.push("/blog");
-        } finally {
-          setLoading(false);
-        }
-      }
-      fetchBlog();
+      // Cache asynchronously without blocking render
+      requestIdleCallback(() => {
+        sessionStorage.setItem(`blog-${slug}`, JSON.stringify(initialBlog));
+        sessionStorage.setItem(`blog-${slug}-time`, Date.now().toString());
+      });
+      return;
     }
-  }, [slug, router, blogs]);
+
+    // Try cache first with validation
+    const cached = sessionStorage.getItem(`blog-${slug}`);
+    const cacheTime = sessionStorage.getItem(`blog-${slug}-time`);
+    const cacheAge = cacheTime ? Date.now() - parseInt(cacheTime) : Infinity;
+    
+    if (cached && cacheAge < 3600000) { // 1 hour cache
+      setBlog(JSON.parse(cached));
+      setLoading(false);
+      return;
+    }
+
+    // Fetch if not in cache or cache expired
+    async function fetchBlog() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`, {
+          cache: 'force-cache',
+          next: { revalidate: 3600 }
+        });
+        if (!res.ok) throw new Error('Blog not found');
+        
+        const data = await res.json();
+        setBlog(data.data);
+        requestIdleCallback(() => {
+          sessionStorage.setItem(`blog-${slug}`, JSON.stringify(data.data));
+          sessionStorage.setItem(`blog-${slug}-time`, Date.now().toString());
+        });
+      } catch (err) {
+        console.error("Error loading blog:", err);
+        router.push("/blog");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBlog();
+  }, [slug, initialBlog, router]);
 
   useEffect(() => {
   const handleScroll = () => {
@@ -71,23 +100,28 @@ export default function BlogDetails({ slug }) {
 
 
   const handleLike = () => {
-    if (!hasLiked) {
-      setLikes(likes + 1);
-      setHasLiked(true);
-    } else {
-      setLikes(likes - 1);
-      setHasLiked(false);
-    }
+    const newLiked = !hasLiked;
+    const newLikes = newLiked ? likes + 1 : likes - 1;
+    
+    setHasLiked(newLiked);
+    setLikes(newLikes);
+    
+    // Persist to storage
+    localStorage.setItem(`blog-liked-${slug}`, newLiked.toString());
+    sessionStorage.setItem(`blog-likes-${slug}`, newLikes.toString());
   };
 
-  // Generate table of contents from headings
-  const tableOfContents = blog?.content?.filter(block => 
-    block.type === "heading" && block.data?.text?.[0]?.value
-  ).map((block, index) => ({
-    id: `heading-${index}`,
-    text: block.data.text[0].value,
-    level: 2 // Assuming h2 for simplicity
-  })) || [];
+  // Memoize table of contents generation
+  const tableOfContents = useMemo(() => {
+    if (!blog?.content) return [];
+    return blog.content
+      .filter(block => block.type === "heading" && block.data?.text?.[0]?.value)
+      .map((block, index) => ({
+        id: `heading-${index}`,
+        text: block.data.text[0].value,
+        level: 2
+      }));
+  }, [blog?.content]);
 
   // Function to render different content block types
   const renderContentBlock = (block, index) => {

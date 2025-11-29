@@ -1,17 +1,55 @@
 import ArticleStructuredData from "@/components/seo/ArticleStructuredData";
 import BlogDetails from "@/page-components/BlogPage/BlogDetails";
+import Link from "next/link";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bestbuyersview.com";
 
-// Revalidate every 60 seconds (SEO + speed)
-export const revalidate = 60;
+// Aggressive static generation
+export const revalidate = 3600;
+export const dynamic = 'force-static';
+export const dynamicParams = true; // Generate new pages on-demand
+export const fetchCache = 'force-cache';
+
+// Generate static paths for all blogs at build time
+export async function generateStaticParams() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
+      next: { revalidate: 3600 }
+    });
+    const data = await res.json();
+    const blogs = data.data || [];
+    
+    return blogs.map((blog) => ({
+      slug: blog.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
+}
 
 async function getBlog(slug) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`, {
-    next: { revalidate: 60 },
-  });
-  const json = await res.json();
-  return json.data;
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`, {
+      next: { revalidate: 3600 },
+      cache: 'force-cache',
+      headers: { 
+        'Accept': 'application/json',
+        'Cache-Control': 'public, max-age=3600'
+      }
+    });
+    
+    if (!res.ok) {
+      console.error(`Failed to fetch blog: ${slug}`);
+      return null;
+    }
+    
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error('Error fetching blog:', error);
+    return null;
+  }
 }
 
 export async function generateMetadata({ params }) {
@@ -57,7 +95,14 @@ export default async function BlogPostPage({ params }) {
   const blog = await getBlog(params.slug);
 
   if (!blog) {
-    return <div>Blog not found</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Blog not found</h1>
+          <Link href="/blog" className="text-blue-600 hover:underline">Back to Blog</Link>
+        </div>
+      </div>
+    );
   }
 
   // JSON-LD BlogPosting Schema
@@ -109,10 +154,8 @@ export default async function BlogPostPage({ params }) {
 
   return (
     <>
-    <ArticleStructuredData blog={blog} />
-      <BlogDetails slug={params.slug} />
-
-      <script
+      <ArticleStructuredData blog={blog} />
+      <BlogDetails slug={params.slug} initialBlog={blog} />      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(blogPostingSchema),

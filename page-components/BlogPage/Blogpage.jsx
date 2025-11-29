@@ -1,38 +1,46 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useTransition } from "react";
 import Breadcrumbs from "@/ui/Breadcrumbs";
 import BackButton from "@/ui/BackButton";
 
-export default function BlogPage() {
-  const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [featuredBlog, setFeaturedBlog] = useState(null);
+export default function BlogPage({ initialBlogs = [] }) {
+  const [blogs, setBlogs] = useState(initialBlogs);
+  const [loading, setLoading] = useState(!initialBlogs.length);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isPending, startTransition] = useTransition();
 
+  // Optimized cache management with immediate render
   useEffect(() => {
-    async function fetchBlogs() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`);
-        const data = await res.json();
-        const blogsData = data.data || [];
-        
-        setBlogs(blogsData);
-        const featured = blogsData.find(blog => blog.isFeatured) || blogsData[0];
-        setFeaturedBlog(featured);
-      } catch (err) {
-        console.log("Error loading blogs =>", err);
-      } finally {
+    if (initialBlogs.length > 0) {
+      setBlogs(initialBlogs);
+      setLoading(false);
+      // Cache asynchronously without blocking render
+      startTransition(() => {
+        sessionStorage.setItem('blogs-cache', JSON.stringify(initialBlogs));
+        sessionStorage.setItem('blogs-timestamp', Date.now().toString());
+      });
+    } else {
+      // Instant load from cache
+      const cached = sessionStorage.getItem('blogs-cache');
+      const timestamp = sessionStorage.getItem('blogs-timestamp');
+      const cacheAge = timestamp ? Date.now() - parseInt(timestamp) : Infinity;
+      
+      if (cached && cacheAge < 3600000) { // 1 hour cache
+        setBlogs(JSON.parse(cached));
         setLoading(false);
       }
     }
-    fetchBlogs();
-  }, []);
+  }, [initialBlogs]);
 
-  // Filter blogs based on category and search
-  const filteredBlogs = blogs.filter(blog => {
+  const featuredBlog = useMemo(() => {
+    return blogs.find(blog => blog.isFeatured) || blogs[0];
+  }, [blogs]);
+
+  // Optimized filtering with useMemo
+  const filteredBlogs = useMemo(() => blogs.filter(blog => {
     const matchesCategory = activeCategory === 'all' || 
       blog.categories?.some(cat => 
         (typeof cat === 'string' ? cat : cat.name).toLowerCase() === activeCategory
@@ -43,24 +51,29 @@ export default function BlogPage() {
       blog.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesCategory && matchesSearch;
-  });
+  }), [blogs, activeCategory, searchTerm]);
 
-  const regularBlogs = filteredBlogs.filter(blog => blog._id !== featuredBlog?._id);
+  const regularBlogs = useMemo(() => 
+    filteredBlogs.filter(blog => blog._id !== featuredBlog?._id),
+    [filteredBlogs, featuredBlog]
+  );
 
-  // Get recent posts (excluding featured)
-  const recentPosts = blogs
-    .filter(blog => blog._id !== featuredBlog?._id)
-    .sort((a, b) => new Date(b.datePublished || b.createdAt) - new Date(a.datePublished || a.createdAt))
-    .slice(0, 5);
+  // Memoize expensive computations
+  const recentPosts = useMemo(() => 
+    blogs
+      .filter(blog => blog._id !== featuredBlog?._id)
+      .sort((a, b) => new Date(b.datePublished || b.createdAt) - new Date(a.datePublished || a.createdAt))
+      .slice(0, 5),
+    [blogs, featuredBlog]
+  );
 
-  // Get unique categories from all blogs
-  const categories = ['all', ...new Set(
+  const categories = useMemo(() => ['all', ...new Set(
     blogs.flatMap(blog => 
       blog.categories?.map(cat => 
         typeof cat === 'string' ? cat.toLowerCase() : cat.name.toLowerCase()
       ) || []
     )
-  )];
+  )], [blogs]);
 
   if (loading) {
     return <BlogPageSkeleton />;
@@ -283,6 +296,7 @@ function FeaturedSection({ blog }) {
             
             <Link
               href={`/blog/${blog.slug}`}
+              prefetch={true}
               className="group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 sm:hover:-translate-y-1 flex items-center gap-2 justify-center text-sm sm:text-base"
             >
               Read Full Analysis
@@ -297,8 +311,8 @@ function FeaturedSection({ blog }) {
   );
 }
 
-// Blog Card Component
-function BlogCard({ blog }) {
+// Blog Card Component - Memoized for performance
+const BlogCard = React.memo(({ blog }) => {
   const getCategoryName = (category) => {
     return typeof category === 'string' ? category : category.name || category;
   };
@@ -394,6 +408,7 @@ function BlogCard({ blog }) {
 
           <Link
             href={`/blog/${blog.slug}`}
+            prefetch={true}
             className="text-blue-600 font-semibold hover:text-blue-700 transition-colors duration-300 flex items-center gap-1 group/link text-xs sm:text-sm"
           >
             Read More
@@ -405,7 +420,9 @@ function BlogCard({ blog }) {
       </div>
     </div>
   );
-}
+});
+
+BlogCard.displayName = 'BlogCard';
 
 // Skeleton Loading
 function BlogPageSkeleton() {
