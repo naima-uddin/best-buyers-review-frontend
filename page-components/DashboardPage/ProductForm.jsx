@@ -70,9 +70,19 @@ export default function ProductForm({ onSubmit, onCancel, categories, categories
       const token = localStorage.getItem("token");
       const requestData = { asins: validAsins };
 
-      if (selectedMain) requestData.mainCategory = selectedMain;
-      if (selectedSub) requestData.subCategory = selectedSub;
-      if (selectedSubSub) requestData.subSubCategory = selectedSubSub;
+      // If no category is selected, automatically assign to "Uncategorized"
+      if (!selectedMain && !selectedSub && !selectedSubSub) {
+        const uncategorized = categories.find(cat => 
+          cat.name.toLowerCase() === 'uncategorized'
+        );
+        if (uncategorized) {
+          requestData.mainCategory = uncategorized._id;
+        }
+      } else {
+        if (selectedMain) requestData.mainCategory = selectedMain;
+        if (selectedSub) requestData.subCategory = selectedSub;
+        if (selectedSubSub) requestData.subSubCategory = selectedSubSub;
+      }
 
       if (seo.title || seo.description || seo.keywords) {
         requestData.seo = {
@@ -195,6 +205,15 @@ export default function ProductForm({ onSubmit, onCancel, categories, categories
             <label className="block text-sm font-semibold text-gray-800">
               Product Category (for all products)
             </label>
+            
+            {/* Info message about Uncategorized */}
+            {!selectedMain && !selectedSub && !selectedSubSub && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-sm text-amber-700">
+                  ℹ️ No category selected. Products will be added to <strong>Uncategorized</strong> category by default.
+                </p>
+              </div>
+            )}
 
             {/* Main */}
             <div>

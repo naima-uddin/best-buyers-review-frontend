@@ -81,8 +81,20 @@ export default function Dashboard() {
       const token = localStorage.getItem("token");
       let url = `${process.env.NEXT_PUBLIC_API_URL}/products?page=${pageNum}&limit=10`;
 
-      if (selectedSub) url += `&subCategory=${selectedSub}`;
-      else if (selectedMain) url += `&mainCategory=${selectedMain}`;
+      // Check if "Uncategorized" is selected
+      const selectedCategory = categories.find(cat => cat._id === selectedMain);
+      const isUncategorized = selectedCategory?.name.toLowerCase() === 'uncategorized';
+
+      if (selectedSub) {
+        url += `&subCategory=${selectedSub}`;
+      } else if (selectedMain) {
+        if (isUncategorized) {
+          // When Uncategorized is selected, get products with this category OR no category
+          url += `&mainCategory=${selectedMain}&includeEmpty=true`;
+        } else {
+          url += `&mainCategory=${selectedMain}`;
+        }
+      }
 
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -90,7 +102,29 @@ export default function Dashboard() {
       const result = await res.json();
 
       if (res.ok) {
-        setProducts(result.data.products || []);
+        let productsToDisplay = result.data.products || [];
+        
+        // If Uncategorized is selected and backend doesn't support includeEmpty,
+        // filter on frontend to include products without mainCategory
+        if (isUncategorized && !url.includes('includeEmpty')) {
+          // This ensures we show both products with Uncategorized category
+          // AND products with no category at all
+          const allProductsRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/products?page=${pageNum}&limit=100`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const allResult = await allProductsRes.json();
+          
+          if (allResult.data?.products) {
+            productsToDisplay = allResult.data.products.filter(p => 
+              !p.mainCategory || 
+              (p.mainCategory && p.mainCategory._id === selectedMain) ||
+              (typeof p.mainCategory === 'string' && p.mainCategory === selectedMain)
+            );
+          }
+        }
+        
+        setProducts(productsToDisplay);
         setPage(result.data.pagination.page);
         setPages(result.data.pagination.pages);
       }
@@ -303,6 +337,92 @@ export default function Dashboard() {
     }
   };
 
+  // ✅ Bulk assign Uncategorized to products without categories
+  const migrateUncategorizedProducts = async () => {
+    if (!confirm('This will assign all products without a category to "Uncategorized". Continue?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      
+      // Find Uncategorized category
+      const uncategorized = categories.find(cat => 
+        cat.name.toLowerCase() === 'uncategorized'
+      );
+      
+      if (!uncategorized) {
+        alert('❌ "Uncategorized" category not found! Please create it first in Categories section.');
+        return;
+      }
+
+      // Fetch all products
+      let allProducts = [];
+      let currentPage = 1;
+      let totalPages = 1;
+
+      do {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/products?page=${currentPage}&limit=100`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const result = await res.json();
+        if (res.ok) {
+          allProducts = [...allProducts, ...(result.data.products || [])];
+          totalPages = result.data.pagination.pages;
+          currentPage++;
+        }
+      } while (currentPage <= totalPages);
+
+      // Filter products without mainCategory
+      const productsWithoutCategory = allProducts.filter(p => 
+        !p.mainCategory || 
+        (typeof p.mainCategory === 'object' && !p.mainCategory._id)
+      );
+
+      if (productsWithoutCategory.length === 0) {
+        alert('✅ All products already have categories assigned!');
+        setLoading(false);
+        return;
+      }
+
+      // Update each product
+      let successCount = 0;
+      for (const product of productsWithoutCategory) {
+        try {
+          const updateRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/products/${product.asin}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                mainCategory: uncategorized._id,
+              }),
+            }
+          );
+
+          if (updateRes.ok) successCount++;
+        } catch (error) {
+          console.error(`Failed to update ${product.asin}:`, error);
+        }
+      }
+
+      alert(`✅ Successfully assigned ${successCount} of ${productsWithoutCategory.length} products to "Uncategorized" category!`);
+      fetchProducts(page); // Refresh the list
+    } catch (error) {
+      console.error('Migration error:', error);
+      alert('❌ Migration failed. Please check console for details.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ✅ Clean Section Rendering - PASS CATEGORIES TO ALL COMPONENTS
   const renderSection = () => {
     switch (activeSection) {
@@ -335,6 +455,7 @@ export default function Dashboard() {
               onEdit={handleEdit}
               onView={handleView}
               onDelete={handleDelete}
+              onMigrateUncategorized={migrateUncategorizedProducts}
             />
 
             <div className="flex justify-center items-center space-x-2 mt-6">

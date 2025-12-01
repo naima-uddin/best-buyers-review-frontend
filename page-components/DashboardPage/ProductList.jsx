@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Eye, Edit, Trash2, ExternalLink } from "lucide-react";
 import Image from "next/image";
 
-export default function ProductList({ products = [], loading, onRefresh, onEdit, onView, onDelete }) {
+export default function ProductList({ products = [], loading, onRefresh, onEdit, onView, onDelete, onMigrateUncategorized }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [userRole, setUserRole] = useState("admin");
 
@@ -75,6 +75,15 @@ export default function ProductList({ products = [], loading, onRefresh, onEdit,
           <span className="text-sm text-gray-500">
             {safeProducts.length} product{safeProducts.length !== 1 ? "s" : ""}
           </span>
+          {onMigrateUncategorized && (
+            <button
+              onClick={onMigrateUncategorized}
+              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm"
+              title="Assign all products without categories to Uncategorized"
+            >
+              Fix Uncategorized
+            </button>
+          )}
           <button
             onClick={onRefresh}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
