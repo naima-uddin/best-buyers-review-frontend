@@ -209,7 +209,7 @@ const handlePageChange = (newPage) => {
       setCouponProduct(couponQueue[0]);
       setShowCoupon(true);
       setCouponIndex(0);
-    }, 4000);
+    }, 6000);
 
     return () => clearTimeout(timerRef.current);
   }, [couponQueue, subCategoryName]);
@@ -311,12 +311,12 @@ const handlePageChange = (newPage) => {
     );
   }
 
-  // ⬇️ ⬇️ FIND TOP PRODUCT
+  // ⬇️ ⬇️ FIND TOP PRODUCT (Based on review count)
   const topProduct =
     products.length > 0
       ? [...products].sort(
           (a, b) =>
-            (b.customRating?.rating || 0) - (a.customRating?.rating || 0)
+            (b.customRating?.reviewCount || 0) - (a.customRating?.reviewCount || 0)
         )[0]
       : null;
 const displayTitle = subSubCategoryParam  
