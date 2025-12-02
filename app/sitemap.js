@@ -157,7 +157,7 @@ export default async function sitemap() {
         lastModified: product.lastUpdated 
           ? new Date(product.lastUpdated) 
           : (product.updatedAt ? new Date(product.updatedAt) : new Date()),
-        changeFrequency: "weekly",
+        changeFrequency: "daily",
         priority: priority,
       });
     });
