@@ -100,7 +100,7 @@ export default function RelatedProducts({
                 className="p-3 min-w-[50%] sm:min-w-[33.33%] md:min-w-[25%] lg:min-w-[16.66%]"
               >
                 <Link
-                  href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}/${createProductSlug(product.title, product._id)}`}
+                  href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}/${product.slug || createProductSlug(product.title, product._id)}`}
                   className="block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
                 >
                   <div className="relative w-full h-48">
@@ -115,11 +115,19 @@ export default function RelatedProducts({
                     <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
                       {product.title}
                     </h3>
-                    {product.discount?.percentage && (
+                    {/* {product.discount?.percentage && (
                       <p className="text-blue-600 font-semibold mt-1 text-sm">
                         Save {product.discount.percentage}%
                       </p>
-                    )}
+                    )} */}
+
+                    {
+                     product.discount?.percentage ? (  <p className="text-blue-600 font-semibold mt-1 text-sm">
+                        Save {product.discount.percentage}%
+                      </p>) : (<p className="text-blue-600 font-semibold mt-1 text-sm">
+                        Save 0 %
+                      </p>)
+                    }
                   </div>
                 </Link>
               </div>

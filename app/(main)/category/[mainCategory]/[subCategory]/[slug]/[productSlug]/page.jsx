@@ -1,4 +1,4 @@
-// app/(main)/category/[mainCategory]/[subCategory]/[productId]/page.jsx
+// app/(main)/category/[mainCategory]/[subCategory]/[slug]/[productSlug]/page.jsx
 import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
@@ -9,7 +9,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview
 // Use ISR to revalidate product pages every 30 minutes
 export const revalidate = 1800;
 
-// Generate static params for all products at build time
+// Generate static params for all products with sub-sub categories at build time
 export async function generateStaticParams() {
   try {
     const response = await fetch(
@@ -18,69 +18,77 @@ export async function generateStaticParams() {
     );
 
     if (!response.ok) {
-      console.error('Failed to fetch products for static generation');
+      console.error('Failed to fetch products for sub-sub category static generation');
       return [];
     }
 
     const data = await response.json();
     const products = data.data?.products || [];
 
-    return products.map((product) => {
-      const mainSlug = slugify(product.mainCategory?.name || '');
-      const subSlug = slugify(product.subCategory?.name || '');
-      const productSlug = createProductSlug(product.title, product._id);
+    // Only include products with sub-sub categories
+    return products
+      .filter(product => product.subSubCategory?.name)
+      .map((product) => {
+        const mainSlug = slugify(product.mainCategory?.name || '');
+        const subSlug = slugify(product.subCategory?.name || '');
+        const subSubSlug = slugify(product.subSubCategory?.name || '');
+        const productSlug = product.slug || createProductSlug(product.title, product._id);
 
-      return {
-        mainCategory: mainSlug,
-        subCategory: subSlug,
-        productId: productSlug,
-      };
-    }).filter(param => param.mainCategory && param.subCategory && param.productId);
+        return {
+          mainCategory: mainSlug,
+          subCategory: subSlug,
+          slug: subSubSlug,
+          productSlug: productSlug,
+        };
+      })
+      .filter(param => param.mainCategory && param.subCategory && param.slug && param.productSlug);
   } catch (error) {
-    console.error('Error in generateStaticParams:', error);
+    console.error('Error in sub-sub category product generateStaticParams:', error);
     return [];
   }
 }
 
 export async function generateMetadata({ params }) {
-  const { mainCategory, subCategory, productId } = await params;
+  const { mainCategory, subCategory, slug, productSlug } = await params;
 
   const mainName = unslugify(mainCategory);
   const subName = unslugify(subCategory);
-  const productSlug = extractProductId(productId);
+  const subSubName = unslugify(slug);
+  const productIdSlug = extractProductId(productSlug);
 
   // Fetch products by category and find matching product by slug
   let productData = null;
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}&subSubCategoryName=${encodeURIComponent(subSubName)}`,
       { next: { revalidate: 1800 } } // Cache for 30 minutes
     );
     if (response.ok) {
       const data = await response.json();
       // Find product matching the slug
       const products = data.data?.products || [];
-      productData = products.find(p => createProductSlug(p.title) === productSlug);
+      productData = products.find(p => (p.slug || createProductSlug(p.title)) === productIdSlug);
     }
   } catch (error) {
     console.error('Error fetching product for SEO:', error);
   }
 
-  const title = productData?.seo?.title || productData?.title || `Best ${subName} (${mainName})`;
+  const title = productData?.seo?.title || productData?.title || `Best ${subSubName} - ${subName} (${mainName})`;
   const description = productData?.seo?.description || productData?.description || 
-    `Detailed review and specifications for ${subName.toLowerCase()} in ${mainName.toLowerCase()}. Expert analysis, features, and buying recommendations.`;
+    `Detailed review and specifications for ${subSubName.toLowerCase()} in ${subName.toLowerCase()}. Expert analysis, features, and buying recommendations.`;
   const keywords = productData?.seo?.keywords || [
+    `${subSubName}`,
     `${subName}`,
     `${mainName}`,
-    `best ${subName.toLowerCase()}`,
-    `${subName.toLowerCase()} review`,
-    `buy ${subName.toLowerCase()}`,
-    `${productData?.brand || subName} review`,
+    `best ${subSubName.toLowerCase()}`,
+    `${subSubName.toLowerCase()} review`,
+    `buy ${subSubName.toLowerCase()}`,
+    `${productData?.brand || subSubName} review`,
     'product review',
     'buying guide',
   ];
 
-  const productUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}/${productId}`;
+  const productUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}/${slug}/${productSlug}`;
   const imageUrl = productData?.images?.[0]?.url || `${SITE_URL}/og-image.jpg`;
 
   return {
@@ -107,7 +115,7 @@ export async function generateMetadata({ params }) {
       article: {
         publishedTime: productData?.createdAt,
         modifiedTime: productData?.updatedAt,
-        section: mainName,
+        section: `${mainName} / ${subName} / ${subSubName}`,
         tags: keywords,
       },
     },
@@ -132,24 +140,25 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const { mainCategory, subCategory, productId } = await params;
+  const { mainCategory, subCategory, slug, productSlug } = await params;
 
   const mainName = unslugify(mainCategory);
   const subName = unslugify(subCategory);
-  const productSlug = extractProductId(productId);
+  const subSubName = unslugify(slug);
+  const productIdSlug = extractProductId(productSlug);
 
   // Fetch products by category and find matching product by slug
   let productData = null;
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}&subSubCategoryName=${encodeURIComponent(subSubName)}`,
       { next: { revalidate: 1800 } } // Cache for 30 minutes
     );
     if (response.ok) {
       const data = await response.json();
       // Find product matching the slug
       const products = data.data?.products || [];
-      productData = products.find(p => createProductSlug(p.title) === productSlug);
+      productData = products.find(p => (p.slug || createProductSlug(p.title)) === productIdSlug);
     }
   } catch (err) {
     console.error('Error fetching product:', err);
@@ -159,12 +168,13 @@ export default async function Page({ params }) {
     { name: "Categories", url: `${SITE_URL}/category` },
     { name: mainName, url: `${SITE_URL}/category/${mainCategory}` },
     { name: subName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}` },
+    { name: subSubName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${slug}` },
   ];
 
   if (productData) {
     breadcrumbItems.push({
       name: productData.title,
-      url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${productId}`
+      url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${slug}/${productSlug}`
     });
   }
 
