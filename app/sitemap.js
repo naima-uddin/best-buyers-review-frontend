@@ -32,7 +32,6 @@ export default async function sitemap() {
   // --------------------------------------------
   // Fetch hierarchical categories from backend
   // --------------------------------------------
-  let mainCategoryPages = [];
   let subCategoryPages = [];
   let subSubCategoryPages = [];
 
@@ -46,18 +45,11 @@ export default async function sitemap() {
       const categories = await categoryRes.json();
       
       // Build category URLs based on hierarchy
+      // NOTE: Main category pages (/category/tech) don't exist - only sub category pages exist
       categories.forEach((mainCat) => {
         const mainSlug = slugify(mainCat.name);
-        
-        // Level 1: Main Category
-        mainCategoryPages.push({
-          url: `${baseUrl}/category/${mainSlug}`,
-          lastModified: mainCat.updatedAt ? new Date(mainCat.updatedAt) : new Date(),
-          changeFrequency: "daily",
-          priority: 0.90,
-        });
 
-        // Level 2: Sub Categories
+        // Level 2: Sub Categories (these are the actual pages: /category/main/sub)
         if (mainCat.children && mainCat.children.length > 0) {
           mainCat.children.forEach((subCat) => {
             const subSlug = slugify(subCat.name);
@@ -69,7 +61,7 @@ export default async function sitemap() {
               priority: 0.85,
             });
 
-            // Level 3: Sub-Sub Categories
+            // Level 3: Sub-Sub Categories (filter pages, may not have dedicated routes)
             if (subCat.children && subCat.children.length > 0) {
               subCat.children.forEach((subSubCat) => {
                 const subSubSlug = slugify(subSubCat.name);
@@ -77,8 +69,8 @@ export default async function sitemap() {
                 subSubCategoryPages.push({
                   url: `${baseUrl}/category/${mainSlug}/${subSlug}/${subSubSlug}`,
                   lastModified: subSubCat.updatedAt ? new Date(subSubCat.updatedAt) : new Date(),
-                  changeFrequency: "weekly",
-                  priority: 0.80,
+                  changeFrequency: "daily",
+                  priority: 0.85,
                 });
               });
             }
@@ -205,7 +197,6 @@ export default async function sitemap() {
   // --------------------------------------------
   const sitemap = [
     ...staticPages,
-    ...mainCategoryPages,
     ...subCategoryPages,
     ...subSubCategoryPages,
     ...productPages,
@@ -214,8 +205,7 @@ export default async function sitemap() {
 
   console.log(`✅ Generated sitemap with ${sitemap.length} URLs:
     - Static pages: ${staticPages.length}
-    - Main categories: ${mainCategoryPages.length}
-    - Sub categories: ${subCategoryPages.length}
+    - Sub categories (Main+Sub): ${subCategoryPages.length}
     - Sub-sub categories: ${subSubCategoryPages.length}
     - Products (Full Reviews Only): ${productPages.length}
     - Blogs: ${blogPages.length}
