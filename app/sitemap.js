@@ -8,7 +8,6 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // --------------------------------------------
   // Static pages with optimized priorities
@@ -30,139 +29,70 @@ export default async function sitemap() {
   }));
 
   // --------------------------------------------
-  // Fetch hierarchical categories from backend
+  // Fetch dynamic categories + products
   // --------------------------------------------
+  let categoryPages = [];
   let subCategoryPages = [];
-  let subSubCategoryPages = [];
-
-  try {
-    const categoryRes = await fetch(`${apiUrl}/categories`, {
-      next: { revalidate: 3600 },
-      cache: 'no-store'
-    });
-
-    if (categoryRes.ok) {
-      const categories = await categoryRes.json();
-      
-      // Build category URLs based on hierarchy
-      // NOTE: Main category pages (/category/tech) don't exist - only sub category pages exist
-      categories.forEach((mainCat) => {
-        const mainSlug = slugify(mainCat.name);
-
-        // Level 2: Sub Categories (these are the actual pages: /category/main/sub)
-        if (mainCat.children && mainCat.children.length > 0) {
-          mainCat.children.forEach((subCat) => {
-            const subSlug = slugify(subCat.name);
-            
-            subCategoryPages.push({
-              url: `${baseUrl}/category/${mainSlug}/${subSlug}`,
-              lastModified: subCat.updatedAt ? new Date(subCat.updatedAt) : new Date(),
-              changeFrequency: "daily",
-              priority: 0.85,
-            });
-
-            // Level 3: Sub-Sub Categories (filter pages, may not have dedicated routes)
-            if (subCat.children && subCat.children.length > 0) {
-              subCat.children.forEach((subSubCat) => {
-                const subSubSlug = slugify(subSubCat.name);
-                
-                subSubCategoryPages.push({
-                  url: `${baseUrl}/category/${mainSlug}/${subSlug}/${subSubSlug}`,
-                  lastModified: subSubCat.updatedAt ? new Date(subSubCat.updatedAt) : new Date(),
-                  changeFrequency: "daily",
-                  priority: 0.85,
-                });
-              });
-            }
-          });
-        }
-      });
-    }
-  } catch (err) {
-    console.error("❌ Failed loading category sitemap:", err);
-  }
-
-  // --------------------------------------------
-  // Fetch all products with full reviews only
-  // --------------------------------------------
   let productPages = [];
 
   try {
-    // Fetch all products (you may need pagination for large datasets)
-    let allProducts = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const productRes = await fetch(
-        `${apiUrl}/products?page=${page}&limit=100`,
-        { 
-          next: { revalidate: 3600 },
-          cache: 'no-store'
-        }
-      );
-
-      if (productRes.ok) {
-        const productData = await productRes.json();
-        const products = productData.data?.products || [];
-        
-        if (products.length === 0) {
-          hasMore = false;
-        } else {
-          allProducts = [...allProducts, ...products];
-          
-          // Check if there are more pages
-          const pagination = productData.data?.pagination;
-          if (pagination && page >= pagination.pages) {
-            hasMore = false;
-          } else {
-            page++;
-          }
-        }
-      } else {
-        hasMore = false;
+    const productRes = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products`,
+      { 
+        next: { revalidate: 3600 },
+        cache: 'no-store'
       }
-    }
+    );
 
-    console.log(`✅ Fetched ${allProducts.length} total products for sitemap`);
+    if (productRes.ok) {
+      const productData = await productRes.json();
+      const products = productData.data?.products || [];
 
-    // Filter products: Only include products with isFullReview: true
-    const fullReviewProducts = allProducts.filter(product => product.isFullReview === true);
-    
-    console.log(`✅ Filtered to ${fullReviewProducts.length} products with full reviews`);
+      const categoriesSet = new Set();
+      const subCategoriesSet = new Set();
 
-    // Generate product URLs with proper category paths - ONLY for full review products
-    // NOTE: Product URLs use only mainCategory/subCategory, NOT subSubCategory
-    fullReviewProducts.forEach((product) => {
-      const main = product.mainCategory?.name;
-      const sub = product.subCategory?.name;
-      const title = product.title;
-      const id = product._id;
+      products.forEach((p) => {
+        const main = p.mainCategory?.name;
+        const sub = p.subCategory?.name;
+        const id = p._id;
+        const title = p.title;
 
-      if (!main || !sub || !id || !title) return;
+        if (!main || !sub || !id) return;
 
-      const mainSlug = slugify(main);
-      const subSlug = slugify(sub);
-      const productSlug = createProductSlug(title, id);
+        const mainSlug = slugify(main);
+        const subSlug = slugify(sub);
+        const productSlug = createProductSlug(title, id);
 
-      // Product URLs always use: /category/main/sub/product-slug
-      // Sub-sub category is NOT included in product detail URLs
-      const productUrl = `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`;
+        categoriesSet.add(mainSlug);
+        subCategoriesSet.add(`${mainSlug}/${subSlug}`);
 
-      // Use SEO data if available, with higher priority for featured products
-      const priority = product.isFeatured ? 0.85 : 0.75;
-      
-      productPages.push({
-        url: productUrl,
-        lastModified: product.lastUpdated 
-          ? new Date(product.lastUpdated) 
-          : (product.updatedAt ? new Date(product.updatedAt) : new Date()),
-        changeFrequency: "daily",
-        priority: priority,
+        // Product Page (important content pages)
+        productPages.push({
+          url: `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`,
+          lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
+          changeFrequency: "weekly",
+          priority: 0.75,
+        });
       });
-    });
+
+      // Main Category pages (higher priority)
+      categoryPages = [...categoriesSet].map((cat) => ({
+        url: `${baseUrl}/category/${cat}`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 0.85,
+      }));
+
+      // Subcategory pages (important for SEO)
+      subCategoryPages = [...subCategoriesSet].map((path) => ({
+        url: `${baseUrl}/category/${path}`,
+        lastModified: new Date(),
+        changeFrequency: "daily",
+        priority: 0.8,
+      }));
+    }
   } catch (err) {
-    console.error("❌ Failed loading product sitemap:", err);
+    console.error("Failed loading product sitemap:", err);
   }
 
   // --------------------------------------------
@@ -170,10 +100,13 @@ export default async function sitemap() {
   // --------------------------------------------
   let blogPages = [];
   try {
-    const blogRes = await fetch(`${apiUrl}/blog`, { 
-      next: { revalidate: 3600 },
-      cache: 'no-store'
-    });
+    const blogRes = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/blog`,
+      { 
+        next: { revalidate: 3600 },
+        cache: 'no-store'
+      }
+    );
 
     if (blogRes.ok) {
       const blogData = await blogRes.json();
@@ -185,31 +118,21 @@ export default async function sitemap() {
           ? new Date(blog.dateModified)
           : new Date(blog.datePublished || new Date()),
         changeFrequency: "weekly",
-        priority: 0.70,
+        priority: 0.7,
       }));
     }
   } catch (err) {
-    console.error("❌ Failed loading blog sitemap:", err);
+    console.error("Failed loading blog sitemap:", err);
   }
 
   // --------------------------------------------
-  // Final sitemap return with proper ordering
+  // Final sitemap return
   // --------------------------------------------
-  const sitemap = [
+  return [
     ...staticPages,
+    ...categoryPages,
     ...subCategoryPages,
-    ...subSubCategoryPages,
     ...productPages,
     ...blogPages,
   ];
-
-  console.log(`✅ Generated sitemap with ${sitemap.length} URLs:
-    - Static pages: ${staticPages.length}
-    - Sub categories (Main+Sub): ${subCategoryPages.length}
-    - Sub-sub categories: ${subSubCategoryPages.length}
-    - Products (Full Reviews Only): ${productPages.length}
-    - Blogs: ${blogPages.length}
-  `);
-
-  return sitemap;
 }

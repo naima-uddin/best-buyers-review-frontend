@@ -52,22 +52,19 @@ const activeSubSubCategoryParam = Object.keys(allParams).find(key =>
   console.log('🔍 Sidebar - Sub-subcategories:', subSubCategories.map(s => s.name));
   console.log('🔍 Sidebar - Active Sub-subcategory:', activeSubSubCategoryName);
 
-const handleSubCategoryClick = (sub) => {
-  // Navigate to the subcategory page (reset to page 1)
-  router.push(
-    `/category/${slugify(mainCategoryName)}/${slugify(sub.name)}`
-  );
-};
-
 const handleSubSubCategoryClick = (subSubCat) => {
   // Use the exact slugified name from the category data
   const slugifiedName = slugify(subSubCat.name);
   
-  // Don't preserve page, start at page 1
+  const queryParams = new URLSearchParams();
+  
+  // Preserve other parameters
+  const currentPage = searchParams?.get('page');
   const currentSort = searchParams?.get('sort');
 
-  let queryString = `${slugifiedName}`; // Just the key, no value
+    let queryString = `${slugifiedName}`; // Just the key, no value
   
+  if (currentPage) queryString += `&page=${currentPage}`;
   if (currentSort && currentSort !== 'default') queryString += `&sort=${currentSort}`;
 
   router.push(

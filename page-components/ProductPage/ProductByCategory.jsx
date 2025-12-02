@@ -17,35 +17,24 @@ import { slugify, unslugify, createProductSlug } from "@/lib/slugify";
 import { Home, HomeIcon } from "lucide-react";
 import { useCategories } from "@/context/CategoryContext";
 
-function ProductByCategoryContent({ 
-  mainCategory: mainCategoryProp = null,
-  subCategory: subCategoryProp = null,
-  subSubCategory: subSubCategoryProp = null,
-  initialProducts: initialProductsProp = null,
-  initialPagination: initialPaginationProp = null
-}) {
+function ProductByCategoryContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { categories } = useCategories(); 
 
-  // Decode URL params - use props if provided, otherwise get from URL
-  const mainCategoryName = mainCategoryProp ? unslugify(mainCategoryProp) : (params?.mainCategory ? unslugify(params.mainCategory) : null);
-  const subCategoryName = subCategoryProp ? unslugify(subCategoryProp) : (params?.subCategory ? unslugify(params.subCategory) : null);
-  const subSubCategoryName = subSubCategoryProp ? unslugify(subSubCategoryProp) : (params?.subSubCategory ? unslugify(params.subSubCategory) : null);
-  
+  // Decode URL params
+  const mainCategoryName = params?.mainCategory ? unslugify(params.mainCategory) : null;
+  const subCategoryName = params?.subCategory ? unslugify(params.subCategory) : null;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
   const allParams = Object.fromEntries(searchParams?.entries() || []);
-  
-  // Legacy support: check query params for sub-sub category (for backwards compatibility)
-  const subSubCategoryParam = subSubCategoryName ? slugify(subSubCategoryName) : Object.keys(allParams).find(key => 
-    key !== 'page' && key !== 'sort'
-  );
+const subSubCategoryParam = Object.keys(allParams).find(key => 
+  key !== 'page' && key !== 'sort'
+);
 
   console.log('🔍 ProductByCategory - Raw params:', params);
   console.log('🔍 ProductByCategory - mainCategoryName:', mainCategoryName);
   console.log('🔍 ProductByCategory - subCategoryName:', subCategoryName);
-  console.log('🔍 ProductByCategory - subSubCategoryName:', subSubCategoryName);
   console.log('🔍 ProductByCategory - subSubCategoryParam:', subSubCategoryParam); 
 
   // Compute date values once to avoid hydration mismatch
@@ -87,23 +76,6 @@ function ProductByCategoryContent({
   };
 
   useEffect(() => {
-    // Use initial products if provided (for SSR)
-    if (initialProductsProp && initialPaginationProp && pageParam === 1) {
-      setProducts(initialProductsProp);
-      setTotalPages(initialPaginationProp.pages || 1);
-      
-      const initialImages = {};
-      initialProductsProp.forEach((product) => {
-        const mainImage =
-          product.images?.find((img) => img.variant === "MAIN")?.url ||
-          product.images?.[0]?.url;
-        initialImages[product._id] = mainImage;
-      });
-      setActiveProductImages(initialImages);
-      setLoading(false);
-      return;
-    }
-
     if (!mainCategoryName || !subCategoryName) {
       setLoading(false);
       return;
@@ -119,22 +91,21 @@ function ProductByCategoryContent({
         // Build URL with optional subSubCategoryName
         let url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
         
-        // Add subSubCategoryName if provided (from URL param or query param)
-        if (subSubCategoryName) {
-          // Direct from URL parameter
-          url += `&subSubCategoryName=${encodeURIComponent(subSubCategoryName)}`;
-        } else if (subSubCategoryParam) {
-          // Legacy: from query parameter
-          const exactSubSubCategoryName = findExactSubSubCategoryName(subSubCategoryParam);
-          if (exactSubSubCategoryName) {
-            url += `&subSubCategoryName=${encodeURIComponent(exactSubSubCategoryName)}`;
-          }
-        }
+        // Add subSubCategoryName if provided
+if (subSubCategoryParam) {
+  // Find the exact sub-subcategory name from your categories data
+  const exactSubSubCategoryName = findExactSubSubCategoryName(subSubCategoryParam);
+  if (exactSubSubCategoryName) {
+    url += `&subSubCategoryName=${encodeURIComponent(exactSubSubCategoryName)}`;
+  }
+}
+
+
 
         console.log('Fetching products from:', url);
         console.log('Main Category:', mainCategoryName);
         console.log('Sub Category:', subCategoryName);
-        console.log('Sub-Sub Category:', subSubCategoryName || (subSubCategoryParam ? unslugify(subSubCategoryParam) : 'None'));
+        console.log('Sub-Sub Category:', subSubCategoryParam ? unslugify(subSubCategoryParam) : 'None');
 
         const res = await fetch(url);
         const data = await res.json();
@@ -164,7 +135,7 @@ function ProductByCategoryContent({
     }
 
     fetchProducts();
-  }, [mainCategoryName, subCategoryName, subSubCategoryName, pageParam, sortParam, subSubCategoryParam]); 
+  }, [mainCategoryName, subCategoryName, pageParam, sortParam, subSubCategoryParam]); 
 
  // Update page change handler to preserve subSubCategory
 const handlePageChange = (newPage) => {
@@ -179,13 +150,12 @@ const handlePageChange = (newPage) => {
     queryString += `${queryString ? '&' : ''}sort=${sortParam}`;
   }
   
-  if (newPage > 1) {
-    queryString += `${queryString ? '&' : ''}page=${newPage}`;
-  }
+  queryString += `${queryString ? '&' : ''}page=${newPage}`;
 
-  const url = `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}${queryString ? '?' + queryString : ''}`;
-  
-  router.push(url, { scroll: false });
+  router.push(
+    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryString}`,
+    { scroll: false }
+  );
 };
 
 
@@ -239,7 +209,7 @@ const handlePageChange = (newPage) => {
       setCouponProduct(couponQueue[0]);
       setShowCoupon(true);
       setCouponIndex(0);
-    }, 4000);
+    }, 6000);
 
     return () => clearTimeout(timerRef.current);
   }, [couponQueue, subCategoryName]);
@@ -261,21 +231,18 @@ const handlePageChange = (newPage) => {
 // Update sort handler to preserve subSubCategory
  const handleSortChange = (e) => {
   const newSort = e.target.value;
-  let queryString = '';
+  const queryParams = new URLSearchParams();
+  queryParams.set('page', pageParam);
+  queryParams.set('sort', newSort);
   
   // Preserve the sub-subcategory if it exists
   if (subSubCategoryParam) {
-    queryString = `${subSubCategoryParam}`;
+    queryParams.set(subSubCategoryParam, ''); // Key with empty value
   }
-  
-  if (newSort && newSort !== 'default') {
-    queryString += `${queryString ? '&' : ''}sort=${newSort}`;
-  }
-  
-  // Reset to page 1 when changing sort
-  const url = `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}${queryString ? '?' + queryString : ''}`;
-  
-  router.push(url);
+
+  router.push(
+    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryParams.toString()}`
+  );
 };
 
   if (loading) {
@@ -344,12 +311,12 @@ const handlePageChange = (newPage) => {
     );
   }
 
-  // ⬇️ ⬇️ FIND TOP PRODUCT
+  // ⬇️ ⬇️ FIND TOP PRODUCT (Based on review count)
   const topProduct =
     products.length > 0
       ? [...products].sort(
           (a, b) =>
-            (b.customRating?.rating || 0) - (a.customRating?.rating || 0)
+            (b.customRating?.reviewCount || 0) - (a.customRating?.reviewCount || 0)
         )[0]
       : null;
 const displayTitle = subSubCategoryParam  
@@ -513,7 +480,7 @@ const displayTitle = subSubCategoryParam
                   return (
                     <div key={product._id} className="relative">
                       {/* Product Number */}
-                      <div className="absolute left-4 top-4 sm:left-0 md:left-4 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white md:w-8 md:h-8 w-6 h-6 md:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base sm:transform sm:-translate-y-1/2 shadow-lg">
+                      <div className="absolute left-4 top-4 sm:-left-2 sm:left-0 md:left-4 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white md:w-8 md:h-8 w-6 h-6 md:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base sm:transform sm:-translate-y-1/2 shadow-lg">
   {productNumber}
 </div>
 
@@ -693,7 +660,7 @@ const displayTitle = subSubCategoryParam
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${product.slug || createProductSlug(product.title, product._id)}`}
+                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(product.title, product._id)}`}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
@@ -865,7 +832,7 @@ const displayTitle = subSubCategoryParam
                             </ul>
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${topProduct.slug || createProductSlug(topProduct.title)}`}
+                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(topProduct.title)}`}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →
@@ -963,13 +930,7 @@ const displayTitle = subSubCategoryParam
   );
 }
 
-export default function ProductByCategory({ 
-  mainCategory = null, 
-  subCategory = null, 
-  subSubCategory = null,
-  initialProducts = null,
-  initialPagination = null
-}) {
+export default function ProductByCategory() {
   return (
     <Suspense
       fallback={
@@ -978,15 +939,7 @@ export default function ProductByCategory({
         </div>
       }
     >
-      <ProductByCategoryContent 
-        mainCategory={mainCategory}
-        subCategory={subCategory}
-        subSubCategory={subSubCategory}
-        initialProducts={initialProducts}
-        initialPagination={initialPagination}
-      />
+      <ProductByCategoryContent />
     </Suspense>
   );
 }
-
-// all

@@ -680,7 +680,7 @@ function ProductDetailsContent({ initialProduct }) {
               "@type": "Offer",
               url: `https://bestbuyersview.com/category/${slugify(
                 mainCategory
-              )}/${slugify(subCategory)}/${product.slug || createProductSlug(product.title)}`,
+              )}/${slugify(subCategory)}/${createProductSlug(product.title)}`,
               priceCurrency: product.price?.currency || "USD",
               price: product.price?.amount || 0,
               priceValidUntil: new Date(
@@ -780,7 +780,7 @@ function ProductDetailsContent({ initialProduct }) {
                 name: product.title,
                 item: `https://bestbuyersview.com/category/${slugify(
                   mainCategory
-                )}/${slugify(subCategory)}/${product.slug || createProductSlug(product.title)}`,
+                )}/${slugify(subCategory)}/${createProductSlug(product.title)}`,
               },
             ],
           }),

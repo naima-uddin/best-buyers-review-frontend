@@ -12,7 +12,7 @@ export default async function ProductStructuredData({ product }) {
   const listPriceObj = product.listPrice || null;
   const rating = product.customRating || {};
   const images = (product.images || []).map(img => img.url).filter(Boolean);
-  const productUrl = `${SITE_URL}/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${product.slug || createProductSlug(product.title)}`;
+  const productUrl = `${SITE_URL}/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`;
 
   const schema = {
     "@context": "https://schema.org/",
