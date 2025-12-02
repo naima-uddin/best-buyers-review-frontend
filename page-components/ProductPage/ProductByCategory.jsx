@@ -693,7 +693,7 @@ const displayTitle = subSubCategoryParam
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(product.title, product._id)}`}
+                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${product.slug || createProductSlug(product.title, product._id)}`}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
@@ -865,7 +865,7 @@ const displayTitle = subSubCategoryParam
                             </ul>
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(topProduct.title)}`}
+                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${topProduct.slug || createProductSlug(topProduct.title)}`}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →

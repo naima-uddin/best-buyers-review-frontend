@@ -29,10 +29,11 @@ export default async function CategoryStructuredData({
   const items = products.map((p, idx) => {
     // Build product URL based on category hierarchy
     let productUrl;
+    const productSlug = p.slug || createProductSlug(p.title);
     if (subSubCategoryName) {
-      productUrl = `${SITE_URL}/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${slugify(subSubCategoryName)}/${createProductSlug(p.title)}`;
+      productUrl = `${SITE_URL}/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${slugify(subSubCategoryName)}/${productSlug}`;
     } else {
-      productUrl = `${SITE_URL}/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(p.title)}`;
+      productUrl = `${SITE_URL}/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${productSlug}`;
     }
     
     return {

@@ -1,4 +1,4 @@
-// app/(main)/category/[mainCategory]/[subCategory]/[subSubCategory]/[productId]/page.jsx
+// app/(main)/category/[mainCategory]/[subCategory]/[slug]/[productSlug]/page.jsx
 import ProductDetailsPage from '@/page-components/ProductPage/ProductDetailsPage';
 import ProductStructuredData from '@/components/seo/ProductStructuredData';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema';
@@ -32,16 +32,16 @@ export async function generateStaticParams() {
         const mainSlug = slugify(product.mainCategory?.name || '');
         const subSlug = slugify(product.subCategory?.name || '');
         const subSubSlug = slugify(product.subSubCategory?.name || '');
-        const productSlug = createProductSlug(product.title, product._id);
+        const productSlug = product.slug || createProductSlug(product.title, product._id);
 
         return {
           mainCategory: mainSlug,
           subCategory: subSlug,
-          subSubCategory: subSubSlug,
-          productId: productSlug,
+          slug: subSubSlug,
+          productSlug: productSlug,
         };
       })
-      .filter(param => param.mainCategory && param.subCategory && param.subSubCategory && param.productId);
+      .filter(param => param.mainCategory && param.subCategory && param.slug && param.productSlug);
   } catch (error) {
     console.error('Error in sub-sub category product generateStaticParams:', error);
     return [];
@@ -49,12 +49,12 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }) {
-  const { mainCategory, subCategory, subSubCategory, productId } = await params;
+  const { mainCategory, subCategory, slug, productSlug } = await params;
 
   const mainName = unslugify(mainCategory);
   const subName = unslugify(subCategory);
-  const subSubName = unslugify(subSubCategory);
-  const productSlug = extractProductId(productId);
+  const subSubName = unslugify(slug);
+  const productIdSlug = extractProductId(productSlug);
 
   // Fetch products by category and find matching product by slug
   let productData = null;
@@ -67,7 +67,7 @@ export async function generateMetadata({ params }) {
       const data = await response.json();
       // Find product matching the slug
       const products = data.data?.products || [];
-      productData = products.find(p => createProductSlug(p.title) === productSlug);
+      productData = products.find(p => (p.slug || createProductSlug(p.title)) === productIdSlug);
     }
   } catch (error) {
     console.error('Error fetching product for SEO:', error);
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }) {
     'buying guide',
   ];
 
-  const productUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}/${subSubCategory}/${productId}`;
+  const productUrl = `${SITE_URL}/category/${mainCategory}/${subCategory}/${slug}/${productSlug}`;
   const imageUrl = productData?.images?.[0]?.url || `${SITE_URL}/og-image.jpg`;
 
   return {
@@ -140,12 +140,12 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function Page({ params }) {
-  const { mainCategory, subCategory, subSubCategory, productId } = await params;
+  const { mainCategory, subCategory, slug, productSlug } = await params;
 
   const mainName = unslugify(mainCategory);
   const subName = unslugify(subCategory);
-  const subSubName = unslugify(subSubCategory);
-  const productSlug = extractProductId(productId);
+  const subSubName = unslugify(slug);
+  const productIdSlug = extractProductId(productSlug);
 
   // Fetch products by category and find matching product by slug
   let productData = null;
@@ -158,7 +158,7 @@ export default async function Page({ params }) {
       const data = await response.json();
       // Find product matching the slug
       const products = data.data?.products || [];
-      productData = products.find(p => createProductSlug(p.title) === productSlug);
+      productData = products.find(p => (p.slug || createProductSlug(p.title)) === productIdSlug);
     }
   } catch (err) {
     console.error('Error fetching product:', err);
@@ -168,13 +168,13 @@ export default async function Page({ params }) {
     { name: "Categories", url: `${SITE_URL}/category` },
     { name: mainName, url: `${SITE_URL}/category/${mainCategory}` },
     { name: subName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}` },
-    { name: subSubName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${subSubCategory}` },
+    { name: subSubName, url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${slug}` },
   ];
 
   if (productData) {
     breadcrumbItems.push({
       name: productData.title,
-      url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${subSubCategory}/${productId}`
+      url: `${SITE_URL}/category/${mainCategory}/${subCategory}/${slug}/${productSlug}`
     });
   }
 
