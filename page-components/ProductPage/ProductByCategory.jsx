@@ -164,7 +164,7 @@ function ProductByCategoryContent({
     }
 
     fetchProducts();
-  }, [mainCategoryName, subCategoryName, pageParam, sortParam, subSubCategoryParam]); 
+  }, [mainCategoryName, subCategoryName, subSubCategoryName, pageParam, sortParam, subSubCategoryParam]); 
 
  // Update page change handler to preserve subSubCategory
 const handlePageChange = (newPage) => {
@@ -179,12 +179,13 @@ const handlePageChange = (newPage) => {
     queryString += `${queryString ? '&' : ''}sort=${sortParam}`;
   }
   
-  queryString += `${queryString ? '&' : ''}page=${newPage}`;
+  if (newPage > 1) {
+    queryString += `${queryString ? '&' : ''}page=${newPage}`;
+  }
 
-  router.push(
-    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryString}`,
-    { scroll: false }
-  );
+  const url = `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}${queryString ? '?' + queryString : ''}`;
+  
+  router.push(url, { scroll: false });
 };
 
 
@@ -260,18 +261,21 @@ const handlePageChange = (newPage) => {
 // Update sort handler to preserve subSubCategory
  const handleSortChange = (e) => {
   const newSort = e.target.value;
-  const queryParams = new URLSearchParams();
-  queryParams.set('page', pageParam);
-  queryParams.set('sort', newSort);
+  let queryString = '';
   
   // Preserve the sub-subcategory if it exists
   if (subSubCategoryParam) {
-    queryParams.set(subSubCategoryParam, ''); // Key with empty value
+    queryString = `${subSubCategoryParam}`;
   }
-
-  router.push(
-    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryParams.toString()}`
-  );
+  
+  if (newSort && newSort !== 'default') {
+    queryString += `${queryString ? '&' : ''}sort=${newSort}`;
+  }
+  
+  // Reset to page 1 when changing sort
+  const url = `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}${queryString ? '?' + queryString : ''}`;
+  
+  router.push(url);
 };
 
   if (loading) {
@@ -509,7 +513,7 @@ const displayTitle = subSubCategoryParam
                   return (
                     <div key={product._id} className="relative">
                       {/* Product Number */}
-                      <div className="absolute left-4 top-4 sm:-left-2 sm:left-0 md:left-4 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white md:w-8 md:h-8 w-6 h-6 md:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base sm:transform sm:-translate-y-1/2 shadow-lg">
+                      <div className="absolute left-4 top-4 sm:left-0 md:left-4 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white md:w-8 md:h-8 w-6 h-6 md:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base sm:transform sm:-translate-y-1/2 shadow-lg">
   {productNumber}
 </div>
 
