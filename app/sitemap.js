@@ -91,7 +91,7 @@ export default async function sitemap() {
   }
 
   // --------------------------------------------
-  // Fetch all products with full SEO data
+  // Fetch all products with full reviews only
   // --------------------------------------------
   let productPages = [];
 
@@ -132,13 +132,18 @@ export default async function sitemap() {
       }
     }
 
-    console.log(`✅ Fetched ${allProducts.length} products for sitemap`);
+    console.log(`✅ Fetched ${allProducts.length} total products for sitemap`);
 
-    // Generate product URLs with proper category paths
-    allProducts.forEach((product) => {
+    // Filter products: Only include products with isFullReview: true
+    const fullReviewProducts = allProducts.filter(product => product.isFullReview === true);
+    
+    console.log(`✅ Filtered to ${fullReviewProducts.length} products with full reviews`);
+
+    // Generate product URLs with proper category paths - ONLY for full review products
+    // NOTE: Product URLs use only mainCategory/subCategory, NOT subSubCategory
+    fullReviewProducts.forEach((product) => {
       const main = product.mainCategory?.name;
       const sub = product.subCategory?.name;
-      const subSub = product.subSubCategory?.name;
       const title = product.title;
       const id = product._id;
 
@@ -148,14 +153,9 @@ export default async function sitemap() {
       const subSlug = slugify(sub);
       const productSlug = createProductSlug(title, id);
 
-      // Build product URL based on category depth
-      let productUrl;
-      if (subSub) {
-        const subSubSlug = slugify(subSub);
-        productUrl = `${baseUrl}/category/${mainSlug}/${subSlug}/${subSubSlug}/${productSlug}`;
-      } else {
-        productUrl = `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`;
-      }
+      // Product URLs always use: /category/main/sub/product-slug
+      // Sub-sub category is NOT included in product detail URLs
+      const productUrl = `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`;
 
       // Use SEO data if available, with higher priority for featured products
       const priority = product.isFeatured ? 0.85 : 0.75;
@@ -217,7 +217,7 @@ export default async function sitemap() {
     - Main categories: ${mainCategoryPages.length}
     - Sub categories: ${subCategoryPages.length}
     - Sub-sub categories: ${subSubCategoryPages.length}
-    - Products: ${productPages.length}
+    - Products (Full Reviews Only): ${productPages.length}
     - Blogs: ${blogPages.length}
   `);
 
