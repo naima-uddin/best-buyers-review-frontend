@@ -115,11 +115,19 @@ export default function RelatedProducts({
                     <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
                       {product.title}
                     </h3>
-                    {product.discount?.percentage && (
+                    {/* {product.discount?.percentage && (
                       <p className="text-blue-600 font-semibold mt-1 text-sm">
                         Save {product.discount.percentage}%
                       </p>
-                    )}
+                    )} */}
+
+                    {
+                     product.discount?.percentage ? (  <p className="text-blue-600 font-semibold mt-1 text-sm">
+                        Save {product.discount.percentage}%
+                      </p>) : (<p className="text-blue-600 font-semibold mt-1 text-sm">
+                        Save 0 %
+                      </p>)
+                    }
                   </div>
                 </Link>
               </div>
