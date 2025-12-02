@@ -32,7 +32,8 @@ export async function generateStaticParams() {
         const mainSlug = slugify(product.mainCategory?.name || '');
         const subSlug = slugify(product.subCategory?.name || '');
         const subSubSlug = slugify(product.subSubCategory?.name || '');
-        const productSlug = product.slug || createProductSlug(product.title, product._id);
+        // Generate slug from title + ID
+        const productSlug = createProductSlug(product.title, product._id);
 
         return {
           mainCategory: mainSlug,
@@ -56,18 +57,17 @@ export async function generateMetadata({ params }) {
   const subSubName = unslugify(slug);
   const productIdSlug = extractProductId(productSlug);
 
-  // Fetch products by category and find matching product by slug
+  // Fetch product by ID directly
   let productData = null;
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}&subSubCategoryName=${encodeURIComponent(subSubName)}`,
-      { next: { revalidate: 1800 } } // Cache for 30 minutes
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${productIdSlug}`,
+      { next: { revalidate: 1800 } }
     );
     if (response.ok) {
       const data = await response.json();
-      // Find product matching the slug
-      const products = data.data?.products || [];
-      productData = products.find(p => (p.slug || createProductSlug(p.title)) === productIdSlug);
+      productData = data.data;
+      console.log('✅ Found product for metadata:', productData?.title);
     }
   } catch (error) {
     console.error('Error fetching product for SEO:', error);
@@ -147,21 +147,51 @@ export default async function Page({ params }) {
   const subSubName = unslugify(slug);
   const productIdSlug = extractProductId(productSlug);
 
-  // Fetch products by category and find matching product by slug
+  console.log('🔍 Page params:', { mainCategory, subCategory, slug, productSlug });
+  console.log('🔍 Extracted ID:', productIdSlug);
+  console.log('🔍 Categories:', { mainName, subName, subSubName });
+
+  // Fetch product directly by ID first (more reliable)
   let productData = null;
+  
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}&subSubCategoryName=${encodeURIComponent(subSubName)}`,
-      { next: { revalidate: 1800 } } // Cache for 30 minutes
+    // Method 1: Try to get product by ID directly
+    const directResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${productIdSlug}`,
+      { next: { revalidate: 1800 } }
     );
-    if (response.ok) {
-      const data = await response.json();
-      // Find product matching the slug
-      const products = data.data?.products || [];
-      productData = products.find(p => (p.slug || createProductSlug(p.title)) === productIdSlug);
+    
+    if (directResponse.ok) {
+      const directData = await directResponse.json();
+      productData = directData.data;
+      console.log('✅ Found product by ID:', productData?.title);
+    } else {
+      console.log('⚠️ Direct ID fetch failed, trying category query...');
+      
+      // Method 2: Fallback to category query
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}&subSubCategoryName=${encodeURIComponent(subSubName)}`,
+        { next: { revalidate: 1800 } }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        const products = data.data?.products || [];
+        console.log('📦 Found', products.length, 'products in category');
+        
+        productData = products.find(p => p._id === productIdSlug);
+        
+        if (productData) {
+          console.log('✅ Found product via category query:', productData.title);
+        } else {
+          console.log('❌ Product not in category. Available IDs:', products.map(p => p._id).slice(0, 5));
+        }
+      } else {
+        console.log('❌ Category query failed:', response.status);
+      }
     }
   } catch (err) {
-    console.error('Error fetching product:', err);
+    console.error('❌ Error fetching product:', err);
   }
 
   const breadcrumbItems = [
@@ -178,10 +208,31 @@ export default async function Page({ params }) {
     });
   }
 
+  // If no product found, show error page
+  if (!productData) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Product Not Found</h1>
+        <p className="text-gray-600 mb-4">
+          We couldn't find the product you're looking for in {subSubName}.
+        </p>
+        <p className="text-sm text-gray-500 mb-8">
+          ID: {productIdSlug}
+        </p>
+        <a
+          href={`/category/${mainCategory}/${subCategory}/${slug}`}
+          className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
+        >
+          Browse {subSubName}
+        </a>
+      </div>
+    );
+  }
+
   return (
     <>
       <BreadcrumbSchema items={breadcrumbItems} />
-      {productData && <ProductStructuredData product={productData} />}
+      <ProductStructuredData product={productData} />
       <ProductDetailsPage product={productData} />
     </>
   );

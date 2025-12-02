@@ -51,7 +51,8 @@ export async function generateStaticParams() {
           }
         } else {
           // Add product page (no sub-sub-category)
-          const productSlug = product.slug || createProductSlug(product.title, product._id);
+          // Generate slug from title + ID
+          const productSlug = createProductSlug(product.title, product._id);
           params.push({
             mainCategory: mainSlug,
             subCategory: subSlug,
@@ -70,31 +71,35 @@ export async function generateStaticParams() {
 
 // Determine if slug is a product or sub-sub-category
 async function getPageType(mainName, subName, slug) {
-  // Try to extract product ID from slug (format: title-productId)
-  const possibleProductId = extractProductId(slug);
+  // Try to extract product ID from slug (format: title-slug)
+  const possibleProductSlug = extractProductId(slug);
   
-  // First, check if it's a product without sub-sub-category
+  console.log('🔍 getPageType - slug:', slug);
+  console.log('🔍 getPageType - extracted ID:', possibleProductSlug);
+  
+  // First, try to fetch product directly by ID
   try {
-    const productResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products?mainCategoryName=${encodeURIComponent(mainName)}&subCategoryName=${encodeURIComponent(subName)}`,
+    const directResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${possibleProductSlug}`,
       { next: { revalidate: 1800 } }
     );
     
-    if (productResponse.ok) {
-      const productData = await productResponse.json();
-      const products = productData.data?.products || [];
+    if (directResponse.ok) {
+      const directData = await directResponse.json();
+      const product = directData.data;
       
-      // Find product matching the slug (without sub-sub-category)
-      const product = products.find(p => 
-        !p.subSubCategory?.name && (p.slug || createProductSlug(p.title)) === possibleProductId
-      );
-      
-      if (product) {
+      // Verify it doesn't have sub-sub-category (should be on different route)
+      if (product && !product.subSubCategory?.name) {
+        console.log('✅ Found product without sub-sub-category:', product.title);
         return { type: 'product', data: product };
+      } else if (product && product.subSubCategory?.name) {
+        console.log('⚠️ Product has sub-sub-category, wrong route');
       }
+    } else {
+      console.log('⚠️ Product ID not found:', possibleProductSlug);
     }
   } catch (error) {
-    console.error('Error checking for product:', error);
+    console.error('❌ Error checking for product:', error);
   }
 
   // If not a product, check if it's a sub-sub-category

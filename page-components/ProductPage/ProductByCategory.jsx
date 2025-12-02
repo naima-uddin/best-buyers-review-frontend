@@ -17,6 +17,23 @@ import { slugify, unslugify, createProductSlug } from "@/lib/slugify";
 import { Home, HomeIcon } from "lucide-react";
 import { useCategories } from "@/context/CategoryContext";
 
+// Helper function to generate correct product URL based on category hierarchy
+const getProductUrl = (product) => {
+  const mainSlug = slugify(product.mainCategory?.name || '');
+  const subSlug = slugify(product.subCategory?.name || '');
+  // Generate slug from title + ID for unique identification
+  const productSlug = createProductSlug(product.title, product._id);
+  
+  if (product.subSubCategory?.name) {
+    // Product with sub-sub-category: /category/main/sub/subsub/product-title-id
+    const subSubSlug = slugify(product.subSubCategory.name);
+    return `/category/${mainSlug}/${subSlug}/${subSubSlug}/${productSlug}`;
+  } else {
+    // Product without sub-sub-category: /category/main/sub/product-title-id
+    return `/category/${mainSlug}/${subSlug}/${productSlug}`;
+  }
+};
+
 function ProductByCategoryContent() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -660,7 +677,7 @@ const displayTitle = subSubCategoryParam
 
                               {product?.isFullReview && (
                                 <Link
-                                  href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(product.title, product._id)}`}
+                                  href={getProductUrl(product)}
                                   className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
@@ -832,7 +849,7 @@ const displayTitle = subSubCategoryParam
                             </ul>
                             {topProduct?.isFullReview && (
                               <Link
-                                href={`/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(topProduct.title)}`}
+                                href={getProductUrl(topProduct)}
                                 className="text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                               >
                                 Read Full Specification →

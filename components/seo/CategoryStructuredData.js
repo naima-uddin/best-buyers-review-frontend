@@ -5,13 +5,27 @@ import { slugify, createProductSlug } from "@/lib/slugify";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
+// Helper function to generate correct product URL
+const getProductUrl = (product) => {
+  const mainSlug = slugify(product.mainCategory?.name || '');
+  const subSlug = slugify(product.subCategory?.name || '');
+  // Generate slug from title + ID
+  const productSlug = createProductSlug(product.title, product._id);
+  
+  if (product.subSubCategory?.name) {
+    const subSubSlug = slugify(product.subSubCategory.name);
+    return `${SITE_URL}/category/${mainSlug}/${subSlug}/${subSubSlug}/${productSlug}`;
+  }
+  return `${SITE_URL}/category/${mainSlug}/${subSlug}/${productSlug}`;
+};
+
 export default async function CategoryStructuredData({ mainCategoryName, subCategoryName, products = [] }) {
   const categoryUrl = `${SITE_URL}/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}`;
   
   const items = products.map((p, idx) => ({
     "@type": "ListItem",
     position: idx + 1,
-    url: `${SITE_URL}/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}/${createProductSlug(p.title)}`,
+    url: getProductUrl(p),
     name: p.title || p.seo?.title || undefined,
     item: {
       "@type": "Product",

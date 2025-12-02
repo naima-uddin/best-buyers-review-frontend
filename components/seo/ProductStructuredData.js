@@ -5,6 +5,20 @@ import { slugify, createProductSlug } from "@/lib/slugify";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
+// Helper function to generate correct product URL
+const getProductUrl = (product) => {
+  const mainSlug = slugify(product.mainCategory?.name || '');
+  const subSlug = slugify(product.subCategory?.name || '');
+  // Generate slug from title + ID
+  const productSlug = createProductSlug(product.title, product._id);
+  
+  if (product.subSubCategory?.name) {
+    const subSubSlug = slugify(product.subSubCategory.name);
+    return `${SITE_URL}/category/${mainSlug}/${subSlug}/${subSubSlug}/${productSlug}`;
+  }
+  return `${SITE_URL}/category/${mainSlug}/${subSlug}/${productSlug}`;
+};
+
 export default async function ProductStructuredData({ product }) {
   if (!product) return null;
 
@@ -12,7 +26,7 @@ export default async function ProductStructuredData({ product }) {
   const listPriceObj = product.listPrice || null;
   const rating = product.customRating || {};
   const images = (product.images || []).map(img => img.url).filter(Boolean);
-  const productUrl = `${SITE_URL}/category/${slugify(product.mainCategory?.name || "")}/${slugify(product.subCategory?.name || "")}/${createProductSlug(product.title)}`;
+  const productUrl = getProductUrl(product);
 
   const schema = {
     "@context": "https://schema.org/",

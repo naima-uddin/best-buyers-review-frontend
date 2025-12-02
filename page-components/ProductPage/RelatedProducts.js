@@ -6,6 +6,23 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { slugify, createProductSlug } from "@/lib/slugify";
 
+// Helper function to generate correct product URL based on category hierarchy
+const getProductUrl = (product) => {
+  const mainSlug = slugify(product.mainCategory?.name || '');
+  const subSlug = slugify(product.subCategory?.name || '');
+  // Generate slug from title + ID for unique identification
+  const productSlug = createProductSlug(product.title, product._id);
+  
+  if (product.subSubCategory?.name) {
+    // Product with sub-sub-category: /category/main/sub/subsub/product-title-id
+    const subSubSlug = slugify(product.subSubCategory.name);
+    return `/category/${mainSlug}/${subSlug}/${subSubSlug}/${productSlug}`;
+  } else {
+    // Product without sub-sub-category: /category/main/sub/product-title-id
+    return `/category/${mainSlug}/${subSlug}/${productSlug}`;
+  }
+};
+
 export default function RelatedProducts({
   mainCategory,
   subCategory,
@@ -100,7 +117,7 @@ export default function RelatedProducts({
                 className="p-3 min-w-[50%] sm:min-w-[33.33%] md:min-w-[25%] lg:min-w-[16.66%]"
               >
                 <Link
-                  href={`/category/${slugify(mainCategory)}/${slugify(subCategory)}/${createProductSlug(product.title, product._id)}`}
+                  href={getProductUrl(product)}
                   className="block bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
                 >
                   <div className="relative w-full h-48">
@@ -115,11 +132,19 @@ export default function RelatedProducts({
                     <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
                       {product.title}
                     </h3>
-                    {product.discount?.percentage && (
+                    {/* {product.discount?.percentage && (
                       <p className="text-blue-600 font-semibold mt-1 text-sm">
                         Save {product.discount.percentage}%
                       </p>
-                    )}
+                    )} */}
+
+                    {
+                      product.discount?.percentage ? (<p className="text-blue-600 font-semibold mt-1 text-sm">
+                        Save {product.discount.percentage}%
+                      </p>) : (<p className="text-blue-600 font-semibold mt-1 text-sm">
+                        Save 0%
+                      </p>)
+                    }
                   </div>
                 </Link>
               </div>
