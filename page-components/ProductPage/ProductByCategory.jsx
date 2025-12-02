@@ -109,20 +109,24 @@ const subSubCategoryParam = Object.keys(allParams).find(key =>
         let url = `${apiUrl}/products?mainCategoryName=${encodeURIComponent(mainCategoryName)}&subCategoryName=${encodeURIComponent(subCategoryName)}&page=${pageParam}&limit=10&sort=${sortParam}`;
         
         // Add subSubCategoryName if provided
-if (subSubCategoryParam) {
-  // Find the exact sub-subcategory name from your categories data
-  const exactSubSubCategoryName = findExactSubSubCategoryName(subSubCategoryParam);
-  if (exactSubSubCategoryName) {
-    url += `&subSubCategoryName=${encodeURIComponent(exactSubSubCategoryName)}`;
-  }
-}
+        let exactSubSubCategoryName = null;
+        if (subSubCategoryParam) {
+          // Find the exact sub-subcategory name from your categories data
+          exactSubSubCategoryName = findExactSubSubCategoryName(subSubCategoryParam);
+          if (exactSubSubCategoryName) {
+            url += `&subSubCategoryName=${encodeURIComponent(exactSubSubCategoryName)}`;
+            console.log('✅ Using sub-sub-category:', exactSubSubCategoryName);
+          } else {
+            console.log('⚠️ Sub-sub-category param exists but not found in categories:', subSubCategoryParam);
+          }
+        }
 
-
-
-        console.log('Fetching products from:', url);
-        console.log('Main Category:', mainCategoryName);
-        console.log('Sub Category:', subCategoryName);
-        console.log('Sub-Sub Category:', subSubCategoryParam ? unslugify(subSubCategoryParam) : 'None');
+        console.log('🔄 Fetching products from:', url);
+        console.log('📦 Main Category:', mainCategoryName);
+        console.log('📦 Sub Category:', subCategoryName);
+        console.log('📦 Sub-Sub Category:', exactSubSubCategoryName || 'None');
+        console.log('📦 Page:', pageParam);
+        console.log('📦 Sort:', sortParam);
 
         const res = await fetch(url);
         const data = await res.json();
@@ -156,6 +160,10 @@ if (subSubCategoryParam) {
 
  // Update page change handler to preserve subSubCategory
 const handlePageChange = (newPage) => {
+  console.log('📄 Changing to page:', newPage);
+  console.log('📄 Current subSubCategory:', subSubCategoryParam);
+  console.log('📄 Current sort:', sortParam);
+  
   // Build query string manually to avoid "=" for sub-subcategory
   let queryString = '';
   
@@ -167,12 +175,13 @@ const handlePageChange = (newPage) => {
     queryString += `${queryString ? '&' : ''}sort=${sortParam}`;
   }
   
+  // Always add page parameter
   queryString += `${queryString ? '&' : ''}page=${newPage}`;
 
-  router.push(
-    `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}?${queryString}`,
-    { scroll: false }
-  );
+  const fullUrl = `/category/${slugify(mainCategoryName)}/${slugify(subCategoryName)}${queryString ? '?' + queryString : ''}`;
+  console.log('📄 Navigating to:', fullUrl);
+
+  router.push(fullUrl, { scroll: false });
 };
 
 
