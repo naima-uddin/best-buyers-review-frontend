@@ -49,41 +49,43 @@ export default async function sitemap() {
       
       // Process hierarchical category structure
       categories.forEach((mainCat) => {
+        const mainSlug = slugify(mainCat.name);
         
-          // Process subcategories
-          if (mainCat.children && mainCat.children.length > 0) {
-            mainCat.children.forEach((subCat) => {
-              if (subCat.level === 2) {
-                const subSlug = slugify(subCat.name);
-                
-                // Add subcategory page
-                subCategoryPages.push({
-                  url: `${baseUrl}/category/${mainSlug}/${subSlug}`,
-                  lastModified: new Date(subCat.updatedAt || Date.now()),
-                  changeFrequency: "daily",
-                  priority: 0.80,
-                });
 
-                // Process sub-subcategories
-                if (subCat.children && subCat.children.length > 0) {
-                  subCat.children.forEach((subSubCat) => {
-                    if (subSubCat.level === 3) {
-                      const subSubSlug = slugify(subSubCat.name);
-                      
-                      // Add sub-subcategory page
-                      subSubCategoryPages.push({
-                        url: `${baseUrl}/category/${mainSlug}/${subSlug}/${subSubSlug}`,
-                        lastModified: new Date(subSubCat.updatedAt || Date.now()),
-                        changeFrequency: "weekly",
-                        priority: 0.75,
-                      });
-                    }
-                  });
-                }
+        
+        // Process subcategories
+        if (mainCat.children && mainCat.children.length > 0) {
+          mainCat.children.forEach((subCat) => {
+            if (subCat.level === 2) {
+              const subSlug = slugify(subCat.name);
+              
+              // Add subcategory page (e.g., /category/outdoor/air-compressors)
+              subCategoryPages.push({
+                url: `${baseUrl}/category/${mainSlug}/${subSlug}`,
+                lastModified: new Date(subCat.updatedAt || Date.now()),
+                changeFrequency: "daily",
+                priority: 0.80,
+              });
+
+              // Process sub-subcategories
+              if (subCat.children && subCat.children.length > 0) {
+                subCat.children.forEach((subSubCat) => {
+                  if (subSubCat.level === 3) {
+                    const subSubSlug = slugify(subSubCat.name);
+                    
+                    // Add sub-subcategory page with query param (e.g., /category/outdoor/air-compressors?air-inflator)
+                    subSubCategoryPages.push({
+                      url: `${baseUrl}/category/${mainSlug}/${subSlug}?${subSubSlug}`,
+                      lastModified: new Date(subSubCat.updatedAt || Date.now()),
+                      changeFrequency: "weekly",
+                      priority: 0.75,
+                    });
+                  }
+                });
               }
-            });
-          }
-       
+            }
+          });
+        }
       });
 
       console.log(`✅ Categories: ${mainCategoryPages.length} main, ${subCategoryPages.length} sub, ${subSubCategoryPages.length} sub-sub`);
