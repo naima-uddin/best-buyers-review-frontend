@@ -507,8 +507,8 @@ const displayTitle = subSubCategoryParam
                     <div key={product._id} className="relative">
                       {/* Product Number */}
                       <div className="absolute left-4 top-4 sm:-left-2 sm:left-0 md:left-4 sm:top-1/2 z-10 bg-gradient-to-br from-orange-500 to-orange-600 text-white md:w-8 md:h-8 w-6 h-6 md:rounded-full flex items-center justify-center font-bold text-xs sm:text-sm md:text-base sm:transform sm:-translate-y-1/2 shadow-lg">
-  {productNumber}
-</div>
+                      {productNumber}
+                    </div>
 
                       {/* Product Card */}
                       <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-400 ml-4 md:ml-8 relative">
@@ -521,69 +521,69 @@ const displayTitle = subSubCategoryParam
                              {(product.labels && product.labels.length > 0) && (
                                 <div className="absolute -top-3 md:-top-5 left-4 md:left-0 right-4 z-10 flex flex-row  gap-2 justify-start">
                                    {product.labels.map((label, i) => {
-      // Function to get color classes based on label content
-      const getLabelColor = (labelText) => {
-        const lowerLabel = labelText.toLowerCase();
-        
-        if (lowerLabel.includes('amazon') || lowerLabel.includes("amazon's choice")) {
-          return "bg-gradient-to-r from-gray-600 to-gray-500  text-white";
-        }
-        else if (lowerLabel.includes('best seller') || lowerLabel.includes('bestseller')) {
-          return "bg-gradient-to-r from-orange-600 to-orange-500 text-white";
-        }
-        else if (lowerLabel.includes('trending')) {
-          return "bg-gradient-to-r from-purple-600 to-purple-500 text-white";
-        }
-        else if (lowerLabel.includes('new') || lowerLabel.includes('arrival')) {
-          return "bg-gradient-to-r from-green-600 to-green-500 text-white";
-        }
-        else if (lowerLabel.includes('featured')) {
-          return "bg-gradient-to-r from-cyan-600 to-cyan-500 text-white";
-        }
-        else if (lowerLabel.includes('hot')) {
-          return "bg-gradient-to-r from-red-600 to-red-500 text-white";
-        }
-        else if (lowerLabel.includes('popular')) {
-          return "bg-gradient-to-r from-pink-600 to-pink-500 text-white";
-        }
-        else if (lowerLabel.includes('top pick') || lowerLabel.includes('top-pick')) {
-          return "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white";
-        }
-        else if (lowerLabel.includes('best value') || lowerLabel.includes('best-value')) {
-          return "bg-gradient-to-r from-teal-600 to-teal-500 text-white";
-        }
-        else if (lowerLabel.includes('editor') || lowerLabel.includes('editor-choice')) {
-          return "bg-gradient-to-r from-blue-700 to-blue-600 text-white";
-        }
-        else if (lowerLabel.includes('black friday') || lowerLabel.includes('black-friday')) {
-          return "bg-gradient-to-r from-pink-800 to-pink-700 text-white";
-        }
-        else if (lowerLabel.includes('flash sale') || lowerLabel.includes('flash-sale')) {
-          return "bg-gradient-to-r from-red-700 to-red-600 text-white";
-        }
-        else if (lowerLabel.includes('limited') || lowerLabel.includes('limited-time')) {
-          return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
-        }
-        else if (lowerLabel.includes('deal') || lowerLabel.includes('sale')) {
-          return "bg-gradient-to-r from-green-700 to-green-600 text-white";
-        }
-        else {
-          // Default color for unknown labels
-          return "bg-gradient-to-r from-gray-600 to-gray-500 text-white";
-        }
-      };
+                                  // Function to get color classes based on label content
+                                  const getLabelColor = (labelText) => {
+                                    const lowerLabel = labelText.toLowerCase();
+                                    
+                                    if (lowerLabel.includes('amazon') || lowerLabel.includes("amazon's choice")) {
+                                      return "bg-gradient-to-r from-gray-600 to-gray-500  text-white";
+                                    }
+                                    else if (lowerLabel.includes('best seller') || lowerLabel.includes('bestseller')) {
+                                      return "bg-gradient-to-r from-orange-600 to-orange-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('trending')) {
+                                      return "bg-gradient-to-r from-purple-600 to-purple-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('new') || lowerLabel.includes('arrival')) {
+                                      return "bg-gradient-to-r from-green-600 to-green-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('featured')) {
+                                      return "bg-gradient-to-r from-cyan-600 to-cyan-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('hot')) {
+                                      return "bg-gradient-to-r from-red-600 to-red-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('popular')) {
+                                      return "bg-gradient-to-r from-pink-600 to-pink-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('top pick') || lowerLabel.includes('top-pick')) {
+                                      return "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('best value') || lowerLabel.includes('best-value')) {
+                                      return "bg-gradient-to-r from-teal-600 to-teal-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('editor') || lowerLabel.includes('editor-choice')) {
+                                      return "bg-gradient-to-r from-blue-700 to-blue-600 text-white";
+                                    }
+                                    else if (lowerLabel.includes('black friday') || lowerLabel.includes('black-friday')) {
+                                      return "bg-gradient-to-r from-pink-800 to-pink-700 text-white";
+                                    }
+                                    else if (lowerLabel.includes('flash sale') || lowerLabel.includes('flash-sale')) {
+                                      return "bg-gradient-to-r from-red-700 to-red-600 text-white";
+                                    }
+                                    else if (lowerLabel.includes('limited') || lowerLabel.includes('limited-time')) {
+                                      return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
+                                    }
+                                    else if (lowerLabel.includes('deal') || lowerLabel.includes('sale')) {
+                                      return "bg-gradient-to-r from-green-700 to-green-600 text-white";
+                                    }
+                                    else {
+                                      // Default color for unknown labels
+                                      return "bg-gradient-to-r from-gray-600 to-gray-500 text-white";
+                                    }
+                                  };
 
-      return (
-        <span
-          key={i}
-          className={`px-2 py-1 rounded text-xs font-bold shadow-md uppercase whitespace-nowrap ${getLabelColor(label)}`}
-        >
-          {label}
-        </span>
-      );
-    })}
-  </div>
-)}
+                                  return (
+                                    <span
+                                      key={i}
+                                      className={`px-2 py-1 rounded text-xs font-bold shadow-md uppercase whitespace-nowrap ${getLabelColor(label)}`}
+                                    >
+                                      {label}
+                                    </span>
+                                  );
+                                })}
+                              </div>
+                            )}
                             
                               <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-1 md:mb-2 mt-2 sm:mt-6">
                                 <Image
