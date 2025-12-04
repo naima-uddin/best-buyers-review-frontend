@@ -104,6 +104,9 @@ function CategoryPageContent() {
                             width={112}
                             height={112}
                             className="object-contain w-full h-full"
+                            loading="lazy"
+                            quality={75}
+                            sizes="(max-width: 768px) 96px, 112px"
                           />
                         </div>
 

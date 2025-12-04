@@ -67,6 +67,57 @@ const subSubCategoryParam = Object.keys(allParams).find(key =>
 
   const { compareItems, addToCompare } = useCompare();
 
+  // Move getLabelColor outside render for performance
+  const getLabelColor = useMemo(() => (labelText) => {
+    const lowerLabel = labelText.toLowerCase();
+    
+    if (lowerLabel.includes('amazon') || lowerLabel.includes("amazon's choice")) {
+      return "bg-gradient-to-r from-black to-gray-600 text-white";
+    }
+    else if (lowerLabel.includes('best seller') || lowerLabel.includes('bestseller')) {
+      return "bg-gradient-to-r from-orange-600 to-orange-500 text-white";
+    }
+    else if (lowerLabel.includes('trending')) {
+      return "bg-gradient-to-r from-purple-700 to-purple-500 text-white";
+    }
+    else if (lowerLabel.includes('new') || lowerLabel.includes('arrival')) {
+      return "bg-gradient-to-r from-green-700 to-green-500 text-white";
+    }
+    else if (lowerLabel.includes('featured')) {
+      return "bg-gradient-to-r from-cyan-700 to-cyan-500 text-white";
+    }
+    else if (lowerLabel.includes('hot')) {
+      return "bg-gradient-to-r from-red-700 to-red-500 text-white";
+    }
+    else if (lowerLabel.includes('popular')) {
+      return "bg-gradient-to-r from-pink-700 to-pink-500 text-white";
+    }
+    else if (lowerLabel.includes('top pick') || lowerLabel.includes('top-pick')) {
+      return "bg-gradient-to-r from-indigo-700 to-indigo-500 text-white";
+    }
+    else if (lowerLabel.includes('best value') || lowerLabel.includes('best-value')) {
+      return "bg-gradient-to-r from-teal-700 to-teal-500 text-white";
+    }
+    else if (lowerLabel.includes('editor') || lowerLabel.includes('editor-choice')) {
+      return "bg-gradient-to-r from-blue-700 to-blue-600 text-white";
+    }
+    else if (lowerLabel.includes('black friday') || lowerLabel.includes('black-friday')) {
+      return "bg-gradient-to-r from-pink-800 to-pink-700 text-white";
+    }
+    else if (lowerLabel.includes('flash sale') || lowerLabel.includes('flash-sale')) {
+      return "bg-gradient-to-r from-red-700 to-red-600 text-white";
+    }
+    else if (lowerLabel.includes('limited') || lowerLabel.includes('limited-time')) {
+      return "bg-gradient-to-r from-yellow-700 to-yellow-500 text-white";
+    }
+    else if (lowerLabel.includes('deal') || lowerLabel.includes('sale')) {
+      return "bg-gradient-to-r from-green-700 to-green-600 text-white";
+    }
+    else {
+      return "bg-gradient-to-r from-gray-700 to-gray-500 text-white";
+    }
+  }, []);
+
   const [showCoupon, setShowCoupon] = useState(false);
   const [couponProduct, setCouponProduct] = useState(null);
   const [couponQueue, setCouponQueue] = useState([]);
@@ -279,7 +330,7 @@ const handlePageChange = (newPage) => {
           <Breadcrumbs mainName={mainCategoryName} subName={subCategoryName} />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 md:py-10">
           {/* Header */}
           <div className="text-center mb-6 md:mb-8">
             <BackButton className="-mb-2" />
@@ -451,7 +502,7 @@ const displayTitle = subSubCategoryParam
         </div>
 
         {/* Sorting */}
-        <div className="flex justify-between items-center mb-4 md:mb-6 px-2 sm:px-0">
+        <div className="flex justify-between items-center mb-8 md:mb-10 px-2 sm:px-0">
           <div className="flex items-center gap-2">
             <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
               Sort by:
@@ -488,7 +539,7 @@ const displayTitle = subSubCategoryParam
         {/* Layout */}
         <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
           {/* Product List */}
-          <div className="flex-1 space-y-4 md:space-y-6">
+          <div className="flex-1 space-y-6 md:space-y-8">
             {products.length > 0 ? (
               <>
                 {products.map((product, index) => {
@@ -510,80 +561,43 @@ const displayTitle = subSubCategoryParam
                       {productNumber}
                     </div>
 
+                              {/* Labels Section - Flex row for all devices */}
+                      {(product.labels && product.labels.length > 0) && (
+                        <div className="absolute -top-3 md:-top-5 left-4 md:ml-8 md:left-0 right-4 z-10 flex flex-row justify-start">
+                          {product.labels.map((label, i) => {
+                            const totalLabels = product.labels.length;
+                            const isFirst = i === 0;
+                            const arrowSize = 10;
+
+                            return (
+                              <span
+                                key={i}
+                                className={`
+                                  relative px-3 mt-1 md:mt-2 md:px-4 py-0.5 md:py-1 text-[8px] md:text-[10px] font-bold uppercase text-white shadow-lg whitespace-nowrap
+                                  ${getLabelColor(label)}
+                                `}
+                                style={{
+                                  clipPath: isFirst
+                                    ? `polygon(0 0, calc(100% - ${arrowSize}px) 0, 100% 50%, calc(100% - ${arrowSize}px) 100%, 0 100%)`
+                                    : `polygon(0 0, calc(100% - ${arrowSize}px) 0, 100% 50%, calc(100% - ${arrowSize}px) 100%, 0 100%, ${arrowSize}px 50%)`,
+                                  zIndex: totalLabels - i,
+                                  marginLeft: !isFirst ? `-${arrowSize}px` : '0'
+                                }}
+                              >
+                                {label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       {/* Product Card */}
-                      <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-400 ml-4 md:ml-8 relative">
+                      <div className="bg-white shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-400 ml-4 md:ml-8 relative">
                         <div className="p-3 sm:p-4 md:p-6">
                           <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                             {/* Image Block */}
                             <div className="flex flex-col items-center w-full md:w-40 lg:w-48 relative mx-auto md:mx-0">
-                              {/* Main Label - Shows first label above image like "Bestseller" */}
-                              {/* Labels Section - Flex row for all devices */}
-                             {(product.labels && product.labels.length > 0) && (
-                                <div className="absolute -top-3 md:-top-5 left-4 md:left-0 right-4 z-10 flex flex-row  gap-2 justify-start">
-                                   {product.labels.map((label, i) => {
-                                  // Function to get color classes based on label content
-                                  const getLabelColor = (labelText) => {
-                                    const lowerLabel = labelText.toLowerCase();
-                                    
-                                    if (lowerLabel.includes('amazon') || lowerLabel.includes("amazon's choice")) {
-                                      return "bg-gradient-to-r from-gray-600 to-gray-500  text-white";
-                                    }
-                                    else if (lowerLabel.includes('best seller') || lowerLabel.includes('bestseller')) {
-                                      return "bg-gradient-to-r from-orange-600 to-orange-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('trending')) {
-                                      return "bg-gradient-to-r from-purple-600 to-purple-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('new') || lowerLabel.includes('arrival')) {
-                                      return "bg-gradient-to-r from-green-600 to-green-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('featured')) {
-                                      return "bg-gradient-to-r from-cyan-600 to-cyan-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('hot')) {
-                                      return "bg-gradient-to-r from-red-600 to-red-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('popular')) {
-                                      return "bg-gradient-to-r from-pink-600 to-pink-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('top pick') || lowerLabel.includes('top-pick')) {
-                                      return "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('best value') || lowerLabel.includes('best-value')) {
-                                      return "bg-gradient-to-r from-teal-600 to-teal-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('editor') || lowerLabel.includes('editor-choice')) {
-                                      return "bg-gradient-to-r from-blue-700 to-blue-600 text-white";
-                                    }
-                                    else if (lowerLabel.includes('black friday') || lowerLabel.includes('black-friday')) {
-                                      return "bg-gradient-to-r from-pink-800 to-pink-700 text-white";
-                                    }
-                                    else if (lowerLabel.includes('flash sale') || lowerLabel.includes('flash-sale')) {
-                                      return "bg-gradient-to-r from-red-700 to-red-600 text-white";
-                                    }
-                                    else if (lowerLabel.includes('limited') || lowerLabel.includes('limited-time')) {
-                                      return "bg-gradient-to-r from-yellow-600 to-yellow-500 text-white";
-                                    }
-                                    else if (lowerLabel.includes('deal') || lowerLabel.includes('sale')) {
-                                      return "bg-gradient-to-r from-green-700 to-green-600 text-white";
-                                    }
-                                    else {
-                                      // Default color for unknown labels
-                                      return "bg-gradient-to-r from-gray-600 to-gray-500 text-white";
-                                    }
-                                  };
 
-                                  return (
-                                    <span
-                                      key={i}
-                                      className={`px-2 py-1 rounded text-xs font-bold shadow-md uppercase whitespace-nowrap ${getLabelColor(label)}`}
-                                    >
-                                      {label}
-                                    </span>
-                                  );
-                                })}
-                              </div>
-                            )}
                             
                               <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-1 md:mb-2 mt-2 sm:mt-6">
                                 <Image
@@ -623,7 +637,7 @@ const displayTitle = subSubCategoryParam
                             </div>
 
                             {/* Info Block */}
-                            <div className="flex-1 mt-1">
+                            <div className="flex-1 ">
                               <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
                                 <div className="flex items-center">
                                   {getStarRating(
@@ -687,7 +701,7 @@ const displayTitle = subSubCategoryParam
                               {product?.isFullReview && (
                                 <Link
                                   href={getProductUrl(product)}
-                                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
+                                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium mt-0 inline-flex items-center gap-1 hover:gap-2 transition-all"
                                 >
                                   Read Full Details Specification <span>→</span>
                                 </Link>
@@ -944,11 +958,11 @@ const displayTitle = subSubCategoryParam
           <CompareModal />
         </div>
 
-        <CouponPopup
+        {/* <CouponPopup
           show={showCoupon}
           onClose={handleCloseCoupon}
           couponProduct={couponProduct}
-        />
+        /> */}
       </div>
 
       <Footer />

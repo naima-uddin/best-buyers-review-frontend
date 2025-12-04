@@ -41,6 +41,7 @@ export default function FeaturedProducts() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [cache, setCache] = useState({}); // Cache products by tab+page
 
 const tabs = [
   { 
@@ -85,10 +86,22 @@ const tabs = [
   }
 ];
   const itemsPerPage = 6;
-  const maxPagesPerLabel = 4;
+  const maxPagesPerLabel = 5;
 
-  // Fetch products based on active tab with pagination
+  // Fetch products based on active tab with pagination (with cache)
   const fetchProducts = async (tabKey, page = 1) => {
+    const cacheKey = `${tabKey}-${page}`;
+    
+    // Check cache first
+    if (cache[cacheKey]) {
+      console.log(`✅ Using cached data for ${cacheKey}`);
+      setProducts(cache[cacheKey].products);
+      setTotalPages(cache[cacheKey].totalPages);
+      setTotalProducts(cache[cacheKey].totalProducts);
+      setCurrentPage(cache[cacheKey].currentPage);
+      return;
+    }
+
     setLoading(true);
     try {
       const activeTabConfig = tabs.find(tab => tab.key === tabKey);
@@ -112,10 +125,20 @@ const tabs = [
       }
       
       if (response.data.success) {
-        setProducts(response.data.data.products);
-        setTotalPages(response.data.data.pagination.pages);
-        setTotalProducts(response.data.data.pagination.total);
-        setCurrentPage(response.data.data.pagination.page);
+        const data = {
+          products: response.data.data.products,
+          totalPages: response.data.data.pagination.pages,
+          totalProducts: response.data.data.pagination.total,
+          currentPage: response.data.data.pagination.page
+        };
+        
+        setProducts(data.products);
+        setTotalPages(data.totalPages);
+        setTotalProducts(data.totalProducts);
+        setCurrentPage(data.currentPage);
+        
+        // Cache the data
+        setCache(prev => ({ ...prev, [cacheKey]: data }));
       }
     } catch (error) {
       console.error("Error fetching products:", error);

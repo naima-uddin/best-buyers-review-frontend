@@ -55,3 +55,24 @@ html {
   margin-bottom: 1em;
 }
 
+/* RIGHT ANGLE ONLY (for single or first label) */
+.tag-right-angle {
+  clip-path: polygon(
+    0% 0%,     /* top left */
+    90% 0%,    /* top before angle */
+    100% 50%,  /* angle point */
+    90% 100%,  /* bottom before angle */
+    0% 100%    /* bottom left */
+  );
+}
+
+/* LEFT ANGLE ONLY (for second+ labels) */
+.tag-left-angle {
+  clip-path: polygon(
+    10% 0%,     /* top after left angle */
+    100% 0%,    /* top right */
+    100% 100%,  /* bottom right */
+    10% 100%,   /* bottom after left angle */
+    0% 50%      /* left angle point */
+  );
+}

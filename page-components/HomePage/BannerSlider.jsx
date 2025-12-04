@@ -51,7 +51,9 @@ export default function BannerSlider() {
         fill
         className="object-cover rounded-2xl"
         priority={i === 0}
-        sizes="90vw"
+        loading={i === 0 ? "eager" : "lazy"}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+        quality={85}
       />
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
