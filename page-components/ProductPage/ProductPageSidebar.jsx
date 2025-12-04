@@ -41,15 +41,33 @@ export default function ProductPageSidebar({
   const hasMore = subSubCategories.length > visibleCount;
 
   // Get current active sub-subcategory from query params
-const allParams = Object.fromEntries(searchParams?.entries() || []);
-const activeSubSubCategoryParam = Object.keys(allParams).find(key => 
-  key !== 'page' && key !== 'sort'
-);
-  const activeSubSubCategoryName = activeSubSubCategoryParam ? 
-    (findExactSubSubCategoryName ? findExactSubSubCategoryName(activeSubSubCategoryParam) : null) : null;
+  const allParams = Object.fromEntries(searchParams?.entries() || []);
+  const activeSubSubCategoryParam = Object.keys(allParams).find(key => 
+    key !== 'page' && key !== 'sort'
+  );
+  
+  // Determine active sub-subcategory name
+  let activeSubSubCategoryName = null;
+  if (activeSubSubCategoryParam) {
+    // First try using the provided function
+    if (findExactSubSubCategoryName) {
+      activeSubSubCategoryName = findExactSubSubCategoryName(activeSubSubCategoryParam);
+    }
+    
+    // If still null, try to find by matching slugified names
+    if (!activeSubSubCategoryName && subSubCategories.length > 0) {
+      const matchedSubSub = subSubCategories.find(
+        subSub => slugify(subSub.name) === activeSubSubCategoryParam
+      );
+      if (matchedSubSub) {
+        activeSubSubCategoryName = matchedSubSub.name;
+      }
+    }
+  }
 
   console.log('🔍 Sidebar - Current Subcategory:', currentSubCat?.name);
   console.log('🔍 Sidebar - Sub-subcategories:', subSubCategories.map(s => s.name));
+  console.log('🔍 Sidebar - Active param:', activeSubSubCategoryParam);
   console.log('🔍 Sidebar - Active Sub-subcategory:', activeSubSubCategoryName);
 
 const handleSubCategoryClick = (sub) => {
@@ -95,11 +113,11 @@ const handleSubSubCategoryClick = (subSubCat) => {
                 <button
                   key={subSubCat._id}
                   onClick={() => handleSubSubCategoryClick(subSubCat)}
-                  className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                  className={`block w-full text-left px-3 py-2 rounded-lg transition-all text-sm ${
                     isActive
-                      ? "bg-blue-700 text-white font-semibold"
-                      : "hover:bg-gray-100 text-gray-700"
-                  } text-sm`}
+                      ? "bg-blue-600 text-white font-semibold shadow-md"
+                      : "hover:bg-blue-50 text-gray-700 hover:text-blue-600"
+                  }`}
                 >
                   {subSubCat.name}
                 </button>
@@ -169,11 +187,11 @@ const handleSubSubCategoryClick = (subSubCat) => {
                     <button
                       key={subSubCat._id}
                       onClick={() => handleSubSubCategoryClick(subSubCat)}
-                      className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                      className={`block w-full text-left px-3 py-2 rounded-lg transition-all text-sm ${
                         isActive
-                          ? "bg-blue-700 text-white font-semibold"
-                          : "hover:bg-gray-100 text-gray-700"
-                      } text-sm`}
+                          ? "bg-blue-600 text-white font-semibold shadow-md"
+                          : "hover:bg-blue-50 text-gray-700 hover:text-blue-600"
+                      }`}
                     >
                       {subSubCat.name}
                     </button>
@@ -201,10 +219,10 @@ const handleSubSubCategoryClick = (subSubCat) => {
                     <button
                       key={sub._id}
                       onClick={() => handleSubCategoryClick(sub)}
-                      className={`block w-full text-left px-3 py-1 rounded-lg transition ${
+                      className={`block w-full text-left px-3 py-2 rounded-lg transition-all text-sm ${
                         isActive
-                          ? "bg-blue-700 text-white font-semibold"
-                          : "hover:bg-gray-100 text-gray-700"
+                          ? "bg-blue-600 text-white font-semibold shadow-md"
+                          : "hover:bg-blue-50 text-gray-700 hover:text-blue-600"
                       }`}
                     >
                       {sub.name}
