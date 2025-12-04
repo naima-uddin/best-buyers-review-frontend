@@ -6,10 +6,33 @@ const nextConfig = {
   trailingSlash: false,
   
   images: {
-    unoptimized: true,
-    domains: ['bestbuyersview.com', 'api.bestbuyersview.com', 'www.bestbuyersview.com'],
+    unoptimized: false, // Enable Next.js image optimization
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bestbuyersview.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.bestbuyersview.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.bestbuyersview.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.amazonaws.com', // Amazon S3 images
+      },
+      {
+        protocol: 'https',
+        hostname: 'm.media-amazon.com', // Amazon product images
+      },
+    ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000, // 1 year
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
   // Performance optimizations
@@ -32,9 +55,28 @@ const nextConfig = {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   },
 
-  // SEO-friendly headers
+  // SEO-friendly headers with aggressive caching
   async headers() {
     return [
+      // Cache static assets aggressively
+      {
+        source: '/bannerImg/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/category_img/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
       {
         source: '/:path*',
         headers: [

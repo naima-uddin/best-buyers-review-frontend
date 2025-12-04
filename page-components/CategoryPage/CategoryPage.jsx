@@ -86,7 +86,7 @@ function CategoryPageContent() {
                     const imageSrc = sub.image
                       ? sub.image.startsWith("http")
                         ? sub.image
-                        : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
+                        : `${process.env.NEXT_PUBLIC_IMAGE_URL}${sub.image}`
                       : "/placeholder-image.jpg";
 
                     return (
@@ -104,6 +104,9 @@ function CategoryPageContent() {
                             width={112}
                             height={112}
                             className="object-contain w-full h-full"
+                            loading="lazy"
+                            quality={75}
+                            sizes="(max-width: 768px) 96px, 112px"
                           />
                         </div>
 

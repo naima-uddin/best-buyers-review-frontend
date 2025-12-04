@@ -164,7 +164,7 @@ export default function CategoriesPage() {
               <div className="h-16 w-16 rounded-xl overflow-hidden bg-gradient-to-br from-purple-100 to-purple-200 flex-shrink-0 shadow-sm border border-purple-200 flex items-center justify-center">
                 {category.image ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_IMAGE_API_URL}${category.image}`}
+                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${category.image}`}
                     alt={category.name}
                     width={64}
                     height={64}

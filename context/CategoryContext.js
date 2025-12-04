@@ -10,6 +10,19 @@ export function CategoryProvider({ children }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        // Check sessionStorage cache first
+        const cachedData = sessionStorage.getItem('categories');
+        const cachedTime = sessionStorage.getItem('categories-time');
+        const now = Date.now();
+        
+        // Use cache if less than 1 hour old
+        if (cachedData && cachedTime && (now - parseInt(cachedTime)) < 3600000) {
+          console.log('✅ Using cached categories');
+          setCategories(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+
         // Use the environment variable with fallback
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.bestbuyersview.com/api';
         console.log('Fetching categories from:', `${apiUrl}/categories`);
@@ -19,8 +32,8 @@ export function CategoryProvider({ children }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          // Add cache option for Next.js
-          cache: 'no-store'
+          // Cache and revalidate every hour
+          next: { revalidate: 3600 }
         });
 
         if (!res.ok) {
@@ -30,6 +43,10 @@ export function CategoryProvider({ children }) {
         const data = await res.json();
         console.log('Categories fetched successfully:', data.length);
         setCategories(data);
+        
+        // Cache in sessionStorage
+        sessionStorage.setItem('categories', JSON.stringify(data));
+        sessionStorage.setItem('categories-time', now.toString());
       } catch (err) {
         console.error("Error fetching categories:", err);
         console.error("Error details:", {

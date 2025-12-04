@@ -107,6 +107,9 @@ const CategoryGrid = () => {
                     width={70}
                     height={70}
                     className="object-contain rounded-full p-2 relative z-10"
+                    loading="lazy"
+                    quality={75}
+                    sizes="70px"
                     onError={(e) => {
                       e.target.style.display = "none";
                       e.target.nextSibling.style.display = "flex";
