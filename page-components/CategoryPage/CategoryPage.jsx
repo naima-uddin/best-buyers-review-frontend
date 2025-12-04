@@ -86,7 +86,7 @@ function CategoryPageContent() {
                     const imageSrc = sub.image
                       ? sub.image.startsWith("http")
                         ? sub.image
-                        : `${process.env.NEXT_PUBLIC_IMAGE_URL}${sub.image}`
+                        : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
                       : "/placeholder-image.jpg";
 
                     return (
