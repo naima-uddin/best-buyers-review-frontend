@@ -450,7 +450,7 @@ function ProductByCategoryContent() {
         findExactSubSubCategoryName(subSubCategoryParam) ||
         unslugify(subSubCategoryParam)
       }`
-    : `Best ${subCategoryName} (${mainCategoryName})`;
+    : `Best ${subCategoryName}`;
   return (
     <>
       <Navbar />
