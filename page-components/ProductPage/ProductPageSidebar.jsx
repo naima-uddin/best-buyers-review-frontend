@@ -122,6 +122,22 @@ const handleSubSubCategoryClick = (subSubCat) => {
         {subSubCategories.length > 0 ? (
           <>
             <p className="text-sm font-semibold text-gray-700 mb-2">Sub-categories:</p>
+            
+            {/* Parent Subcategory - Show "All [SubCategory]" option */}
+            <button
+              onClick={() => handleSubCategoryClick(currentSubCat)}
+              className={`block w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-medium border-b border-gray-200 mb-2 ${
+                !activeSubSubCategoryName
+                  ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-md"
+                  : "hover:bg-blue-50 text-gray-800 hover:text-blue-600"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <span>📋</span>
+                <span>All {currentSubCategoryName}</span>
+              </span>
+            </button>
+            
             {subSubCategories.slice(0, visibleCount).map((subSubCat) => {
               const isActive = subSubCat.name === activeSubSubCategoryName;
               return (
@@ -196,6 +212,21 @@ const handleSubSubCategoryClick = (subSubCat) => {
           {subSubCategories.length > 0 ? (
             <>
               <div className="space-y-1">
+                {/* Parent Subcategory - Show "All [SubCategory]" option */}
+                <button
+                  onClick={() => handleSubCategoryClick(currentSubCat)}
+                  className={`block w-full text-left px-3 py-2 rounded-lg transition-all text-sm font-medium border-b border-gray-200 mb-2 ${
+                    !activeSubSubCategoryName
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-md"
+                      : "hover:bg-blue-50 text-gray-800 hover:text-blue-600"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>📋</span>
+                    <span>All {currentSubCategoryName}</span>
+                  </span>
+                </button>
+                
                 {subSubCategories.slice(0, visibleCount).map((subSubCat) => {
                   const isActive = subSubCat.name === activeSubSubCategoryName;
                   return (
