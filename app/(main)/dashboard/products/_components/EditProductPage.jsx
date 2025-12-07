@@ -30,6 +30,8 @@ export default function EditProductPage() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
             },
           }
         );
@@ -62,6 +64,8 @@ export default function EditProductPage() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
             },
           }
         );

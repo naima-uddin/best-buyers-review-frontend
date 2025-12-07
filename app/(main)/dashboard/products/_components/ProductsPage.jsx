@@ -58,20 +58,22 @@ export default function ProductsPage() {
     return mainCategory?.children || [];
   };
 
-const getSubSubCategories = (subCategoryId) => {
-  if (!subCategoryId) return [];
-  
-  // First, find the main category that contains this sub category
-  const mainCategory = categories.find(mainCat => 
-    mainCat.children?.some(subCat => subCat._id === subCategoryId)
-  );
-  
-  if (!mainCategory) return [];
-  
-  // Then find the specific sub category
-  const subCategory = mainCategory.children?.find(subCat => subCat._id === subCategoryId);
-  return subCategory?.children || [];
-};
+  const getSubSubCategories = (subCategoryId) => {
+    if (!subCategoryId) return [];
+
+    // First, find the main category that contains this sub category
+    const mainCategory = categories.find((mainCat) =>
+      mainCat.children?.some((subCat) => subCat._id === subCategoryId)
+    );
+
+    if (!mainCategory) return [];
+
+    // Then find the specific sub category
+    const subCategory = mainCategory.children?.find(
+      (subCat) => subCat._id === subCategoryId
+    );
+    return subCategory?.children || [];
+  };
 
   // Fetch categories
   useEffect(() => {
@@ -81,7 +83,11 @@ const getSubSubCategories = (subCategoryId) => {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+            },
           }
         );
 
@@ -116,7 +122,11 @@ const getSubSubCategories = (subCategoryId) => {
       if (subSubCat) url += `&subSubCategory=${subSubCat}`;
 
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+        },
       });
       const result = await res.json();
 
@@ -134,10 +144,10 @@ const getSubSubCategories = (subCategoryId) => {
 
   useEffect(() => {
     fetchProducts(
-      page, 
-      searchQuery, 
-      selectedMainCategory, 
-      selectedSubCategory, 
+      page,
+      searchQuery,
+      selectedMainCategory,
+      selectedSubCategory,
       selectedSubSubCategory
     );
   }, [page]);
@@ -193,10 +203,10 @@ const getSubSubCategories = (subCategoryId) => {
     e.preventDefault();
     setPage(1);
     fetchProducts(
-      1, 
-      searchQuery, 
-      selectedMainCategory, 
-      selectedSubCategory, 
+      1,
+      searchQuery,
+      selectedMainCategory,
+      selectedSubCategory,
       selectedSubSubCategory
     );
   };
@@ -206,13 +216,13 @@ const getSubSubCategories = (subCategoryId) => {
     setSelectedMainCategory(category._id);
     setMainCategorySearch(category.name);
     setShowMainDropdown(false);
-    
+
     // Reset sub and sub-sub categories
     setSelectedSubCategory("");
     setSubCategorySearch("");
     setSelectedSubSubCategory("");
     setSubSubCategorySearch("");
-    
+
     setPage(1);
     fetchProducts(1, searchQuery, category._id, "", "");
   };
@@ -222,11 +232,11 @@ const getSubSubCategories = (subCategoryId) => {
     setSelectedSubCategory(category._id);
     setSubCategorySearch(category.name);
     setShowSubDropdown(false);
-    
+
     // Reset sub-sub category
     setSelectedSubSubCategory("");
     setSubSubCategorySearch("");
-    
+
     setPage(1);
     fetchProducts(1, searchQuery, selectedMainCategory, category._id, "");
   };
@@ -237,7 +247,13 @@ const getSubSubCategories = (subCategoryId) => {
     setSubSubCategorySearch(category.name);
     setShowSubSubDropdown(false);
     setPage(1);
-    fetchProducts(1, searchQuery, selectedMainCategory, selectedSubCategory, category._id);
+    fetchProducts(
+      1,
+      searchQuery,
+      selectedMainCategory,
+      selectedSubCategory,
+      category._id
+    );
   };
 
   // Clear main category filter
@@ -267,7 +283,13 @@ const getSubSubCategories = (subCategoryId) => {
     setSelectedSubSubCategory("");
     setSubSubCategorySearch("");
     setPage(1);
-    fetchProducts(1, searchQuery, selectedMainCategory, selectedSubCategory, "");
+    fetchProducts(
+      1,
+      searchQuery,
+      selectedMainCategory,
+      selectedSubCategory,
+      ""
+    );
   };
 
   // Filter categories based on search
@@ -279,8 +301,10 @@ const getSubSubCategories = (subCategoryId) => {
     (cat) => cat.name.toLowerCase().includes(subCategorySearch.toLowerCase())
   );
 
-  const filteredSubSubCategories = getSubSubCategories(selectedSubCategory).filter(
-    (cat) => cat.name.toLowerCase().includes(subSubCategorySearch.toLowerCase())
+  const filteredSubSubCategories = getSubSubCategories(
+    selectedSubCategory
+  ).filter((cat) =>
+    cat.name.toLowerCase().includes(subSubCategorySearch.toLowerCase())
   );
 
   return (

@@ -33,7 +33,11 @@ export default function DashboardComponent() {
         const productsRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/products?page=1&limit=1`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+            },
           }
         );
         const productsData = await productsRes.json();
@@ -42,7 +46,11 @@ export default function DashboardComponent() {
         const categoriesRes = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/categories`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
+            },
           }
         );
         const categoriesData = await categoriesRes.json();

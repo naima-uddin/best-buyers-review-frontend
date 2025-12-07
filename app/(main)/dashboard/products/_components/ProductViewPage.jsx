@@ -46,6 +46,8 @@ export default function ProductViewPage() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
             },
           }
         );
@@ -68,7 +70,8 @@ export default function ProductViewPage() {
   }, [productId]);
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${product?.title}"?`)) return;
+    if (!confirm(`Are you sure you want to delete "${product?.title}"?`))
+      return;
 
     try {
       const token = localStorage.getItem("token");
@@ -154,7 +157,9 @@ export default function ProductViewPage() {
 
             <div className="flex gap-2">
               <Button
-                onClick={() => router.push(`/dashboard/products/${productId}/edit`)}
+                onClick={() =>
+                  router.push(`/dashboard/products/${productId}/edit`)
+                }
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Edit size={16} />
@@ -171,7 +176,9 @@ export default function ProductViewPage() {
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {product.title}
+            </h1>
             <p className="text-gray-500 mt-1 font-mono">ASIN: {product.asin}</p>
           </div>
         </div>
@@ -185,7 +192,10 @@ export default function ProductViewPage() {
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-4">
                   {displayImages.length > 0 ? (
                     <Image
-                      src={displayImages[activeImage]?.url || "/placeholder-image.jpg"}
+                      src={
+                        displayImages[activeImage]?.url ||
+                        "/placeholder-image.jpg"
+                      }
                       alt={product.title}
                       width={600}
                       height={600}
@@ -234,13 +244,19 @@ export default function ProductViewPage() {
               <div className="space-y-6">
                 {/* Brand & Category */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 mb-2">Brand</h3>
-                  <p className="text-lg text-gray-900">{product.brand || "N/A"}</p>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-2">
+                    Brand
+                  </h3>
+                  <p className="text-lg text-gray-900">
+                    {product.brand || "N/A"}
+                  </p>
                 </div>
 
                 {/* Categories */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 mb-2">Categories</h3>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-2">
+                    Categories
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {product.mainCategory && (
                       <Badge variant="default">
@@ -262,11 +278,19 @@ export default function ProductViewPage() {
 
                 {/* Status Badges */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 mb-2">Status</h3>
+                  <h3 className="text-sm font-semibold text-gray-500 mb-2">
+                    Status
+                  </h3>
                   <div className="flex flex-wrap gap-2">
-                    {product.isFeatured && <Badge variant="success">Featured</Badge>}
-                    {product.isFullReview && <Badge variant="default">Full Review</Badge>}
-                    {product.isCoupon && <Badge variant="warning">Coupon</Badge>}
+                    {product.isFeatured && (
+                      <Badge variant="success">Featured</Badge>
+                    )}
+                    {product.isFullReview && (
+                      <Badge variant="default">Full Review</Badge>
+                    )}
+                    {product.isCoupon && (
+                      <Badge variant="warning">Coupon</Badge>
+                    )}
                     {product.labels?.map((label, index) => (
                       <Badge key={index} variant="outline">
                         {label}
@@ -412,7 +436,10 @@ export default function ProductViewPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {product.specifications.map((spec, index) => (
-                    <div key={index} className="border-l-4 border-blue-500 pl-3">
+                    <div
+                      key={index}
+                      className="border-l-4 border-blue-500 pl-3"
+                    >
                       <div className="text-sm font-semibold text-gray-600">
                         {spec.key}
                       </div>
@@ -466,7 +493,8 @@ export default function ProductViewPage() {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>
-                {product.mostImportantFactors.heading || "Most Important Factors"}
+                {product.mostImportantFactors.heading ||
+                  "Most Important Factors"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -521,7 +549,10 @@ export default function ProductViewPage() {
             <CardContent>
               <div className="space-y-4">
                 {product.commonQuestions.map((qa, index) => (
-                  <div key={index} className="border-b border-gray-200 last:border-0 pb-4 last:pb-0">
+                  <div
+                    key={index}
+                    className="border-b border-gray-200 last:border-0 pb-4 last:pb-0"
+                  >
                     <div className="font-semibold text-gray-900 mb-2">
                       Q: {qa.question}
                     </div>
@@ -570,7 +601,9 @@ export default function ProductViewPage() {
                     <div className="text-sm font-semibold text-purple-700">
                       SEO Description
                     </div>
-                    <div className="text-gray-900">{product.seo.description}</div>
+                    <div className="text-gray-900">
+                      {product.seo.description}
+                    </div>
                   </div>
                 )}
                 {product.seo.keywords && product.seo.keywords.length > 0 && (

@@ -22,6 +22,8 @@ export default function CreateProductPage() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+              Pragma: "no-cache",
             },
           }
         );
