@@ -344,7 +344,7 @@ function ProductByCategoryContent() {
         setShowCoupon(true);
         return nextIndex;
       });
-    }, 15000);
+    }, 40000);
   };
 
   // Update sort handler to preserve subSubCategory
