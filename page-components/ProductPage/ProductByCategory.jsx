@@ -39,6 +39,7 @@ function ProductByCategoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { categories } = useCategories();
+  const productSectionRef = useRef(null);
 
   // Decode URL params
   const mainCategoryName = params?.mainCategory
@@ -276,6 +277,21 @@ function ProductByCategoryContent() {
     console.log("📄 Navigating to:", fullUrl);
 
     router.push(fullUrl, { scroll: false });
+    
+    // Smooth scroll to product section after navigation
+    setTimeout(() => {
+      scrollToProductSection();
+    }, 100);
+  };
+
+  // Function to scroll to product section smoothly
+  const scrollToProductSection = () => {
+    if (productSectionRef.current) {
+      productSectionRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start'
+      });
+    }
   };
 
   const getStarRating = (rating) => {
@@ -412,6 +428,7 @@ function ProductByCategoryContent() {
                 currentSubCategoryName={subCategoryName}
                 findExactSubSubCategoryName={findExactSubSubCategoryName}
                 showOnlyRelatedCategories={true}
+                onCategoryChange={scrollToProductSection}
               />
             </div>
           </div>
@@ -608,6 +625,7 @@ function ProductByCategoryContent() {
               mainCategoryName={mainCategoryName}
               currentSubCategoryName={subCategoryName}
               showOnlyRelatedCategories={true}
+              onCategoryChange={scrollToProductSection}
             />
           </div>
         </div>
@@ -616,6 +634,9 @@ function ProductByCategoryContent() {
         <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
           {/* Product List */}
           <div className="flex-1 space-y-6 md:space-y-8">
+            {/* Product Section Ref - scroll target with offset for fixed header */}
+            <div ref={productSectionRef} className="-mt-20 pt-20"></div>
+            
             {products.length > 0 ? (
               <>
                 {products.map((product, index) => {
@@ -1054,6 +1075,7 @@ function ProductByCategoryContent() {
             <ProductPageSidebar
               mainCategoryName={mainCategoryName}
               currentSubCategoryName={subCategoryName}
+              onCategoryChange={scrollToProductSection}
             />
           </div>
         </div>

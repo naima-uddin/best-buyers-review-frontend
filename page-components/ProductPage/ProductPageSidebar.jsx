@@ -9,7 +9,8 @@ export default function ProductPageSidebar({
   mainCategoryName,
   currentSubCategoryName,
   showOnlyRelatedCategories = false,
-  findExactSubSubCategoryName 
+  findExactSubSubCategoryName,
+  onCategoryChange
 }) {
   const { categories } = useCategories();
   const router = useRouter();
@@ -75,6 +76,13 @@ const handleSubCategoryClick = (sub) => {
   router.push(
     `/category/${slugify(mainCategoryName)}/${slugify(sub.name)}`
   );
+  
+  // Trigger scroll after navigation
+  if (onCategoryChange) {
+    setTimeout(() => {
+      onCategoryChange();
+    }, 100);
+  }
 };
 
 const handleSubSubCategoryClick = (subSubCat) => {
@@ -88,6 +96,13 @@ const handleSubSubCategoryClick = (subSubCat) => {
     `/category/${slugify(mainCategoryName)}/${slugify(currentSubCategoryName)}?${queryString}`,
     { scroll: false }
   );
+  
+  // Trigger scroll after navigation
+  if (onCategoryChange) {
+    setTimeout(() => {
+      onCategoryChange();
+    }, 100);
+  }
 };
 
 
