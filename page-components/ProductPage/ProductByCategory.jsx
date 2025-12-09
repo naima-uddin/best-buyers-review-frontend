@@ -277,7 +277,7 @@ function ProductByCategoryContent() {
     console.log("📄 Navigating to:", fullUrl);
 
     router.push(fullUrl, { scroll: false });
-    
+
     // Smooth scroll to product section after navigation
     setTimeout(() => {
       scrollToProductSection();
@@ -287,9 +287,9 @@ function ProductByCategoryContent() {
   // Function to scroll to product section smoothly
   const scrollToProductSection = () => {
     if (productSectionRef.current) {
-      productSectionRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start'
+      productSectionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
       });
     }
   };
@@ -595,15 +595,15 @@ function ProductByCategoryContent() {
         </div>
 
         {/* Sorting */}
-        <div className="flex justify-between items-center mb-8 md:mb-10 px-2 sm:px-0">
-          <div className="flex items-center gap-2">
+        <div className="flex justify-between items-center mb-8 md:mb-10 px-2 sm:px-0 relative z-10">
+          <div className="flex items-center gap-2 relative">
             <span className="text-xs sm:text-sm text-gray-600 hidden sm:inline">
               Sort by:
             </span>
             <select
               value={sortParam}
               onChange={handleSortChange}
-              className="border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+              className="border border-gray-300 rounded-lg px-2 sm:px-3 py-2 text-xs sm:text-sm bg-white hover:border-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all cursor-pointer relative z-20"
             >
               <option value="rating">Ratings (High to Low)</option>
               <option value="reviews">Reviews Count (High to Low)</option>
@@ -636,7 +636,7 @@ function ProductByCategoryContent() {
           <div className="flex-1 space-y-6 md:space-y-8">
             {/* Product Section Ref - scroll target with offset for fixed header */}
             <div ref={productSectionRef} className="-mt-20 pt-20"></div>
-            
+
             {products.length > 0 ? (
               <>
                 {products.map((product, index) => {
