@@ -14,6 +14,7 @@ import {
   Award,
   Crown,
   Users,
+  ShoppingCart,
 } from "lucide-react";
 import Accordion from "@/ui/Accordion";
 import RelatedProducts from "./RelatedProducts";
@@ -34,7 +35,7 @@ import {
   MostImportantFactorsSection,
   ConclusionSection,
   AllCommonQuestionsSection,
-  AllCustomReviewsSection
+  AllCustomReviewsSection,
 } from "./ProductDetailsSections";
 
 function ProductDetailsContent({ initialProduct }) {
@@ -419,6 +420,18 @@ function ProductDetailsContent({ initialProduct }) {
                         {product.customRating?.reviewCount || 29} reviews
                       </span>
                     </div>
+
+                    {product.boughtInPastMonth && (
+                      <div className="flex items-center space-x-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 shadow-sm">
+                        <ShoppingCart className="h-4 w-4 text-green-600" />
+                        <span className="text-orange-600 text-xs font-medium">
+                          <span className="font-bold text-gray-900">
+                            {product.boughtInPastMonth}
+                          </span>
+                          bought in past month
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Buy at Amazon Button */}
@@ -533,7 +546,6 @@ function ProductDetailsContent({ initialProduct }) {
           />
           <ProductInfoTabs product={product} />
 
-
           {/* Add this after ProductInfoTabs and before RelatedProducts */}
 
           {/* All Additional Sections */}
@@ -548,13 +560,12 @@ function ProductDetailsContent({ initialProduct }) {
             <FactorsToConsiderSection factors={product.factorsToConsider} />
 
             {/* Most Important Factors */}
-            <MostImportantFactorsSection factors={product.mostImportantFactors} />
+            <MostImportantFactorsSection
+              factors={product.mostImportantFactors}
+            />
 
             {/* Conclusion */}
-
           </div>
-
-          
 
           {/* Customer Reviews Section */}
           {product.customReviews && product.customReviews.length > 0 && (
@@ -659,7 +670,6 @@ function ProductDetailsContent({ initialProduct }) {
         <div className="max-w-7xl mx-auto mt-6 px-6">
           <ConclusionSection conclusion={product.conclusion} />
         </div>
-
       </div>
 
       {/* JSON-LD Structured Data for Product */}

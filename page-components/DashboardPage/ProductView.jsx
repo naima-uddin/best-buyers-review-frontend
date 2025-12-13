@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowLeft, Star, ExternalLink, ShoppingCart, Package, DollarSign } from "lucide-react";
+import {
+  ArrowLeft,
+  Star,
+  ExternalLink,
+  ShoppingCart,
+  Package,
+  DollarSign,
+} from "lucide-react";
 import Image from "next/image";
 
 export default function ProductView({ product, onClose }) {
@@ -9,7 +16,8 @@ export default function ProductView({ product, onClose }) {
     if (!price) return "$0.00";
     if (typeof price === "string") return price;
     if (price.displayAmount) return price.displayAmount;
-    if (price.amount && price.currency) return `${price.currency} ${price.amount}`;
+    if (price.amount && price.currency)
+      return `${price.currency} ${price.amount}`;
     return "$0.00";
   };
 
@@ -27,17 +35,19 @@ export default function ProductView({ product, onClose }) {
     }
 
     let processedContent = content;
-    const sortedAnchors = [...anchorTags].sort((a, b) => b.word.length - a.word.length);
-    
-    sortedAnchors.forEach(anchor => {
-      const regex = new RegExp(`\\b${anchor.word}\\b`, 'gi');
+    const sortedAnchors = [...anchorTags].sort(
+      (a, b) => b.word.length - a.word.length
+    );
+
+    sortedAnchors.forEach((anchor) => {
+      const regex = new RegExp(`\\b${anchor.word}\\b`, "gi");
       processedContent = processedContent.replace(regex, (match) => {
         return `<a href="${anchor.link}" ${
-          anchor.isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''
+          anchor.isExternal ? 'target="_blank" rel="noopener noreferrer"' : ""
         } class="text-blue-600 underline hover:text-blue-800 transition-colors">${match}</a>`;
       });
     });
-    
+
     return processedContent;
   };
 
@@ -49,7 +59,9 @@ export default function ProductView({ product, onClose }) {
       <div className="mb-8">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Product Details</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">
+              Product Details
+            </h1>
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               <span className="font-mono bg-gray-100 px-3 py-1 rounded-lg">
                 ASIN: {product.asin}
@@ -83,7 +95,7 @@ export default function ProductView({ product, onClose }) {
                     height={400}
                     className="w-full h-96 object-cover rounded-xl"
                   />
-                   
+
                   {product.images.length > 1 && (
                     <div className="flex flex-wrap gap-2">
                       {product.images.slice(1, 5).map((img, idx) => (
@@ -112,8 +124,7 @@ export default function ProductView({ product, onClose }) {
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
                   {product.title}
                 </h2>
-                
-                
+
                 {/* Pricing */}
                 <div className="flex items-center space-x-4 mb-4">
                   {product.price && (
@@ -138,12 +149,20 @@ export default function ProductView({ product, onClose }) {
               {/* Categories */}
               <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div>
-                  <span className="block text-sm font-medium text-gray-700 mb-1">Main Category</span>
-                  <p className="text-gray-900 font-semibold">{product.mainCategory?.name || "—"}</p>
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    Main Category
+                  </span>
+                  <p className="text-gray-900 font-semibold">
+                    {product.mainCategory?.name || "—"}
+                  </p>
                 </div>
                 <div>
-                  <span className="block text-sm font-medium text-gray-700 mb-1">Sub Category</span>
-                  <p className="text-gray-900 font-semibold">{product.subCategory?.name || "—"}</p>
+                  <span className="block text-sm font-medium text-gray-700 mb-1">
+                    Sub Category
+                  </span>
+                  <p className="text-gray-900 font-semibold">
+                    {product.subCategory?.name || "—"}
+                  </p>
                 </div>
               </div>
 
@@ -171,8 +190,21 @@ export default function ProductView({ product, onClose }) {
                 {product.availability && (
                   <div className="flex items-center space-x-2">
                     <Package className="w-4 h-4 text-green-500" />
-                    <span className="font-medium text-gray-700">Availability:</span>
-                    <span className="text-gray-900">{product.availability}</span>
+                    <span className="font-medium text-gray-700">
+                      Availability:
+                    </span>
+                    <span className="text-gray-900">
+                      {product.availability}
+                    </span>
+                  </div>
+                )}
+                {product.boughtInPastMonth && (
+                  <div className="flex items-center space-x-2">
+                    <ShoppingCart className="w-4 h-4 text-blue-500" />
+                    <span className="font-medium text-gray-700">Bought:</span>
+                    <span className="text-gray-900">
+                      {product.boughtInPastMonth} in past month
+                    </span>
                   </div>
                 )}
               </div>
@@ -195,31 +227,41 @@ export default function ProductView({ product, onClose }) {
           {/* Introduction with Anchor Tags */}
           {product.introduction && (
             <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Introduction</h3>
-              <div 
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Introduction
+              </h3>
+              <div
                 className="text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ 
+                dangerouslySetInnerHTML={{
                   __html: processContentWithAnchors(
-                    product.introduction, 
+                    product.introduction,
                     product.anchorTags || []
-                  ) 
+                  ),
                 }}
               />
             </div>
           )}
 
-         {/* Features with Anchor Tags */}
+          {/* Features with Anchor Tags */}
           {product.features?.feature?.length > 0 && (
             <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Features</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Features
+              </h3>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {product.features.feature.map((f, i) => (
-                  <li key={i} className="flex items-start space-x-2 text-gray-600">
+                  <li
+                    key={i}
+                    className="flex items-start space-x-2 text-gray-600"
+                  >
                     <span className="text-green-500 mt-1">•</span>
-                    <div 
+                    <div
                       className="leading-relaxed"
-                      dangerouslySetInnerHTML={{ 
-                        __html: processContentWithAnchors(f, product.anchorTags || [])
+                      dangerouslySetInnerHTML={{
+                        __html: processContentWithAnchors(
+                          f,
+                          product.anchorTags || []
+                        ),
                       }}
                     />
                   </li>
@@ -231,14 +273,16 @@ export default function ProductView({ product, onClose }) {
           {/* Conclusion with Anchor Tags */}
           {product.conclusion?.text && (
             <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Conclusion</h3>
-              <div 
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Conclusion
+              </h3>
+              <div
                 className="text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ 
+                dangerouslySetInnerHTML={{
                   __html: processContentWithAnchors(
-                    product.conclusion.text, 
+                    product.conclusion.text,
                     product.anchorTags || []
-                  ) 
+                  ),
                 }}
               />
             </div>
@@ -247,14 +291,16 @@ export default function ProductView({ product, onClose }) {
           {/* Most Important Factors with Anchor Tags */}
           {product.mostImportantFactors?.text && (
             <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Most Important Factors</h3>
-              <div 
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Most Important Factors
+              </h3>
+              <div
                 className="text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ 
+                dangerouslySetInnerHTML={{
                   __html: processContentWithAnchors(
-                    product.mostImportantFactors.text, 
+                    product.mostImportantFactors.text,
                     product.anchorTags || []
-                  ) 
+                  ),
                 }}
               />
             </div>
@@ -263,7 +309,9 @@ export default function ProductView({ product, onClose }) {
           {/* Personal Review */}
           {product.personalReview && (
             <div className="mt-8 pt-8 border-t border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Personal Review</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Personal Review
+              </h3>
               <p className="text-gray-600 leading-relaxed bg-blue-50 p-4 rounded-lg">
                 {product.personalReview}
               </p>

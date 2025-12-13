@@ -56,6 +56,9 @@ export default function ProductEdit({
     discountPrice: "",
     discountPercentage: "",
 
+    // Bought in Past Month
+    boughtInPastMonth: "",
+
     // Custom Rating
     customRating: "",
     reviewCount: "",
@@ -187,6 +190,9 @@ export default function ProductEdit({
         originalPrice: originalPrice.toString(),
         discountPrice: discountPrice.toString(),
         discountPercentage: discountPercentage.toString(),
+
+        // Bought in Past Month
+        boughtInPastMonth: product.boughtInPastMonth || "",
 
         // Custom Rating
         customRating: product.customRating?.rating?.toString() || "",
@@ -732,6 +738,9 @@ export default function ProductEdit({
       anchorTags: formData.anchorTags || [],
       isCoupon: formData.isCoupon || false,
 
+      // Bought in Past Month
+      boughtInPastMonth: formData.boughtInPastMonth || "",
+
       // ✅ CORRECTED PRICING STRUCTURE
       price: {
         amount: parseFloat(formData.discountPrice) || 0,
@@ -1143,6 +1152,30 @@ export default function ProductEdit({
                 Calculated automatically
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Bought in Past Month */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">
+            Bought in Past Month
+          </h2>
+          <div className="max-w-md">
+            <label className="block text-sm font-semibold text-gray-800 mb-3">
+              Bought Count
+            </label>
+            <input
+              type="text"
+              name="boughtInPastMonth"
+              value={formData.boughtInPastMonth}
+              onChange={handleChange}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g., 30K, 50K, 1M"
+            />
+            <p className="text-xs text-gray-500 mt-2">
+              Enter the number of purchases in the past month (e.g., 30K, 50K,
+              1M)
+            </p>
           </div>
         </div>
 

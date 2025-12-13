@@ -847,6 +847,13 @@ function ProductByCategoryContent() {
                                   </span>
                                 </div>
 
+                                {product.boughtInPastMonth && (
+                                  <p className="text-[12px] text-blue-600 -mt-3 flex justify-center">
+                                    {product.boughtInPastMonth || "N/A"}+ Bought
+                                    in Past Month
+                                  </p>
+                                )}
+
                                 <div className="hidden md:block">
                                   <div className="flex items-center justify-center mt-4 sm:mt-6">
                                     <input
@@ -1031,6 +1038,13 @@ function ProductByCategoryContent() {
                               height={24}
                               className="h-6 mt-2 mx-auto opacity-80"
                             />
+
+                            {topProduct.boughtInPastMonth && (
+                              <p className="text-[12px] text-blue-600 mt-1 flex justify-center">
+                                {topProduct.boughtInPastMonth || "N/A"}+ Bought
+                                in Past Month
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>

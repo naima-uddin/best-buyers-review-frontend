@@ -40,6 +40,12 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* 🟦 Left Side - Coupon Info */}
           <div className="bg-blue-700 text-white flex flex-col justify-center items-center p-6 text-center">
+            {couponProduct.boughtInPastMonth && (
+              <p className="text-[12px] text-orange-600 mb-1 flex justify-center">
+                {couponProduct.boughtInPastMonth || "N/A"}+ Bought in Past Month
+              </p>
+            )}
+
             <h2 className="text-2xl font-bold mb-3">
               Best {couponProduct.subCategory?.name || "Deal"}
             </h2>
@@ -54,23 +60,22 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               {couponProduct.title.slice(0, 100)}...
             </p>
             <div className="hidden md:block mt-4">
-
-            <a
-              href={couponProduct.affiliateUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center w-full max-w-xs "
-            >
-              View
-              <Image
-                src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
-                alt="Amazon"
-                width={60}
-                height={20}
-                className="h-5 ml-2 mr-2 flex items-center justify-center"
-              />
-              Deal
-            </a>
+              <a
+                href={couponProduct.affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors flex items-center justify-center w-full max-w-xs "
+              >
+                View
+                <Image
+                  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                  alt="Amazon"
+                  width={60}
+                  height={20}
+                  className="h-5 ml-2 mr-2 flex items-center justify-center"
+                />
+                Deal
+              </a>
             </div>
           </div>
 
@@ -81,7 +86,8 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               {couponProduct.customRating?.rating || "9.8"} ⭐
             </div>
             <div className="text-gray-500 mb-2">
-              {couponProduct.customRating?.reviewCount || 50}+ reviewed in past month
+              {couponProduct.customRating?.reviewCount || 50}+ reviewed in past
+              month
             </div>
 
             {/* 🖼️ Main Image */}
@@ -117,27 +123,26 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
                 ))}
               </div>
             )}
-          {/* 📱 Mobile Only: View Deal Button Below Images */}
-<div className="block md:hidden w-full mt-4">
-  <a
-    href={couponProduct.affiliateUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center w-full"
-  >
-    View
-    <Image
-      src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
-      alt="Amazon"
-      width={60}
-      height={20}
-      className="h-5 ml-2 mr-2 flex items-center justify-center"
-    />
-    Deal
-  </a>
-</div>
+            {/* 📱 Mobile Only: View Deal Button Below Images */}
+            <div className="block md:hidden w-full mt-4">
+              <a
+                href={couponProduct.affiliateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2 rounded-lg transition-colors flex items-center justify-center w-full"
+              >
+                View
+                <Image
+                  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                  alt="Amazon"
+                  width={60}
+                  height={20}
+                  className="h-5 ml-2 mr-2 flex items-center justify-center"
+                />
+                Deal
+              </a>
+            </div>
           </div>
-
         </div>
       </div>
     </div>
