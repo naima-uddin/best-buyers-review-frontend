@@ -135,6 +135,8 @@ function ProductByCategoryContent() {
         return "bg-gradient-to-r from-yellow-700 to-yellow-500 text-white";
       } else if (lowerLabel.includes("deal") || lowerLabel.includes("sale")) {
         return "bg-gradient-to-r from-green-700 to-green-600 text-white";
+      } else if (lowerLabel.includes("limited-time-deal")) {
+        return "bg-gradient-to-r from-yellow-700 to-yellow-600 text-white";
       } else {
         return "bg-gradient-to-r from-gray-700 to-gray-500 text-white";
       }

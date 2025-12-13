@@ -425,46 +425,44 @@ export default function ProductEdit({
     }));
   };
 
-const addSpecification = (e) => {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
+  const addSpecification = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-  // Case 1: If user typed something → save it
-  if (newSpecKey.trim() || newSpecValue.trim()) {
-    const newSpec = {
-      key: newSpecKey.trim(),
-      value: newSpecValue.trim(),
+    // Case 1: If user typed something → save it
+    if (newSpecKey.trim() || newSpecValue.trim()) {
+      const newSpec = {
+        key: newSpecKey.trim(),
+        value: newSpecValue.trim(),
+        _tempId: Date.now() + Math.random(),
+      };
+
+      setFormData((prev) => ({
+        ...prev,
+        specifications: [...prev.specifications, newSpec],
+      }));
+
+      // Clear input fields after saving
+      setNewSpecKey("");
+      setNewSpecValue("");
+
+      return; // stop here
+    }
+
+    // Case 2: If fields are empty → create empty row
+    const emptySpec = {
+      key: "",
+      value: "",
       _tempId: Date.now() + Math.random(),
     };
 
     setFormData((prev) => ({
       ...prev,
-      specifications: [...prev.specifications, newSpec],
+      specifications: [...prev.specifications, emptySpec],
     }));
-
-    // Clear input fields after saving
-    setNewSpecKey("");
-    setNewSpecValue("");
-
-    return; // stop here
-  }
-
-  // Case 2: If fields are empty → create empty row
-  const emptySpec = {
-    key: "",
-    value: "",
-    _tempId: Date.now() + Math.random(),
   };
-
-  setFormData((prev) => ({
-    ...prev,
-    specifications: [...prev.specifications, emptySpec],
-  }));
-};
-
-
 
   const updateSpecification = (index, field, value) => {
     setFormData((prev) => ({
@@ -1037,6 +1035,7 @@ const addSpecification = (e) => {
                 <option value="black-friday-deal">Black Friday Deal</option>
                 <option value="flash-sale">Flash Sale</option>
                 <option value="overall-pick">Overall Pick</option>
+                <option value="limited-time-deal">Limited Time Deal</option>
               </select>
 
               <div>
