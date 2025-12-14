@@ -426,7 +426,7 @@ function ProductDetailsContent({ initialProduct }) {
                         <ShoppingCart className="h-4 w-4 text-green-600" />
                         <span className="text-orange-600 text-xs font-medium">
                           <span className="font-bold text-gray-900">
-                            {product.boughtInPastMonth}
+                            {product.boughtInPastMonth}+{" "}
                           </span>
                           bought in past month
                         </span>

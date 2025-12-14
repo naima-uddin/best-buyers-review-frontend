@@ -40,8 +40,6 @@ function CategoryPageContent() {
     );
   }
 
-
-
   return (
     <>
       <Navbar />
@@ -67,61 +65,67 @@ function CategoryPageContent() {
         {/* Category List */}
         <div className="space-y-10">
           {categories
-          .filter((main) => main.name.toLowerCase() !== "uncategorized")   // 👈 filter added
-          .map((main) => (
-            <div
-              key={main._id}
-              ref={(el) => (categoryRefs.current[main.name] = el)}
-              className="border border-gray-200 rounded-xl p-6 shadow-sm"
-            >
-              {/* Main Category Title */}
-              <h2 className="text-xl font-bold text-gray-800 mb-5 uppercase">
-                {main.name}
-              </h2>
+            .filter((main) => main.name.toLowerCase() !== "uncategorized") // 👈 filter added
+            .map((main) => (
+              <div
+                key={main._id}
+                ref={(el) => (categoryRefs.current[main.name] = el)}
+                className="border border-gray-200 rounded-xl p-6 shadow-sm"
+              >
+                {/* Main Category Title */}
+                <h2 className="text-xl font-bold text-gray-800 mb-5 uppercase">
+                  {main.name}
+                </h2>
 
-              {/* Subcategories */}
-              {main.children && main.children.length > 0 ? (
-                <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-2 gap-y-4">
-                  {main.children.map((sub) => {
-                    const imageSrc = sub.image
-                      ? sub.image.startsWith("http")
-                        ? sub.image
-                        : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
-                      : "/placeholder-image.jpg";
+                {/* Subcategories */}
+                {main.children && main.children.length > 0 ? (
+                  <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-2 gap-y-4">
+                    {main.children.map((sub) => {
+                      const imageSrc = sub.image
+                        ? sub.image.startsWith("https" || "http")
+                          ? sub.image
+                          : `${process.env.NEXT_PUBLIC_IMAGE_API_URL}${sub.image}`
+                        : "/placeholder-image.jpg";
 
-                    return (
-                      <div
-                        key={sub._id}
-                        className="flex flex-col items-center text-center group cursor-pointer hover:scale-105 transition-transform duration-200"
-                        onClick={() =>
-                          router.push(`/category/${slugify(main.name)}/${slugify(sub.name)}`)
-                        }
-                      >
-                        <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                          <Image
-                            src={imageSrc}
-                            alt={sub.name}
-                            width={112}
-                            height={112}
-                            className="object-contain w-full h-full"
-                            loading="lazy"
-                            quality={75}
-                            sizes="(max-width: 768px) 96px, 112px"
-                          />
+                      return (
+                        <div
+                          key={sub._id}
+                          className="flex flex-col items-center text-center group cursor-pointer hover:scale-105 transition-transform duration-200"
+                          onClick={() =>
+                            router.push(
+                              `/category/${slugify(main.name)}/${slugify(
+                                sub.name
+                              )}`
+                            )
+                          }
+                        >
+                          <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                            <Image
+                              src={imageSrc}
+                              alt={sub.name}
+                              width={112}
+                              height={112}
+                              className="object-contain w-full h-full"
+                              loading="lazy"
+                              quality={75}
+                              sizes="(max-width: 768px) 96px, 112px"
+                            />
+                          </div>
+
+                          <span className="mt-2 text-sm text-gray-700 group-hover:text-blue-600 font-medium text-center">
+                            {sub.name}
+                          </span>
                         </div>
-
-                        <span className="mt-2 text-sm text-gray-700 group-hover:text-blue-600 font-medium text-center">
-                          {sub.name}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-sm">No subcategories available</p>
-              )}
-            </div>
-          ))}
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    No subcategories available
+                  </p>
+                )}
+              </div>
+            ))}
         </div>
       </div>
 

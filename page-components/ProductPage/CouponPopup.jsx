@@ -41,7 +41,7 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
           {/* 🟦 Left Side - Coupon Info */}
           <div className="bg-blue-700 text-white flex flex-col justify-center items-center p-6 text-center">
             {couponProduct.boughtInPastMonth && (
-              <p className="text-[12px] text-orange-600 mb-1 flex justify-center">
+              <p className="text-lg  text-[#9AE630] flex justify-center -mt-6 mb-2 drop-shadow-[0_0_6px_rgba(154,230,48,0.5)]">
                 {couponProduct.boughtInPastMonth || "N/A"}+ Bought in Past Month
               </p>
             )}
