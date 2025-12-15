@@ -26,7 +26,7 @@ export default function CompareModal() {
 
   // Function to get specification value by key
   const getSpecificationValue = (product, specKey) => {
-    const spec = product.specifications?.find(s => 
+    const spec = product.specifications?.find((s) =>
       s.key.toLowerCase().includes(specKey.toLowerCase())
     );
     return spec?.value || "N/A";
@@ -35,9 +35,12 @@ export default function CompareModal() {
   // Get all unique specification keys from all products
   const getAllSpecificationKeys = () => {
     const allKeys = new Set();
-    compareItems.forEach(product => {
-      product.specifications?.forEach(spec => {
-        allKeys.add(spec.key);
+    compareItems.forEach((product) => {
+      product.specifications?.forEach((spec) => {
+        // Skip if the key is "brand" (case-insensitive) since it's already shown separately
+        if (!spec.key.toLowerCase().includes("brand")) {
+          allKeys.add(spec.key);
+        }
       });
     });
     return Array.from(allKeys).slice(0, 5); // Limit to 5 specifications
@@ -121,7 +124,7 @@ export default function CompareModal() {
                             <h4 className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2 line-clamp-3 leading-tight">
                               {product.title}
                             </h4>
-                            
+
                             <a
                               href={product.affiliateUrl}
                               target="_blank"
@@ -156,12 +159,11 @@ export default function CompareModal() {
                           key={p._id}
                           className="p-2 sm:p-3 md:p-4 text-center border-r"
                         >
-                          <div className="flex justify-center items-center"> 
-
-                          {getStarRating(p.customRating?.rating || 0)}
-                          <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                            ({p.customRating?.rating?.toFixed(1) || "0"})
-                          </div>
+                          <div className="flex justify-center items-center">
+                            {getStarRating(p.customRating?.rating || 0)}
+                            <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                              ({p.customRating?.rating?.toFixed(1) || "0"})
+                            </div>
                           </div>
                         </td>
                       ))}
@@ -178,16 +180,13 @@ export default function CompareModal() {
                           className="p-2 sm:p-3 md:p-4 text-center border-r"
                         >
                           <div className="text-sm text-gray-700">
-                            {p.customRating?.reviewCount 
-                              ? `${p.customRating.reviewCount.toLocaleString()} people` 
+                            {p.customRating?.reviewCount
+                              ? `${p.customRating.reviewCount.toLocaleString()} people`
                               : "No reviews"}
                           </div>
-                          
                         </td>
                       ))}
                     </tr>
-
-
 
                     {/* 🔹 Savings Row */}
                     <tr className="border-b">
@@ -231,6 +230,7 @@ export default function CompareModal() {
                         <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm capitalize">
                           {specKey.toLowerCase()}
                         </td>
+
                         {compareItems.map((p) => (
                           <td
                             key={p._id}
@@ -244,34 +244,6 @@ export default function CompareModal() {
                       </tr>
                     ))}
 
-                    
-
-                    {/* 🔹 Key Features */}
-                    <tr className="border-b align-top">
-                      <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
-                        Key Features
-                      </td>
-                      {compareItems.map((p) => (
-                        <td
-                          key={p._id}
-                          className="p-2 sm:p-3 md:p-4 border-r text-xs sm:text-sm"
-                        >
-                          <ul className="list-disc list-inside text-gray-700 space-y-1">
-                            {p.features?.feature?.slice(0, 2).map((f, i) => (
-                              <li key={i} className="leading-relaxed">
-                                {f}
-                              </li>
-                            ))}
-                            {(!p.features?.feature || p.features.feature.length === 0) && (
-                              <li className="text-gray-500">N/A</li>
-                            )}
-                          </ul>
-                        </td>
-                      ))}
-                    </tr>
-
-                    
-
                     {/* 🔹 Availability */}
                     <tr className="border-b">
                       <td className="p-2 sm:p-3 md:p-4 font-semibold bg-gray-50 border-r sticky left-0 z-10 text-xs sm:text-sm">
@@ -282,19 +254,20 @@ export default function CompareModal() {
                           key={p._id}
                           className="p-2 sm:p-3 md:p-4 text-center border-r text-xs sm:text-sm"
                         >
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            p.availability === "In Stock" 
-                              ? "bg-green-100 text-green-800"
-                              : p.availability === "Out of Stock"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              p.availability === "In Stock"
+                                ? "bg-green-100 text-green-800"
+                                : p.availability === "Out of Stock"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
                             {p.availability || "N/A"}
                           </span>
                         </td>
                       ))}
                     </tr>
-
                   </tbody>
                 </table>
               </div>
