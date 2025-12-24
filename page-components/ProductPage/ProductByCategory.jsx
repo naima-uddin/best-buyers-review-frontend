@@ -87,7 +87,7 @@ function ProductByCategoryContent() {
         lowerLabel.includes("amazon") ||
         lowerLabel.includes("amazon's choice")
       ) {
-        return "bg-gradient-to-r from-black to-gray-600 text-white";
+        return "bg-gradient-to-r from-orange-700 to-yellow-500 text-white";
       } else if (
         lowerLabel.includes("best seller") ||
         lowerLabel.includes("bestseller")
