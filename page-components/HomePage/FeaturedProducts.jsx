@@ -274,13 +274,28 @@ export default function FeaturedProducts() {
                     fill
                     className="object-contain group-hover:scale-110 transition-transform duration-300"
                   />
-                  {product.discount?.displayAmount && (
-                    <>
-                    <span className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
-                      {product.discount.displayAmount}
-                    </span>
-                    </>
-                  )}
+                  
+                <>
+                  {product.discount?.displayAmount &&
+                    product.discount.displayAmount !== "-0%" &&
+                    (() => {
+                      const discountValue = parseFloat(product.discount.displayAmount); // 25 from "25%"
+
+                      const badgeColor =
+                        discountValue < -30
+                          ? "from-orange-500 to-orange-600"
+                          : "from-green-500 to-green-600";
+
+                      return (
+                        <span
+                          className={`absolute top-0.5 left-2 bg-gradient-to-r ${badgeColor} text-white text-xs font-bold px-2.5 py-1 rounded-xl shadow-lg`}
+                        >
+                          {product.discount.displayAmount}
+                        </span>
+                      );
+                    })()}
+                </>
+
                 </div>
 
                 {/* Title */}
@@ -295,7 +310,7 @@ export default function FeaturedProducts() {
                 )}
 
                 {/* Rating */}
-                <div className="flex items-center justify-center mb-3 gap-0.5">
+                <div className="flex items-center justify-center mb-1.5 gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <span
                       key={i}
@@ -320,7 +335,7 @@ export default function FeaturedProducts() {
                   href={product.affiliateUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 w-full bg-gradient-to-r from-amber-400 to-orange-400 text-gray-900 py-2 md:py-2.5 rounded-xl hover:from-amber-500 hover:to-orange-500 transition-all duration-300 font-semibold text-xs md:text-sm shadow-md hover:shadow-lg group-hover:scale-105"
+                  className="flex items-center justify-center gap-1.5 w-full bg-gradient-to-r from-amber-400 to-orange-400 text-gray-900 py-1.5 md:py-2 rounded-sm hover:from-amber-500 hover:to-orange-500 transition-all duration-300 font-semibold text-xs md:text-sm shadow-md hover:shadow-lg group-hover:scale-105"
                 >
                   <span>View on</span>
                   <Image
@@ -328,7 +343,7 @@ export default function FeaturedProducts() {
                     alt="Amazon"
                     width={40}
                     height={50}
-                    className="object-contain mt-1.5"
+                    className="object-contain mt-1"
                   />
                 </a>
               </div>
