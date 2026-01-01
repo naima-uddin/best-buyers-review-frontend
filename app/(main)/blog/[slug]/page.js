@@ -53,7 +53,8 @@ async function getBlog(slug) {
 }
 
 export async function generateMetadata({ params }) {
-  const blog = await getBlog(params.slug);
+  const { slug } = await params;
+  const blog = await getBlog(slug);
 
   if (!blog) {
     return {
@@ -92,7 +93,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogPostPage({ params }) {
-  const blog = await getBlog(params.slug);
+  const { slug } = await params;
+  const blog = await getBlog(slug);
 
   if (!blog) {
     return (
@@ -155,7 +157,7 @@ export default async function BlogPostPage({ params }) {
   return (
     <>
       <ArticleStructuredData blog={blog} />
-      <BlogDetails slug={params.slug} initialBlog={blog} />      <script
+      <BlogDetails slug={slug} initialBlog={blog} />      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(blogPostingSchema),
