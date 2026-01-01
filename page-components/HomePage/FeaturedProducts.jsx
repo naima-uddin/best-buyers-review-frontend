@@ -275,9 +275,11 @@ export default function FeaturedProducts() {
                     className="object-contain group-hover:scale-110 transition-transform duration-300"
                   />
                   {product.discount?.displayAmount && (
+                    <>
                     <span className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
                       {product.discount.displayAmount}
                     </span>
+                    </>
                   )}
                 </div>
 
