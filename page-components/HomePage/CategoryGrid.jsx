@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { slugify } from "@/lib/slugify";
 
 const CategoryGrid = () => {
@@ -26,7 +26,6 @@ const CategoryGrid = () => {
 
   const [visibleCount, setVisibleCount] = useState(12);
   const [showAll, setShowAll] = useState(false);
-  const router = useRouter();
 
   // Calculate visible categories based on screen size
   useEffect(() => {
@@ -86,14 +85,10 @@ const CategoryGrid = () => {
         {/* Category Grid */}
         <div className="flex flex-wrap justify-center gap-2 md:gap-4">
           {displayCategories.map((category, index) => (
-            <div
+            <Link
               key={index}
+              href={`/category?scrollTo=${slugify(category.name)}`}
               className="flex flex-col items-center text-center cursor-pointer group"
-              onClick={() =>
-                router.push(
-                  `/category?scrollTo=${slugify(category.name)}`
-                )
-              }
             >
               {/* Circular Image with modern design */}
               <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center mb-3 shadow-md border-2 border-white group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
@@ -131,7 +126,7 @@ const CategoryGrid = () => {
               <span className="text-sm md:text-base text-gray-700 font-semibold leading-tight group-hover:text-purple-600 transition-colors max-w-[90px] break-words">
                 {category.name}
               </span>
-            </div>
+            </Link>
           ))}
 
           {/* More Button */}
