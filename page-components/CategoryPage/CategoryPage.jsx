@@ -5,6 +5,7 @@ import { useCategories } from "@/context/CategoryContext";
 import BackButton from "@/ui/BackButton";
 import Breadcrumbs from "@/ui/Breadcrumbs";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, Suspense } from "react";
 import { slugify, unslugify } from "@/lib/slugify";
@@ -88,16 +89,12 @@ function CategoryPageContent() {
                         : "/placeholder-image.jpg";
 
                       return (
-                        <div
+                        <Link
                           key={sub._id}
+                          href={`/category/${slugify(main.name)}/${slugify(
+                            sub.name
+                          )}`}
                           className="flex flex-col items-center text-center group cursor-pointer hover:scale-105 transition-transform duration-200"
-                          onClick={() =>
-                            router.push(
-                              `/category/${slugify(main.name)}/${slugify(
-                                sub.name
-                              )}`
-                            )
-                          }
                         >
                           <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
                             <Image
@@ -115,7 +112,7 @@ function CategoryPageContent() {
                           <span className="mt-2 text-sm text-gray-700 group-hover:text-blue-600 font-medium text-center">
                             {sub.name}
                           </span>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>
