@@ -100,6 +100,18 @@ export function BlogCacheProvider({ children }) {
     return !cached.isPartial && (Date.now() - cached.fetchedAt) < CACHE_DURATION;
   }, [blogDetails]);
 
+  // Invalidate cache - force refresh on next fetch
+  const invalidateCache = useCallback(() => {
+    lastFetchTime.current = 0;
+    setBlogDetails({});
+  }, []);
+
+  // Refresh blogs - invalidate and fetch fresh data
+  const refreshBlogs = useCallback(async () => {
+    invalidateCache();
+    return fetchBlogs(true);
+  }, [invalidateCache, fetchBlogs]);
+
   // Prefetch on mount (app load)
   useEffect(() => {
     fetchBlogs();
@@ -113,7 +125,9 @@ export function BlogCacheProvider({ children }) {
     fetchBlogDetail,
     getCachedBlog,
     isBlogCached,
-    blogDetails
+    blogDetails,
+    invalidateCache,
+    refreshBlogs
   };
 
   return (

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useTransition } from "react";
 import api from "@/lib/api/axios";
 import SimplifiedBlogForm from "./SimplifiedBlogForm";
 import BlogTable from "./BlogTable";
+import { useBlogCache } from "@/context/BlogCacheContext";
 
 // Prefetch blog data - starts loading immediately when module loads
 let prefetchedBlogs = null;
@@ -30,6 +31,7 @@ export default function BlogAdminPage() {
   const [editingBlog, setEditingBlog] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const { invalidateCache } = useBlogCache();
 
   const loadBlogs = async () => {
     const res = await api.get("/blog");
@@ -56,8 +58,8 @@ const handleSubmit = async (data) => {
     console.log("🔄 Submitting blog data:", data);
     
     if (editingBlog) {
-      // Update existing blog
-      await api.patch(`/blog/${editingBlog.slug}`, data);
+      // Update existing blog - encode slug for URL safety
+      await api.patch(`/blog/${encodeURIComponent(editingBlog.slug)}`, data);
       alert("Blog updated successfully!");
     } else {
       // Create new blog
@@ -69,6 +71,7 @@ const handleSubmit = async (data) => {
     setShowForm(false);
     setEditingBlog(null);
     loadBlogs(); // Refresh the list
+    invalidateCache(); // Clear public blog cache so /blog shows updated data
   } catch (error) {
     console.error("❌ Error submitting blog:", error);
     console.error("❌ Error response:", error.response?.data);
@@ -87,9 +90,9 @@ const handleSubmit = async (data) => {
       return;
     }
     
-    // Fallback to API fetch
+    // Fallback to API fetch - encode slug for URL safety
     try {
-      const res = await api.get(`/blog/${slug}`);
+      const res = await api.get(`/blog/${encodeURIComponent(slug)}`);
       if (res.data.success) {
         setEditingBlog(res.data.data);
         setShowForm(true);
@@ -101,16 +104,20 @@ const handleSubmit = async (data) => {
   };
 
   const handleDelete = async (slug) => {
+    console.log("🗑️ Attempting to delete blog with slug:", slug);
     if (confirm("Are you sure you want to delete this blog?")) {
       try {
-        // Encode the slug to handle spaces and special characters
-        const encodedSlug = encodeURIComponent(slug);
-        await api.delete(`/blog/${encodedSlug}`);
+        // Encode slug for URL safety
+        const response = await api.delete(`/blog/${encodeURIComponent(slug)}`);
+        console.log("✅ Delete response:", response);
         alert("Blog deleted successfully!");
         loadBlogs();
+        invalidateCache(); // Clear public blog cache
       } catch (error) {
-        console.error("Error deleting blog:", error);
-        alert("Error deleting blog!");
+        console.error("❌ Error deleting blog:", error);
+        console.error("❌ Error response:", error.response?.data);
+        console.error("❌ Request URL:", error.config?.url);
+        alert(`Error deleting blog: ${error.response?.data?.message || error.message}`);
       }
     }
   };

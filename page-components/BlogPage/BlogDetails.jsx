@@ -338,12 +338,11 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
 
             {/* Meta info */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-200">
-              {blog.author?.name && (
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
                   <span>Best Buyer's View</span>
                 </div>
-              )}
+              
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span>{formatDate(blog.datePublished || blog.createdAt)}</span>
