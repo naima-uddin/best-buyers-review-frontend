@@ -293,7 +293,14 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
       <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         {/* Hero Section */}
         <div className="relative bg-gradient-to-r from-blue-900 via-purple-900 to-blue-900 text-white">
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0">
+            <img
+              src="/blog-banner.png"
+              alt={blog.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          </div>
           <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-24">
             {/* Breadcrumb */}
             <nav className="mb-6">
