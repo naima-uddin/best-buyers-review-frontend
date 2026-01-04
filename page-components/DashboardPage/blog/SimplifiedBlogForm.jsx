@@ -451,7 +451,7 @@ export default function SimplifiedBlogForm({ initialData = null, onSubmit, onCan
         <button
           type="button"
           onClick={onCancel}
-          className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 cursor-pointer"
+          className="flex items-center gap-1 px-4 py-2 text-red-600 hover:text-gray-800 cursor-pointer"
         >
           <X className="w-4 h-4" />
           Cancel
