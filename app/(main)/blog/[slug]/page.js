@@ -4,14 +4,18 @@ import Link from "next/link";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
-// Force dynamic for instant navigation (cache handled client-side)
-export const dynamic = 'force-dynamic';
+// Use ISR - pages are statically generated and revalidated on-demand
+// This makes navigation instant (pre-rendered HTML)
+export const revalidate = 60; // Revalidate every 60 seconds if needed
+
+// Allow dynamic paths not generated at build time
+export const dynamicParams = true;
 
 // Generate static paths for all blogs at build time
 export async function generateStaticParams() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
-      next: { revalidate: 3600 }
+      cache: 'no-store' // Get fresh list at build time
     });
     const data = await res.json();
     const blogs = data.data || [];
@@ -28,11 +32,9 @@ export async function generateStaticParams() {
 async function getBlog(slug) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`, {
-      next: { revalidate: 3600 },
-      cache: 'force-cache',
+      next: { revalidate: 60 }, // Revalidate every 60 seconds
       headers: { 
-        'Accept': 'application/json',
-        'Cache-Control': 'public, max-age=3600'
+        'Accept': 'application/json'
       }
     });
     

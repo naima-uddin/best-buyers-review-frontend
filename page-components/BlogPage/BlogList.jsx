@@ -1,11 +1,14 @@
 "use client";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Calendar, Clock, Eye, ArrowRight } from "lucide-react";
 
 // Memoized Blog Card for optimal re-rendering
 const BlogCard = memo(function BlogCard({ blog, featured = false }) {
+  const router = useRouter();
+  
   const readTime = useMemo(() => {
     if (!blog?.content) return "5 min";
     const text = blog.content
@@ -26,13 +29,22 @@ const BlogCard = memo(function BlogCard({ blog, featured = false }) {
     });
   };
 
+  // Prefetch route on hover for instant navigation
+  const handleMouseEnter = useCallback(() => {
+    router.prefetch(`/blog/${blog.slug}`);
+  }, [router, blog.slug]);
 
   const imageUrl = blog.featuredImage?.url || "/default-blog.jpg";
   const category = blog.categories?.[0]?.name || blog.categories?.[0] || "General";
 
   if (featured) {
     return (
-      <Link href={`/blog/${blog.slug}`} prefetch={true} className="group block">
+      <Link 
+        href={`/blog/${blog.slug}`} 
+        prefetch={true} 
+        className="group block"
+        onMouseEnter={handleMouseEnter}
+      >
         <article className="relative h-[300px] sm:h-[400px] rounded-2xl overflow-hidden shadow-xl">
           <div className="absolute inset-0">
             <img
@@ -70,7 +82,12 @@ const BlogCard = memo(function BlogCard({ blog, featured = false }) {
   }
 
   return (
-    <Link href={`/blog/${blog.slug}`} prefetch={true} className="group block">
+    <Link 
+      href={`/blog/${blog.slug}`} 
+      prefetch={true} 
+      className="group block"
+      onMouseEnter={handleMouseEnter}
+    >
       <article className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
         <div className="relative h-48 overflow-hidden">
           <img
