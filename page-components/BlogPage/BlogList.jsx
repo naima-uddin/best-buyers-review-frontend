@@ -45,7 +45,7 @@ const BlogCard = memo(function BlogCard({ blog, featured = false }) {
         className="group block"
         onMouseEnter={handleMouseEnter}
       >
-        <article className="relative h-[300px] sm:h-[400px] rounded-2xl overflow-hidden shadow-xl">
+        <article className="relative h-[350px] sm:h-[400px] rounded-2xl overflow-hidden shadow-xl">
           <div className="absolute inset-0">
             <img
               src={imageUrl}
