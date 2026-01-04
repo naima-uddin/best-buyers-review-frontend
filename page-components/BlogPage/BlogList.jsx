@@ -19,14 +19,13 @@ const BlogCard = memo(function BlogCard({ blog, featured = false }) {
     return `${Math.max(1, Math.ceil(words / 200))} min`;
   }, [blog?.content]);
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString("en-US", {
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      day: "2-digit",
       month: "short",
-      day: "numeric",
-      year: "numeric",
     });
   };
+
 
   const imageUrl = blog.featuredImage?.url || "/default-blog.jpg";
   const category = blog.categories?.[0]?.name || blog.categories?.[0] || "General";
@@ -84,7 +83,7 @@ const BlogCard = memo(function BlogCard({ blog, featured = false }) {
             {category}
           </span>
         </div>
-        <div className="flex-1 p-5 flex flex-col">
+        <div className="flex-1 p-5 flex flex-col bg-[#FFFDF8]">
           <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
             {blog.title}
           </h3>

@@ -251,14 +251,12 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
   }, [blog?.title, blog?.excerpt, blog?.description]);
 
   // Format date
-  const formatDate = useCallback((dateStr) => {
-    if (!dateStr) return "";
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
     });
-  }, []);
+  };
 
   // Calculate read time
   const readTime = useMemo(() => {
