@@ -336,7 +336,7 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
               {blog.author?.name && (
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  <span>{blog.author.name}</span>
+                  <span>Best Buyer's View</span>
                 </div>
               )}
               <div className="flex items-center gap-2">
@@ -361,14 +361,14 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Main Content */}
-            <article className="flex-1 lg:max-w-3xl">
+            <article className="flex-1">
               {/* Featured Image */}
               {blog.featuredImage?.url && (
                 <div className="mb-10 -mt-20 relative z-10">
                   <img
                     src={blog.featuredImage.url}
                     alt={blog.featuredImage.alt || blog.title}
-                    className="w-full h-auto max-h-[400px] object-cover rounded-2xl shadow-2xl"
+                    className="w-full h-auto max-h-[360px] object-cover rounded-2xl shadow-2xl"
                   />
                 </div>
               )}
