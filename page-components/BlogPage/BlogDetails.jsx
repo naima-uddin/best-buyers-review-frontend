@@ -297,7 +297,7 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
             <img
               src="/blog-banner.png"
               alt={blog.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-50"
               loading="lazy"
             />
           </div>
