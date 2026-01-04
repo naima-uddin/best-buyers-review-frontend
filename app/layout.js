@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth";
 import "hover.css/css/hover-min.css";
 import { CategoryProvider } from "@/context/CategoryContext";
 import { CompareProvider } from "@/context/CompareContext";
+import { BlogCacheProvider } from "@/context/BlogCacheContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -175,7 +176,9 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <CategoryProvider>
-            <CompareProvider>{children}</CompareProvider>
+            <CompareProvider>
+              <BlogCacheProvider>{children}</BlogCacheProvider>
+            </CompareProvider>
           </CategoryProvider>
         </AuthProvider>
       </body>

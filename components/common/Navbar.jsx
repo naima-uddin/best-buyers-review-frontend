@@ -204,6 +204,7 @@ export default function Navbar() {
 
           <Link
             href="/blog"
+            prefetch={true}
             className="text-[#0215A6] hover:text-[#0313ff] transition-all duration-300 font-semibold px-4 py-2 rounded-lg hover:bg-blue-50 relative group"
           >
             Blog
@@ -272,6 +273,7 @@ export default function Navbar() {
 
             <Link
               href="/blog"
+              prefetch={true}
               className="block text-gray-700 hover:text-[#0313ff] font-semibold py-3 px-4 rounded-lg hover:bg-blue-50"
               onClick={() => setIsMenuOpen(false)}
             >

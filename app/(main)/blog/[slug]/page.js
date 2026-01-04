@@ -157,7 +157,8 @@ export default async function BlogPostPage({ params }) {
   return (
     <>
       <ArticleStructuredData blog={blog} />
-      <BlogDetails slug={slug} initialBlog={blog} />      <script
+      <BlogDetails blog={blog} />
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(blogPostingSchema),

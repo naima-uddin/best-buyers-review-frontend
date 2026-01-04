@@ -1,502 +1,401 @@
 "use client";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useMemo } from "react";
-import Breadcrumbs from "@/ui/Breadcrumbs";
+import { ArrowLeft, Heart, Clock, Calendar, User, Share2, Eye } from "lucide-react";
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
+import ScrollToTopButton from "@/ui/ScrollToTopButton";
+import api from "@/lib/api/axios";
+import { useBlogCache } from "@/context/BlogCacheContext";
 
-export default function BlogDetails({ slug, initialBlog = null }) {
-  const [blog, setBlog] = useState(initialBlog);
-  const [loading, setLoading] = useState(!initialBlog);
+// Memoized content block renderer for performance
+const ContentBlock = memo(function ContentBlock({ block, index }) {
+  const { type, data } = block;
+
+  switch (type) {
+    case "paragraph":
+      return (
+        <p className="text-gray-700 leading-relaxed text-lg mb-6">
+          {data?.text?.map((t, i) => (
+            <span key={i}>{t.value}</span>
+          ))}
+        </p>
+      );
+
+    case "heading":
+      const headingId = data?.text?.[0]?.value?.toLowerCase().replace(/\s+/g, "-") || `heading-${index}`;
+      return (
+        <h2 id={headingId} className="text-2xl font-bold text-gray-900 mt-10 mb-4 scroll-mt-24">
+          {data?.text?.map((t, i) => <span key={i}>{t.value}</span>)}
+        </h2>
+      );
+
+    case "quote":
+      return (
+        <blockquote className="border-l-4 border-blue-500 pl-6 py-2 my-6 bg-blue-50 rounded-r-lg italic text-gray-700">
+          {data?.text?.map((t, i) => <span key={i}>{t.value}</span>)}
+        </blockquote>
+      );
+
+    case "link":
+      return (
+        <a
+          href={data?.url || "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline block my-4"
+        >
+          {data?.text?.[0]?.value || data?.url}
+        </a>
+      );
+
+    case "list":
+      return (
+        <ul className="list-disc list-inside space-y-2 my-6 pl-4">
+          {data?.items?.map((item, i) => (
+            <li key={i} className="text-gray-700">{item}</li>
+          ))}
+        </ul>
+      );
+
+    case "image":
+      if (!data?.url) return null;
+      return (
+        <figure className="my-8">
+          <div className="relative w-full h-auto rounded-lg overflow-hidden">
+            <img
+              src={data.url}
+              alt={data.alt || "Blog image"}
+              className="w-full h-auto object-cover rounded-lg"
+              loading="lazy"
+            />
+          </div>
+          {data.alt && (
+            <figcaption className="text-center text-sm text-gray-500 mt-2">
+              {data.alt}
+            </figcaption>
+          )}
+        </figure>
+      );
+
+    default:
+      return null;
+  }
+});
+
+// Memoized Table of Contents
+const TableOfContents = memo(function TableOfContents({ headings, activeHeading }) {
+  if (!headings.length) return null;
+
+  return (
+    <nav className="sticky top-24 bg-white rounded-xl shadow-lg p-6 max-h-[calc(100vh-150px)] overflow-y-auto">
+      <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <span className="w-1 h-6 bg-blue-600 rounded-full"></span>
+        Table of Contents
+      </h3>
+      <ul className="space-y-2">
+        {headings.map((heading, index) => {
+          const id = heading.toLowerCase().replace(/\s+/g, "-");
+          const isActive = activeHeading === id;
+          return (
+            <li key={index}>
+              <a
+                href={`#${id}`}
+                className={`block py-2 px-3 text-sm rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? "bg-blue-100 text-blue-700 font-medium"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                {heading}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+});
+
+// Reading progress bar component
+const ReadingProgress = memo(function ReadingProgress({ progress }) {
+  return (
+    <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
+      <div
+        className="h-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-150"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+});
+
+export default function OptimizedBlogDetails({ blog: initialBlog }) {
+  const { getCachedBlog, fetchBlogDetail, isBlogCached } = useBlogCache();
+  const [liked, setLiked] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [showTableOfContents, setShowTableOfContents] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("tocClosed") !== "true";
-    }
-    return true;
-  });
-  const [likes, setLikes] = useState(() => {
-    if (typeof window !== "undefined" && slug) {
-      const cached = sessionStorage.getItem(`blog-likes-${slug}`);
-      return cached ? parseInt(cached) : Math.floor(Math.random() * 50) + 10;
-    }
-    return 10;
-  });
-  const [hasLiked, setHasLiked] = useState(() => {
-    if (typeof window !== "undefined" && slug) {
-      return localStorage.getItem(`blog-liked-${slug}`) === 'true';
-    }
-    return false;
-  });
-  const router = useRouter();
+  const [activeHeading, setActiveHeading] = useState("");
+  const [blogData, setBlogData] = useState(initialBlog);
 
+  // Use cached blog if available, fetch full details if needed
   useEffect(() => {
-    if (initialBlog) {
-      setBlog(initialBlog);
-      setLoading(false);
-      // Cache asynchronously without blocking render
-      requestIdleCallback(() => {
-        sessionStorage.setItem(`blog-${slug}`, JSON.stringify(initialBlog));
-        sessionStorage.setItem(`blog-${slug}-time`, Date.now().toString());
+    if (!initialBlog?.slug) return;
+    
+    // Check if we have a full cached version
+    const cached = getCachedBlog(initialBlog.slug);
+    if (cached && isBlogCached(initialBlog.slug)) {
+      setBlogData(cached);
+    } else {
+      // Fetch full details and cache it
+      fetchBlogDetail(initialBlog.slug).then((data) => {
+        if (data) setBlogData(data);
       });
-      return;
     }
+  }, [initialBlog?.slug, getCachedBlog, fetchBlogDetail, isBlogCached]);
 
-    // Try cache first with validation
-    const cached = sessionStorage.getItem(`blog-${slug}`);
-    const cacheTime = sessionStorage.getItem(`blog-${slug}-time`);
-    const cacheAge = cacheTime ? Date.now() - parseInt(cacheTime) : Infinity;
-    
-    if (cached && cacheAge < 3600000) { // 1 hour cache
-      setBlog(JSON.parse(cached));
-      setLoading(false);
-      return;
-    }
+  // Use the most up-to-date blog data
+  const blog = blogData || initialBlog;
 
-    // Fetch if not in cache or cache expired
-    async function fetchBlog() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`, {
-          cache: 'force-cache',
-          next: { revalidate: 3600 }
-        });
-        if (!res.ok) throw new Error('Blog not found');
-        
-        const data = await res.json();
-        setBlog(data.data);
-        requestIdleCallback(() => {
-          sessionStorage.setItem(`blog-${slug}`, JSON.stringify(data.data));
-          sessionStorage.setItem(`blog-${slug}-time`, Date.now().toString());
-        });
-      } catch (err) {
-        console.error("Error loading blog:", err);
-        router.push("/blog");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchBlog();
-  }, [slug, initialBlog, router]);
-
-  useEffect(() => {
-  const handleScroll = () => {
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight - windowHeight;
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const progress = (scrollTop / documentHeight) * 100;
-    setReadingProgress(Math.min(100, Math.max(0, progress)));
-    
-    // Only show TOC if user hasn't closed it
-    if (localStorage.getItem("tocClosed") !== "true") {
-      setShowTableOfContents(scrollTop > 400);
-    }
-  };
-
-  window.addEventListener('scroll', handleScroll);
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
-
-
-  const handleLike = () => {
-    const newLiked = !hasLiked;
-    const newLikes = newLiked ? likes + 1 : likes - 1;
-    
-    setHasLiked(newLiked);
-    setLikes(newLikes);
-    
-    // Persist to storage
-    localStorage.setItem(`blog-liked-${slug}`, newLiked.toString());
-    sessionStorage.setItem(`blog-likes-${slug}`, newLikes.toString());
-  };
-
-  // Memoize table of contents generation
-  const tableOfContents = useMemo(() => {
+  // Extract headings from content for TOC
+  const headings = useMemo(() => {
     if (!blog?.content) return [];
     return blog.content
-      .filter(block => block.type === "heading" && block.data?.text?.[0]?.value)
-      .map((block, index) => ({
-        id: `heading-${index}`,
-        text: block.data.text[0].value,
-        level: 2
-      }));
+      .filter((block) => block.type === "heading")
+      .map((block) => block.data?.text?.[0]?.value || "")
+      .filter(Boolean);
   }, [blog?.content]);
 
-  // Function to render different content block types
-  const renderContentBlock = (block, index) => {
-    const headingId = `heading-${index}`;
-    
-    switch (block.type) {
-      case "paragraph":
-        const paragraphText = block.data?.text?.[0]?.value || "";
-        if (paragraphText.trim()) {
-          return (
-            <p key={index} className="text-gray-700 leading-relaxed text-lg mb-8">
-              {paragraphText}
-            </p>
-          );
-        }
-        return null;
+  // Scroll handler for reading progress and active heading
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-      case "heading":
-        const headingText = block.data?.text?.[0]?.value || "";
-        if (headingText.trim()) {
-          return (
-            <h2 
-              id={headingId}
-              key={index} 
-              className="text-3xl font-bold text-gray-900 mt-16 mb-8 leading-tight scroll-mt-24 border-l-4 border-blue-500 pl-6 py-2 bg-blue-50/30 rounded-r-lg"
-            >
-              {headingText}
-            </h2>
-          );
-        }
-        return null;
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollTop = window.scrollY;
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0;
+          setReadingProgress(progress);
 
-      case "quote":
-        const quoteText = block.data?.text?.[0]?.value || "";
-        if (quoteText.trim()) {
-          return (
-            <blockquote key={index} className="relative my-12 p-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-l-4 border-blue-500">
-              <div className="text-6xl text-blue-500 absolute -top-2 left-4">"</div>
-              <p className="text-xl text-gray-700 leading-relaxed italic relative z-10">
-                {quoteText}
-              </p>
-              <div className="text-6xl text-blue-500 absolute -bottom-8 right-4">"</div>
-            </blockquote>
-          );
-        }
-        return null;
+          // Update active heading
+          const headingElements = document.querySelectorAll("h2[id]");
+          for (let i = headingElements.length - 1; i >= 0; i--) {
+            const el = headingElements[i];
+            if (el.getBoundingClientRect().top <= 150) {
+              setActiveHeading(el.id);
+              break;
+            }
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
 
-      case "link":
-        const linkText = block.data?.text?.[0]?.value || block.data?.url || "";
-        const linkUrl = block.data?.url || "#";
-        if (linkText.trim()) {
-          return (
-            <div key={index} className="my-8">
-              <a 
-                href={linkUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-6 py-4 bg-blue-50 text-blue-700 rounded-2xl font-medium hover:bg-blue-100 transition-all duration-300 group border border-blue-200"
-              >
-                <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-                <span className="font-semibold">{linkText}</span>
-              </a>
-            </div>
-          );
-        }
-        return null;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-      case "list":
-        const listItems = block.data?.items || [];
-        if (listItems.length > 0) {
-          return (
-            <div key={index} className="my-8">
-              <ul className="space-y-4">
-                {listItems.map((item, itemIndex) => (
-                  item.trim() && (
-                    <li key={itemIndex} className="flex items-start gap-4 text-gray-700 text-lg bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <span>{item}</span>
-                    </li>
-                  )
-                ))}
-              </ul>
-            </div>
-          );
-        }
-        return null;
-
-      case "image":
-        const imageUrl = block.data?.url;
-        const imageAlt = block.data?.alt || blog?.title || "Blog image";
-        if (imageUrl) {
-          return (
-            <div key={index} className="my-12">
-              <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl group">
-                <Image
-                  src={imageUrl}
-                  alt={imageAlt}
-                  width={320}
-                  height={240}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              {block.data?.alt && (
-                <p className="text-center text-gray-500 text-sm mt-4 italic bg-gray-50 py-2 rounded-lg">
-                  {block.data.alt}
-                </p>
-              )}
-            </div>
-          );
-        }
-        return null;
-
-      default:
-        return null;
+  // Check initial like status
+  useEffect(() => {
+    if (blog?.slug && typeof window !== "undefined") {
+      const likedBlogs = JSON.parse(localStorage.getItem("likedBlogs") || "{}");
+      setLiked(!!likedBlogs[blog.slug]);
     }
-  };
+  }, [blog?.slug]);
 
-  if (loading) {
-    return <BlogDetailsSkeleton readingProgress={readingProgress} />;
-  }
+  // Handle like toggle
+  const handleLike = useCallback(async () => {
+    if (!blog?.slug) return;
+    
+    const likedBlogs = JSON.parse(localStorage.getItem("likedBlogs") || "{}");
+    const newLiked = !liked;
+    
+    if (newLiked) {
+      likedBlogs[blog.slug] = true;
+    } else {
+      delete likedBlogs[blog.slug];
+    }
+    
+    localStorage.setItem("likedBlogs", JSON.stringify(likedBlogs));
+    setLiked(newLiked);
+
+    try {
+      await api.post(`/blog/${blog.slug}/like`, { action: newLiked ? "like" : "unlike" });
+    } catch (error) {
+      console.error("Failed to update like:", error);
+    }
+  }, [blog?.slug, liked]);
+
+  // Handle share
+  const handleShare = useCallback(async () => {
+    const shareData = {
+      title: blog?.title,
+      text: blog?.excerpt || blog?.description,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          navigator.clipboard.writeText(window.location.href);
+        }
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard!");
+    }
+  }, [blog?.title, blog?.excerpt, blog?.description]);
+
+  // Format date
+  const formatDate = useCallback((dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }, []);
+
+  // Calculate read time
+  const readTime = useMemo(() => {
+    if (!blog?.content) return "5 min";
+    const text = blog.content
+      .map((block) => {
+        if (block.data?.text) return block.data.text.map((t) => t.value).join(" ");
+        if (block.data?.items) return block.data.items.join(" ");
+        return "";
+      })
+      .join(" ");
+    const words = text.split(/\s+/).length;
+    return `${Math.max(1, Math.ceil(words / 200))} min read`;
+  }, [blog?.content]);
 
   if (!blog) {
-    return <NotFoundState />;
-  }
-
-  const readingTime = Math.ceil((blog.content?.length || 0) / 5);
-
-  const applyAnchorTags = (text, anchors) => {
-  if (!anchors || !Array.isArray(anchors) || !text) return text;
-
-  let result = text;
-
-  anchors.forEach(({ keyword, url }) => {
-    if (!keyword || !url) return;
-
-    // Replace ONLY first occurrence per paragraph
-    const regex = new RegExp(`\\b${keyword}\\b`, "i"); 
-    result = result.replace(
-      regex,
-      `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${keyword}</a>`
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Blog not found</h1>
+          <Link href="/blog" className="text-blue-600 hover:underline">
+            Back to Blog
+          </Link>
+        </div>
+      </div>
     );
-  });
-
-  return result;
-};
-
+  }
 
   return (
     <>
       <Navbar />
-      <div className=" bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
-        {/* Reading Progress Bar */}
-        <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/50 z-50 backdrop-blur-sm">
-          <div 
-            className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-150 ease-out shadow-lg shadow-blue-500/25"
-            style={{ width: `${readingProgress}%` }}
-          />
-        </div>
+      <ReadingProgress progress={readingProgress} />
 
-        {/* Table of Contents Sidebar */}
-        {/* Table of Contents Sidebar */}
-{showTableOfContents && tableOfContents.length > 0 && (
-  <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden xl:block">
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-2xl border border-gray-200/50 max-w-xs relative">
-      {/* Close Button */}
-      <button
-  onClick={() => {
-    setShowTableOfContents(false);
-    localStorage.setItem("tocClosed", "true"); // remember user closed it
-  }}
-  className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors"
->
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-  </svg>
-</button>
+      <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        {/* Hero Section */}
+        <div className="relative bg-gradient-to-r from-blue-900 via-purple-900 to-blue-900 text-white">
+          <div className="absolute inset-0 bg-black/30" />
+          <div className="relative max-w-7xl mx-auto px-4 py-16 sm:py-24">
+            {/* Breadcrumb */}
+            <nav className="mb-6">
+              <ol className="flex items-center gap-2 text-sm text-gray-300">
+                <li>
+                  <Link href="/" className="hover:text-white transition-colors">Home</Link>
+                </li>
+                <li>/</li>
+                <li>
+                  <Link href="/blog" prefetch={true} className="hover:text-white transition-colors">Blog</Link>
+                </li>
+                <li>/</li>
+                <li className="text-white font-medium truncate max-w-[200px]">{blog.title}</li>
+              </ol>
+            </nav>
 
-
-      <h4 className="font-semibold text-gray-900 mb-4 text-sm uppercase tracking-wider">Contents</h4>
-      <nav className="space-y-2">
-        {tableOfContents.map((item, index) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className="block text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200 py-1 border-l-2 border-transparent hover:border-blue-500 hover:pl-2 pl-1"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById(item.id)?.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-              });
-            }}
-          >
-            {item.text}
-          </a>
-        ))}
-      </nav>
-    </div>
-  </div>
-)}
-
-
-
-        <div className="max-w-6xl mx-auto px-6 py-16">
-        <Breadcrumbs />
-
-          {/* Back Button */}
-          <div className="mb-12">
-            <Link
-              href="/blog"
-              className="group inline-flex items-center gap-3 text-gray-600 hover:text-gray-900 transition-all duration-300 font-medium"
-            >
-              <div className="w-10 h-10 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center group-hover:shadow-xl group-hover:scale-105 transition-all duration-300">
-                <svg className="w-5 h-5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </div>
-              <span className="group-hover:translate-x-1 transition-transform">Back to Blog</span>
-            </Link>
-          </div>
-
-          {/* Blog Content */}
-          <article className="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100/80 overflow-hidden">
-            {/* Header with Gradient Background */}
-            <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white p-12 relative overflow-hidden">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-32 translate-x-32"></div>
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-24 -translate-x-24"></div>
-              </div>
-              
-              <div className="relative z-10">
-                {/* Categories */}
-                {blog.categories && blog.categories.length > 0 && (
-                  <div className="flex flex-wrap gap-3 mb-6">
-                    {blog.categories.map((category, index) => (
-                      <span
-                        key={index}
-                        className="px-4 py-2 bg-white/20 backdrop-blur-sm text-white/90 text-sm font-semibold rounded-2xl border border-white/30"
-                      >
-                        {category.name || category}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Title */}
-                <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight tracking-tight">
-                  {blog.title}
-                </h1>
-                
-                {/* Meta Information */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    
-                      <div className="w-14 h-14 rounded-full border-1 border-white/30 overflow-hidden shadow-lg">
-                        <Image 
-                          src="/fullLogo.jpg"
-                          alt="Best Buyers View"
-                          width={56}
-                          height={100}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                    
-                    <div>
-                      <p className="font-semibold text-white/95 text-lg">Best Buyers View</p>
-                      <p className="text-white/70 flex items-center gap-3 text-sm">
-                        
-                        <span>•</span>
-                        <span>{readingTime} min read</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Social Stats */}
-                  <div className="flex items-center gap-6 text-white/80">
-                    <button 
-                      onClick={handleLike}
-                      className={`flex items-center gap-2 transition-all duration-300 ${
-                        hasLiked ? 'text-red-400' : 'hover:text-red-300'
-                      }`}
-                    >
-                      <svg className="w-5 h-5" fill={hasLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      <span>{likes}</span>
-                    </button>
-                    
-                    
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Featured Image */}
-            {blog.featuredImage?.url && (
-              <div className="relative h-96 -mt-8 mx-8 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                <Image
-                  src={blog.featuredImage.url}
-                  alt={blog.featuredImage.alt || blog.title}
-                  width={320}
-                  height={240}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            {/* Categories */}
+            {blog.categories?.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {blog.categories.map((cat, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium"
+                  >
+                    {cat.name || cat}
+                  </span>
+                ))}
               </div>
             )}
 
-            {/* Content Area */}
-            <div className="p-8 md:p-12">
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+              {blog.title}
+            </h1>
+
+            {/* Meta info */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-200">
+              {blog.author?.name && (
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  <span>{blog.author.name}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>{formatDate(blog.datePublished || blog.createdAt)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{readTime}</span>
+              </div>
+              {blog.views > 0 && (
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4" />
+                  <span>{blog.views.toLocaleString()} views</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Main Content */}
+            <article className="flex-1 lg:max-w-3xl">
+              {/* Featured Image */}
+              {blog.featuredImage?.url && (
+                <div className="mb-10 -mt-20 relative z-10">
+                  <img
+                    src={blog.featuredImage.url}
+                    alt={blog.featuredImage.alt || blog.title}
+                    className="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-2xl"
+                  />
+                </div>
+              )}
+
               {/* Excerpt */}
               {blog.excerpt && (
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-12 border border-blue-100 relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-4 h-full bg-gradient-to-b from-blue-500 to-purple-500"></div>
-                  <div className="relative z-10">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2" >
-                      <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      Quick Summary
-                      
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: applyAnchorTags(blog.excerpt, blog.anchors) }}>
-                    </p>
-                  </div>
-                </div>
+                <p className="text-xl text-gray-600 leading-relaxed mb-8 font-medium border-l-4 border-blue-600 pl-6">
+                  {blog.excerpt}
+                </p>
               )}
 
-              {/* Description */}
-              {blog.description && (
-                <div className="mb-12">
-                  <p className="text-gray-600 text-lg leading-relaxed border-l-4 border-green-500 pl-6 py-2 bg-green-50/30 rounded-r-lg">
-                    {blog.description}
-                  </p>
-                </div>
-              )}
-
-              {/* Main Content Blocks */}
+              {/* Content Blocks */}
               <div className="prose prose-lg max-w-none">
-                {blog.content && blog.content.length > 0 ? (
-                  blog.content.map((block, index) => renderContentBlock(block, index))
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <p className="text-gray-500 text-lg">Content coming soon...</p>
-                  </div>
-                )}
+                {blog.content?.map((block, index) => (
+                  <ContentBlock key={index} block={block} index={index} />
+                ))}
               </div>
 
               {/* Tags */}
-              {blog.tags && blog.tags.length > 0 && (
-                <div className="mt-16 pt-12 border-t border-gray-200">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                    <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    Related Topics
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {blog.tags.map((tag, index) => (
+              {blog.tags?.length > 0 && (
+                <div className="mt-12 pt-8 border-t border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-500 mb-3">Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {blog.tags.map((tag, i) => (
                       <span
-                        key={index}
-                        className="px-5 py-3 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 text-base font-medium rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer hover:border-blue-200 hover:text-blue-600"
+                        key={i}
+                        className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
                       >
                         #{tag}
                       </span>
@@ -505,152 +404,51 @@ export default function BlogDetails({ slug, initialBlog = null }) {
                 </div>
               )}
 
-              {/* Author Bio */}
-              <div className="mt-16 pt-12 border-t border-gray-200">
-                <div className="flex flex-col md:flex-row items-start gap-6 bg-gray-50 rounded-2xl p-8">
-                    <Image 
-                      src="/fullLogo.jpg"
-                      alt="Best Buyers View"
-                      width={80}
-                      height={80}
-                      className="w-20 h-20 rounded-2xl object-contain border-4 border-white shadow-lg flex-shrink-0"
-                    />
-                    
-                  <div className="flex-1">
-                    <h4 className="text-xl font-bold text-gray-900 mb-2">
-                      Best Buyers View Team
-                    </h4>
-                    <p className="text-gray-600 leading-relaxed mb-4">
-                      Our team of expert reviewers tests and analyzes products to bring you unbiased, comprehensive reviews and buying guides.
-                    </p>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>Senior Product Reviewer</span>
-                      <span>•</span>
-                      <span>5+ years experience</span>
-                    </div>
-                  </div>
-                </div>
+              {/* Actions */}
+              <div className="mt-8 flex items-center justify-between py-6 border-t border-b border-gray-200">
+                <button
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                    liked
+                      ? "bg-red-100 text-red-600"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <Heart className={`w-5 h-5 ${liked ? "fill-current" : ""}`} />
+                  <span>{liked ? "Liked" : "Like"}</span>
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                >
+                  <Share2 className="w-5 h-5" />
+                  <span>Share</span>
+                </button>
               </div>
 
-              {/* Social Share & Actions */}
-              <div className="mt-12 pt-8 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                  
-
-                  <div className="flex items-center gap-4">
-                    <button 
-                      onClick={handleLike}
-                      className={`flex items-center gap-3 px-6 py-3 rounded-2xl font-medium transition-all duration-300 ${
-                        hasLiked 
-                          ? 'bg-red-50 text-red-600 border border-red-200' 
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      <svg className="w-5 h-5" fill={hasLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                      </svg>
-                      {likes} {hasLiked ? 'Liked' : 'Like'}
-                    </button>
-                    
-                    
-                  </div>
-                </div>
+              {/* Back to Blog */}
+              <div className="mt-8">
+                <Link
+                  href="/blog"
+                  prefetch={true}
+                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Blog
+                </Link>
               </div>
-            </div>
-          </article>
+            </article>
 
-
-          {/* Back to Blog CTA */}
-          <div className="mt-12 text-center">
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-              Explore More Reviews
-            </Link>
+            {/* Sidebar - Table of Contents */}
+            <aside className="hidden lg:block w-72 shrink-0">
+              <TableOfContents headings={headings} activeHeading={activeHeading} />
+            </aside>
           </div>
         </div>
-      </div>
+      </main>
+
       <Footer />
+      <ScrollToTopButton />
     </>
-  );
-}
-
-// Skeleton Loading for Blog Details
-function BlogDetailsSkeleton({ readingProgress }) {
-  return (
-    <>
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20">
-      <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/50 z-50 backdrop-blur-sm">
-        <div 
-          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-150 ease-out shadow-lg shadow-blue-500/25"
-          style={{ width: `${readingProgress}%` }}
-        />
-      </div>
-
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <div className="animate-pulse space-y-8">
-          {/* Back Button Skeleton */}
-          <div className="h-6 bg-gray-200 rounded w-24 mb-12"></div>
-          
-          {/* Header Skeleton */}
-          <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-3xl p-12 space-y-6">
-            <div className="h-4 bg-white/20 rounded w-32"></div>
-            <div className="h-12 bg-white/20 rounded w-3/4"></div>
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-white/20 rounded w-24"></div>
-                <div className="h-3 bg-white/20 rounded w-16"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Featured Image Skeleton */}
-          <div className="h-96 bg-gray-200 rounded-2xl -mt-8 mx-8"></div>
-
-          {/* Content Skeleton */}
-          <div className="bg-white rounded-3xl p-12 space-y-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-    </>
-  );
-}
-
-// Not Found State
-function NotFoundState() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
-      <div className="text-center max-w-md mx-auto px-6">
-        <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Review Not Found</h1>
-        <p className="text-gray-600 mb-8">The product review you're looking for doesn't exist or has been moved.</p>
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Reviews
-        </Link>
-      </div>
-    </div>
   );
 }

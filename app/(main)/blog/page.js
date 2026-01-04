@@ -3,10 +3,8 @@ import Navbar from "@/components/common/Navbar";
 import BlogPage from "@/page-components/BlogPage/Blogpage";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
 
-// Aggressive caching for maximum speed
-export const revalidate = 3600; // 1 hour
-export const dynamic = 'force-static'; // Force static generation
-export const fetchCache = 'force-cache';
+// Force dynamic rendering for instant navigation (data comes from client cache)
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: "Blog | Best Buyers View",
@@ -49,29 +47,8 @@ export const metadata = {
   },
 };
 
-async function getBlogs() {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
-      next: { revalidate: 3600 },
-      cache: 'force-cache',
-      headers: { 
-        'Accept': 'application/json',
-        'Cache-Control': 'public, max-age=3600'
-      }
-    });
-    
-    if (!res.ok) throw new Error('Failed to fetch blogs');
-    const data = await res.json();
-    return data.data || [];
-  } catch (error) {
-    console.error('Error fetching blogs:', error);
-    return [];
-  }
-}
-
-export default async function Page() {
-  const blogs = await getBlogs();
-  
+// No server-side fetch needed - data comes from BlogCacheContext (prefetched on app load)
+export default function Page() {
   const blogSchema = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -92,7 +69,7 @@ export default async function Page() {
   return (
     <>
       <Navbar />
-      <BlogPage initialBlogs={blogs} />
+      <BlogPage />
 
       <script
         type="application/ld+json"

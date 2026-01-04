@@ -1,8 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import api from "@/lib/api/axios";
-import EditBlogForm from "./EditBlogForm";
-import CreateBlog from "./BlogForm";
+import SimplifiedBlogForm from "./SimplifiedBlogForm";
 import BlogTable from "./BlogTable";
 
 
@@ -10,6 +9,7 @@ export default function BlogAdminPage() {
   const [blogs, setBlogs] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const loadBlogs = async () => {
     const res = await api.get("/blog");
@@ -22,6 +22,7 @@ export default function BlogAdminPage() {
 
 const handleSubmit = async (data) => {
   try {
+    setIsLoading(true);
     console.log("🔄 Submitting blog data:", data);
     
     if (editingBlog) {
@@ -42,6 +43,8 @@ const handleSubmit = async (data) => {
     console.error("❌ Error submitting blog:", error);
     console.error("❌ Error response:", error.response?.data);
     alert(`Error: ${error.response?.data?.message || error.message}`);
+  } finally {
+    setIsLoading(false);
   }
 };
 
@@ -93,16 +96,12 @@ const handleSubmit = async (data) => {
           </button>
           <BlogTable blogs={blogs} onEdit={handleEdit} onDelete={handleDelete} />
         </>
-      ) : editingBlog ? (
-        <EditBlogForm
-          editingData={editingBlog}
-          onSubmit={handleSubmit}
-          onCancel={handleCancel}
-        />
       ) : (
-        <CreateBlog
+        <SimplifiedBlogForm
+          initialData={editingBlog}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
+          isLoading={isLoading}
         />
       )}
     </div>
