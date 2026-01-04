@@ -32,20 +32,20 @@ export default function BlogTable({ blogs, onEdit, onDelete }) {
                 <td className="p-2 border space-x-2">
                   <button
                     onClick={() => onEdit(blog.slug)}
-                    className="bg-blue-600 text-white px-3 py-1 rounded"
+                    className="bg-blue-600 text-white px-3 py-1 rounded cursor-pointer"
                   >
                     Edit
                   </button>
 
                   <Link href={`/blog/${blog.slug}`} target="_blank">
-                    <button className="bg-green-600 text-white px-3 py-1 rounded">
+                    <button className="bg-green-600 text-white px-3 py-1 rounded cursor-pointer">
                       View
                     </button>
                   </Link>
 
                   <button
                     onClick={() => onDelete(blog.slug)}
-                    className="bg-red-600 text-white px-3 py-1 rounded"
+                    className="bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
                   >
                     Delete
                   </button>

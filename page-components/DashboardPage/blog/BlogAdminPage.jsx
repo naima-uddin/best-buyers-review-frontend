@@ -1,23 +1,53 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import api from "@/lib/api/axios";
 import SimplifiedBlogForm from "./SimplifiedBlogForm";
 import BlogTable from "./BlogTable";
 
+// Prefetch blog data - starts loading immediately when module loads
+let prefetchedBlogs = null;
+let prefetchPromise = null;
+
+const prefetchBlogs = () => {
+  if (!prefetchPromise) {
+    prefetchPromise = api.get("/blog").then(res => {
+      if (res.data.success) {
+        prefetchedBlogs = res.data.data;
+        return prefetchedBlogs;
+      }
+      return [];
+    }).catch(() => []);
+  }
+  return prefetchPromise;
+};
+
+// Start prefetching immediately
+prefetchBlogs();
 
 export default function BlogAdminPage() {
-  const [blogs, setBlogs] = useState([]);
+  const [blogs, setBlogs] = useState(prefetchedBlogs || []);
   const [showForm, setShowForm] = useState(false);
   const [editingBlog, setEditingBlog] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const loadBlogs = async () => {
     const res = await api.get("/blog");
-    if (res.data.success) setBlogs(res.data.data);
+    if (res.data.success) {
+      setBlogs(res.data.data);
+      prefetchedBlogs = res.data.data; // Update cache
+    }
   };
 
   useEffect(() => {
-    loadBlogs();
+    // If prefetch already completed, use it; otherwise wait for it
+    if (prefetchedBlogs) {
+      setBlogs(prefetchedBlogs);
+    } else {
+      prefetchBlogs().then(data => {
+        if (data.length > 0) setBlogs(data);
+      });
+    }
   }, []);
 
 const handleSubmit = async (data) => {
@@ -49,6 +79,15 @@ const handleSubmit = async (data) => {
 };
 
   const handleEdit = async (slug) => {
+    // Check if blog is already in memory
+    const cachedBlog = blogs.find(b => b.slug === slug);
+    if (cachedBlog) {
+      setEditingBlog(cachedBlog);
+      setShowForm(true);
+      return;
+    }
+    
+    // Fallback to API fetch
     try {
       const res = await api.get(`/blog/${slug}`);
       if (res.data.success) {
@@ -86,7 +125,7 @@ const handleSubmit = async (data) => {
       {!showForm ? (
         <>
           <button
-            className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="mb-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer"
             onClick={() => {
               setEditingBlog(null);
               setShowForm(true);
