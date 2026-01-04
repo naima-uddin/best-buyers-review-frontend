@@ -291,40 +291,60 @@ export default function OptimizedBlogPage({ initialBlogs = [] }) {
 
             {/* Results count */}
             <p className="text-sm text-gray-500 mb-6">
-              Showing {filteredBlogs.length} of {blogs.length} articles
+              {isLoading && blogs.length === 0 
+                ? "Loading articles..." 
+                : `Showing ${filteredBlogs.length} of ${blogs.length} articles`}
             </p>
 
-            {/* Featured Blog */}
-            {featuredBlog && filteredBlogs.length > 0 && (
-              <div className="mb-10">
-                <BlogCard blog={featuredBlog} featured />
-              </div>
-            )}
-
-            {/* Blog Grid */}
-            {regularBlogs.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {regularBlogs.map((blog) => (
-                  <BlogCard key={blog._id || blog.slug} blog={blog} />
-                ))}
-              </div>
-            ) : filteredBlogs.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+            {/* Show skeleton while loading */}
+            {isLoading && blogs.length === 0 ? (
+              <>
+                {/* Featured skeleton */}
+                <div className="mb-10">
+                  <BlogCardSkeleton featured />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No results found</h3>
-                <p className="text-gray-500 mb-4">Try adjusting your search or filter criteria</p>
-                <button
-                  onClick={clearFilters}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
-                >
-                  Clear Filters
-                </button>
-              </div>
-            ) : null}
+                {/* Grid skeleton */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <BlogCardSkeleton key={i} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Featured Blog */}
+                {featuredBlog && filteredBlogs.length > 0 && (
+                  <div className="mb-10">
+                    <BlogCard blog={featuredBlog} featured />
+                  </div>
+                )}
+
+                {/* Blog Grid */}
+                {regularBlogs.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {regularBlogs.map((blog) => (
+                      <BlogCard key={blog._id || blog.slug} blog={blog} />
+                    ))}
+                  </div>
+                ) : filteredBlogs.length === 0 && hasActiveFilters ? (
+                  <div className="text-center py-16">
+                    <div className="text-gray-400 mb-4">
+                      <svg className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No results found</h3>
+                    <p className="text-gray-500 mb-4">Try adjusting your search or filter criteria</p>
+                    <button
+                      onClick={clearFilters}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
 
           {/* Sidebar */}

@@ -359,7 +359,7 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
 
         {/* Content Area */}
         <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-4">
             {/* Main Content */}
             <article className="flex-1 lg:max-w-3xl">
               {/* Featured Image */}
@@ -368,7 +368,7 @@ export default function OptimizedBlogDetails({ blog: initialBlog }) {
                   <img
                     src={blog.featuredImage.url}
                     alt={blog.featuredImage.alt || blog.title}
-                    className="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-2xl"
+                    className="w-full h-auto max-h-[400px] object-cover rounded-2xl shadow-2xl"
                   />
                 </div>
               )}

@@ -34,7 +34,7 @@ const BlogCard = memo(function BlogCard({ blog, featured = false }) {
   if (featured) {
     return (
       <Link href={`/blog/${blog.slug}`} prefetch={true} className="group block">
-        <article className="relative h-[400px] sm:h-[500px] rounded-2xl overflow-hidden shadow-xl">
+        <article className="relative h-[300px] sm:h-[400px] rounded-2xl overflow-hidden shadow-xl">
           <div className="absolute inset-0">
             <img
               src={imageUrl}
