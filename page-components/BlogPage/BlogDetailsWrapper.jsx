@@ -38,37 +38,28 @@ function BlogDetailsSkeleton() {
 }
 
 export default function BlogDetailsWrapper({ slug, initialBlog }) {
-  const { getCachedBlog, fetchBlogDetail, isBlogCached } = useBlogCache();
+  const { getBlogBySlug, cacheBlog } = useBlogCache();
   const [blog, setBlog] = useState(initialBlog);
   const [isLoading, setIsLoading] = useState(!initialBlog);
 
   useEffect(() => {
     if (!slug) return;
 
-    // Check cache first
-    const cached = getCachedBlog(slug);
-    if (cached && isBlogCached(slug)) {
-      setBlog(cached);
-      setIsLoading(false);
-      return;
-    }
-
-    // If we have initial blog from server, use it
+    // If we have initial blog from server, use it and cache it
     if (initialBlog) {
       setBlog(initialBlog);
+      cacheBlog(initialBlog);
       setIsLoading(false);
-      // Still fetch to update cache
-      fetchBlogDetail(slug);
       return;
     }
 
-    // Fetch if no data
+    // Fetch from cache or API
     setIsLoading(true);
-    fetchBlogDetail(slug).then((data) => {
+    getBlogBySlug(slug).then((data) => {
       if (data) setBlog(data);
       setIsLoading(false);
     });
-  }, [slug, initialBlog, getCachedBlog, fetchBlogDetail, isBlogCached]);
+  }, [slug]); // Only depend on slug - callbacks are stable now
 
   if (isLoading && !blog) {
     return <BlogDetailsSkeleton />;

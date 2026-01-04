@@ -131,7 +131,7 @@ const CategoriesSidebar = memo(function CategoriesSidebar({ blogs, activeCategor
 });
 
 export default function OptimizedBlogPage({ initialBlogs = [] }) {
-  const { blogs: cachedBlogs, isLoading, isInitialized } = useBlogCache();
+  const { blogs: cachedBlogs, isLoading } = useBlogCache();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [showMobileFilters, setShowMobileFilters] = useState(false);

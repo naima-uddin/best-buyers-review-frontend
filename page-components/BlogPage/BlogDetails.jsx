@@ -131,30 +131,20 @@ const ReadingProgress = memo(function ReadingProgress({ progress }) {
 });
 
 export default function OptimizedBlogDetails({ blog: initialBlog }) {
-  const { getCachedBlog, fetchBlogDetail, isBlogCached } = useBlogCache();
+  const { cacheBlog } = useBlogCache();
   const [liked, setLiked] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [activeHeading, setActiveHeading] = useState("");
-  const [blogData, setBlogData] = useState(initialBlog);
 
-  // Use cached blog if available, fetch full details if needed
+  // Cache the blog when component mounts (only once)
   useEffect(() => {
-    if (!initialBlog?.slug) return;
-    
-    // Check if we have a full cached version
-    const cached = getCachedBlog(initialBlog.slug);
-    if (cached && isBlogCached(initialBlog.slug)) {
-      setBlogData(cached);
-    } else {
-      // Fetch full details and cache it
-      fetchBlogDetail(initialBlog.slug).then((data) => {
-        if (data) setBlogData(data);
-      });
+    if (initialBlog?.slug) {
+      cacheBlog(initialBlog);
     }
-  }, [initialBlog?.slug, getCachedBlog, fetchBlogDetail, isBlogCached]);
+  }, [initialBlog?.slug]); // Only depend on slug - cacheBlog is stable
 
-  // Use the most up-to-date blog data
-  const blog = blogData || initialBlog;
+  // Use the blog data
+  const blog = initialBlog;
 
   // Extract headings from content for TOC
   const headings = useMemo(() => {

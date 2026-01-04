@@ -3,30 +3,35 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 
 const BlogCacheContext = createContext(null);
 
-// Cache duration: 30 minutes
-const CACHE_DURATION = 30 * 60 * 1000;
-
 export function BlogCacheProvider({ children }) {
   const [blogs, setBlogs] = useState([]);
   const [blogDetails, setBlogDetails] = useState({}); // { slug: blogData }
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
-  const lastFetchTime = useRef(0);
+  
+  // Use refs for stable callback access
+  const blogDetailsRef = useRef(blogDetails);
+  const blogsRef = useRef(blogs);
+  
+  useEffect(() => {
+    blogDetailsRef.current = blogDetails;
+  }, [blogDetails]);
+  
+  useEffect(() => {
+    blogsRef.current = blogs;
+  }, [blogs]);
 
   // Fetch all blogs (called on app load)
-  const fetchBlogs = useCallback(async (force = false) => {
-    const now = Date.now();
-    
-    // Skip if recently fetched and not forced
-    if (!force && blogs.length > 0 && (now - lastFetchTime.current) < CACHE_DURATION) {
-      return blogs;
+  const fetchBlogs = useCallback(async () => {
+    // If already have blogs, don't fetch again (instant navigation)
+    if (blogsRef.current.length > 0) {
+      setIsLoading(false);
+      return blogsRef.current;
     }
 
     try {
       setIsLoading(true);
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
         headers: { 'Accept': 'application/json' },
-        cache: 'no-store' // We handle caching ourselves
       });
       
       if (!res.ok) throw new Error('Failed to fetch blogs');
@@ -35,84 +40,87 @@ export function BlogCacheProvider({ children }) {
       const fetchedBlogs = data.data || [];
       
       setBlogs(fetchedBlogs);
-      lastFetchTime.current = now;
       
-      // Also cache individual blogs from list
+      // Also cache individual blogs from list for quick access
       const detailsCache = {};
       fetchedBlogs.forEach(blog => {
-        detailsCache[blog.slug] = { data: blog, fetchedAt: now, isPartial: true };
+        detailsCache[blog.slug] = blog;
       });
       setBlogDetails(prev => ({ ...prev, ...detailsCache }));
       
       return fetchedBlogs;
     } catch (error) {
       console.error('Error fetching blogs:', error);
-      return blogs; // Return existing data on error
+      return [];
     } finally {
       setIsLoading(false);
-      setIsInitialized(true);
     }
-  }, [blogs]);
+  }, []);
 
-  // Fetch single blog detail
-  const fetchBlogDetail = useCallback(async (slug, force = false) => {
-    const now = Date.now();
-    const cached = blogDetails[slug];
-    
-    // Return cached if available, not partial, and not expired
-    if (!force && cached && !cached.isPartial && (now - cached.fetchedAt) < CACHE_DURATION) {
-      return cached.data;
+  // Get blog by slug - from cache or fetch (stable callback)
+  const getBlogBySlug = useCallback(async (slug) => {
+    // Check if already cached
+    if (blogDetailsRef.current[slug]) {
+      return blogDetailsRef.current[slug];
     }
 
+    // Fetch single blog
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`, {
         headers: { 'Accept': 'application/json' },
-        cache: 'no-store'
       });
       
-      if (!res.ok) return cached?.data || null;
+      if (!res.ok) return null;
       
       const json = await res.json();
       const blogData = json.data;
       
-      // Cache the full blog detail
-      setBlogDetails(prev => ({
-        ...prev,
-        [slug]: { data: blogData, fetchedAt: now, isPartial: false }
-      }));
+      // Cache it
+      setBlogDetails(prev => ({ ...prev, [slug]: blogData }));
       
       return blogData;
     } catch (error) {
-      console.error('Error fetching blog detail:', error);
-      return cached?.data || null;
+      console.error('Error fetching blog:', error);
+      return null;
     }
-  }, [blogDetails]);
-
-  // Get cached blog (no fetch)
-  const getCachedBlog = useCallback((slug) => {
-    return blogDetails[slug]?.data || null;
-  }, [blogDetails]);
-
-  // Check if blog is cached
-  const isBlogCached = useCallback((slug) => {
-    const cached = blogDetails[slug];
-    if (!cached) return false;
-    return !cached.isPartial && (Date.now() - cached.fetchedAt) < CACHE_DURATION;
-  }, [blogDetails]);
-
-  // Invalidate cache - force refresh on next fetch
-  const invalidateCache = useCallback(() => {
-    lastFetchTime.current = 0;
-    setBlogDetails({});
   }, []);
 
-  // Refresh blogs - invalidate and fetch fresh data
-  const refreshBlogs = useCallback(async () => {
-    invalidateCache();
-    return fetchBlogs(true);
-  }, [invalidateCache, fetchBlogs]);
+  // Cache a blog (stable callback)
+  const cacheBlog = useCallback((blog) => {
+    if (blog?.slug && !blogDetailsRef.current[blog.slug]) {
+      setBlogDetails(prev => ({ ...prev, [blog.slug]: blog }));
+    }
+  }, []);
 
-  // Prefetch on mount (app load)
+  // Reload blogs (for admin after create/update/delete)
+  const reloadBlogs = useCallback(async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
+        headers: { 'Accept': 'application/json' },
+      });
+      
+      if (!res.ok) throw new Error('Failed to fetch blogs');
+      
+      const data = await res.json();
+      const fetchedBlogs = data.data || [];
+      
+      setBlogs(fetchedBlogs);
+      
+      // Update cache
+      const detailsCache = {};
+      fetchedBlogs.forEach(blog => {
+        detailsCache[blog.slug] = blog;
+      });
+      setBlogDetails(detailsCache);
+      
+      return fetchedBlogs;
+    } catch (error) {
+      console.error('Error reloading blogs:', error);
+      return blogsRef.current;
+    }
+  }, []);
+
+  // Prefetch on app load
   useEffect(() => {
     fetchBlogs();
   }, []);
@@ -120,14 +128,10 @@ export function BlogCacheProvider({ children }) {
   const value = {
     blogs,
     isLoading,
-    isInitialized,
     fetchBlogs,
-    fetchBlogDetail,
-    getCachedBlog,
-    isBlogCached,
-    blogDetails,
-    invalidateCache,
-    refreshBlogs
+    getBlogBySlug,
+    cacheBlog,
+    reloadBlogs,
   };
 
   return (
