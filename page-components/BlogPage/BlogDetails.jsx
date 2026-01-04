@@ -6,8 +6,6 @@ import { ArrowLeft, Heart, Clock, Calendar, User, Share2, Eye } from "lucide-rea
 import Navbar from "@/components/common/Navbar";
 import { Footer } from "@/components/common/Footer";
 import ScrollToTopButton from "@/ui/ScrollToTopButton";
-import api from "@/lib/api/axios";
-import { useBlogCache } from "@/context/BlogCacheContext";
 
 // Memoized content block renderer for performance
 const ContentBlock = memo(function ContentBlock({ block, index }) {
@@ -131,17 +129,9 @@ const ReadingProgress = memo(function ReadingProgress({ progress }) {
 });
 
 export default function OptimizedBlogDetails({ blog: initialBlog }) {
-  const { cacheBlog } = useBlogCache();
   const [liked, setLiked] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [activeHeading, setActiveHeading] = useState("");
-
-  // Cache the blog when component mounts (only once)
-  useEffect(() => {
-    if (initialBlog?.slug) {
-      cacheBlog(initialBlog);
-    }
-  }, [initialBlog?.slug]); // Only depend on slug - cacheBlog is stable
 
   // Use the blog data
   const blog = initialBlog;

@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useBlogCache } from "@/context/BlogCacheContext";
 import BlogDetails from "./BlogDetails";
 
 // Loading skeleton
@@ -38,35 +37,36 @@ function BlogDetailsSkeleton() {
 }
 
 export default function BlogDetailsWrapper({ slug, initialBlog }) {
-  const { getBlogBySlug, cacheBlog } = useBlogCache();
   const [blog, setBlog] = useState(initialBlog);
   const [isLoading, setIsLoading] = useState(!initialBlog);
 
   useEffect(() => {
-    if (!slug) return;
-
-    // If we have initial blog from server, use it and cache it
+    // If we have initial blog, use it
     if (initialBlog) {
       setBlog(initialBlog);
-      cacheBlog(initialBlog);
       setIsLoading(false);
       return;
     }
 
-    // Fetch from cache or API
-    setIsLoading(true);
-    getBlogBySlug(slug).then((data) => {
-      if (data) setBlog(data);
-      setIsLoading(false);
-    });
-  }, [slug]); // Only depend on slug - callbacks are stable now
+    // Fetch blog if not provided
+    if (slug && !initialBlog) {
+      setIsLoading(true);
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${slug}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) setBlog(data.data);
+        })
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
+    }
+  }, [slug, initialBlog]);
 
   if (isLoading && !blog) {
     return <BlogDetailsSkeleton />;
   }
 
   if (!blog) {
-    return null; // Will show not found from parent
+    return null;
   }
 
   return <BlogDetails blog={blog} />;

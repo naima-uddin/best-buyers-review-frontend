@@ -35,11 +35,15 @@ export default function BlogAdminPage() {
 
   const loadBlogs = async () => {
     // Use admin endpoint - no cache, includes unpublished blogs
-    const res = await api.get("/admin/blogs");
-    if (res.data.success) {
-      setBlogs(res.data.data);
-      prefetchedBlogs = res.data.data;
-      prefetchPromise = null;
+    try {
+      const res = await api.get("/admin/blogs");
+      if (res.data.success) {
+        setBlogs(res.data.data);
+        prefetchedBlogs = res.data.data;
+        prefetchPromise = null;
+      }
+    } catch (error) {
+      console.error("Error loading blogs:", error);
     }
   };
 
@@ -67,8 +71,12 @@ export default function BlogAdminPage() {
 
       setShowForm(false);
       setEditingBlog(null);
-      loadBlogs(); // Refresh dashboard list
-      reloadBlogs(); // Refresh public blog cache
+      
+      // Refresh both dashboard and public blog cache
+      await Promise.all([
+        loadBlogs(),
+        reloadBlogs()
+      ]);
     } catch (error) {
       console.error("Error submitting blog:", error);
       alert(`Error: ${error.response?.data?.message || error.message}`);
@@ -90,8 +98,12 @@ export default function BlogAdminPage() {
       try {
         await api.delete(`/blog/${encodeURIComponent(slug)}`);
         alert("Blog deleted successfully!");
-        loadBlogs(); // Refresh dashboard list
-        reloadBlogs(); // Refresh public blog cache
+        
+        // Refresh both dashboard and public blog cache
+        await Promise.all([
+          loadBlogs(),
+          reloadBlogs()
+        ]);
       } catch (error) {
         console.error("Error deleting blog:", error);
         alert(`Error: ${error.response?.data?.message || error.message}`);

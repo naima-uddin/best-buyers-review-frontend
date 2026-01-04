@@ -247,7 +247,7 @@ export default function SimplifiedBlogForm({ initialData = null, onSubmit, onCan
     tags: [],
     seo: { title: "", description: "", keywords: "" },
     isFeatured: false,
-    published: false,
+    published: true, // Default to published so blogs show on public page
   });
 
   // Featured image state
