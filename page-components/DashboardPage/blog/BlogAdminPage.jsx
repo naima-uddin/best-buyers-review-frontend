@@ -85,11 +85,17 @@ export default function BlogAdminPage() {
     }
   };
 
-  const handleEdit = (slug) => {
-    const blog = blogs.find(b => b.slug === slug);
-    if (blog) {
-      setEditingBlog(blog);
-      setShowForm(true);
+  const handleEdit = async (slug) => {
+    try {
+      // Fetch full blog data including content for editing
+      const res = await api.get(`/blog/${encodeURIComponent(slug)}`);
+      if (res.data.success) {
+        setEditingBlog(res.data.data);
+        setShowForm(true);
+      }
+    } catch (error) {
+      console.error("Error fetching blog for edit:", error);
+      alert("Error loading blog data for editing");
     }
   };
 
