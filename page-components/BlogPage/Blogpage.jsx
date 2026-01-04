@@ -193,8 +193,16 @@ export default function OptimizedBlogPage({ initialBlogs = [] }) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-900 via-purple-900 to-blue-900 text-white py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+      <div className="relative text-white py-16 sm:py-28 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/blog-banner.png')" }}
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-purple-900/80 to-blue-900/80" />
+        
+        <div className="relative max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             Our Blog
           </h1>

@@ -1,14 +1,11 @@
 import ArticleStructuredData from "@/components/seo/ArticleStructuredData";
-import BlogDetails from "@/page-components/BlogPage/BlogDetails";
+import BlogDetailsWrapper from "@/page-components/BlogPage/BlogDetailsWrapper";
 import Link from "next/link";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
 
-// Aggressive static generation
-export const revalidate = 3600;
-export const dynamic = 'force-static';
-export const dynamicParams = true; // Generate new pages on-demand
-export const fetchCache = 'force-cache';
+// Force dynamic for instant navigation (cache handled client-side)
+export const dynamic = 'force-dynamic';
 
 // Generate static paths for all blogs at build time
 export async function generateStaticParams() {
@@ -157,7 +154,7 @@ export default async function BlogPostPage({ params }) {
   return (
     <>
       <ArticleStructuredData blog={blog} />
-      <BlogDetails blog={blog} />
+      <BlogDetailsWrapper slug={slug} initialBlog={blog} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
