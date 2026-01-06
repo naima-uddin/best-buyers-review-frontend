@@ -9,3 +9,13 @@ pickhub-amazon-frontend/pages/LoginPage/Login.jsx (login form uses useAuth())
 title: it will show on the top of page also will show on the search result and social media previews
 description:Provides a summary of your page content for search engines and users and appears under the title in Google search results
 keyword: Lists target keywords for the page, Note: Google ignores this tag for ranking, but some minor search engines or internal search tools may still use it.
+
+
+# NEXT_PUBLIC_API_URL=http://localhost:5000/api
+# NEXT_PUBLIC_IMAGE_API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=https://api.bestbuyersview.com/api
+NEXT_PUBLIC_IMAGE_API_URL=https://api.bestbuyersview.com
+
+
+# NEXT_PUBLIC_API_URL=https://best-buyers-review-backend-q2rp.onrender.com/api
+# NEXT_PUBLIC_IMAGE_API_URL=https://best-buyers-review-backend-q2rp.onrender.com
