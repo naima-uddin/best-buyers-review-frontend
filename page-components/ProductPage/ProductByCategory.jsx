@@ -819,11 +819,13 @@ function ProductByCategoryContent() {
                             </div>
 
                             {/* Price Block */}
-                            <div className="flex flex-col items-center md:items-end justify-between w-full md:w-44 lg:w-48 mt-3 md:mt-0 border-t md:border-t-0 pt-3 md:pt-0">
+                            <div className="flex flex-col items-center md:items-end w-full md:w-44 lg:w-48 mt-3 md:mt-0 border-t md:border-t-0 pt-3 md:pt-0">
                               <div className="text-center md:text-right w-full">
-                                <div className="text-lg sm:text-xl md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb text-center">
-                                  Save {product.discount?.percentage || 36}%
-                                </div>
+                                {product.discount?.percentage > 0 && (
+                                  <div className="text-lg sm:text-xl md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb text-center">
+                                    Save {product.discount.percentage}%
+                                  </div>
+                                )}
 
                                 <a
                                   href={product.affiliateUrl}
@@ -1018,9 +1020,11 @@ function ProductByCategoryContent() {
 
                           {/* CTA Section */}
                           <div className="text-center w-full md:w-48">
-                            <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-orange-600 to-yellow-500 bg-clip-text text-transparent drop-shadow-md mb-2">
-                              Save {topProduct.discount?.percentage || 36}%
-                            </div>
+                            {topProduct.discount?.percentage > 0 && (
+                              <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-orange-600 to-yellow-500 bg-clip-text text-transparent drop-shadow-md mb-2">
+                                Save {topProduct.discount.percentage}%
+                              </div>
+                            )}
 
                             <a
                               href={topProduct.affiliateUrl}
