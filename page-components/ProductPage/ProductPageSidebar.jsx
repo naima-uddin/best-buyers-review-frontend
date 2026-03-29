@@ -339,7 +339,7 @@ const handleSubSubCategoryClick = (subSubCat) => {
                 1,000,000+
               </div>
               <p className="text-sm text-gray-600">
-                shoppers use Buyer's Guide every week to find the best products
+                shoppers use Buyer's View every week to find the best products
                 and services online.
               </p>
             </div>
