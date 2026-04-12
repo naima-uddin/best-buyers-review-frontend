@@ -147,7 +147,7 @@ export default function FeaturedProducts() {
         setCache((prev) => ({ ...prev, [cacheKey]: data }));
       }
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.log("Featured products not available:", error.message || error);
       setProducts([]);
       setTotalPages(1);
       setTotalProducts(0);

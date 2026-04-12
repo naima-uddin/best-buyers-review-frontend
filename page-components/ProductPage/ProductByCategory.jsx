@@ -237,7 +237,7 @@ function ProductByCategoryContent() {
           setProducts([]);
         }
       } catch (err) {
-        console.error("Error fetching products:", err);
+        console.log("Products not available:", err.message || err);
         setProducts([]);
       } finally {
         setLoading(false);

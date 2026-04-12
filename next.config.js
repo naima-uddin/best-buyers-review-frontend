@@ -33,6 +33,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "m.media-amazon.com", // Amazon product images
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com", // Cloudinary images
+      },
     ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 31536000, // 1 year

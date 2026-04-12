@@ -7,19 +7,23 @@ export function BlogCacheProvider({ children }) {
   const [blogs, setBlogs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch all blogs
+  // Fetch all published blogs
   const fetchBlogs = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/blog`, {
         headers: { 'Accept': 'application/json' },
         cache: 'no-store'
       });
       
-      if (!res.ok) throw new Error('Failed to fetch blogs');
+      if (!res.ok) {
+        console.error('Blog fetch failed:', res.status, res.statusText);
+        throw new Error(`Failed to fetch blogs: ${res.status}`);
+      }
       
       const data = await res.json();
-      const fetchedBlogs = data.data || [];
+      const fetchedBlogs = data.blogs || [];
       
       setBlogs(fetchedBlogs);
       return fetchedBlogs;
@@ -34,7 +38,8 @@ export function BlogCacheProvider({ children }) {
   // Reload blogs - same as fetchBlogs but always fetches fresh
   const reloadBlogs = useCallback(async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog?_t=${Date.now()}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/blog?_t=${Date.now()}`, {
         headers: { 'Accept': 'application/json' },
         cache: 'no-store'
       });
@@ -42,7 +47,7 @@ export function BlogCacheProvider({ children }) {
       if (!res.ok) throw new Error('Failed to fetch blogs');
       
       const data = await res.json();
-      const fetchedBlogs = data.data || [];
+      const fetchedBlogs = data.blogs || [];
       
       setBlogs(fetchedBlogs);
       console.log('✅ Blogs reloaded:', fetchedBlogs.length);

@@ -11,3 +11,6 @@ NEXT_PUBLIC_IMAGE_API_URL=https://api.bestbuyersview.com
 # NEXT_PUBLIC_IMAGE_API_URL=https://best-buyers-review-backend-q2rp.onrender.com -->
 
 <!-- all live links -->
+
+
+need to create a api documentation how the api works for that project here for the api documentation there needs to have how 
