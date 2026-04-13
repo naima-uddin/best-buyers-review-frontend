@@ -345,7 +345,7 @@ export default function BlogListClient() {
                         />
                       )}
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40 group-hover:from-black/70 transition-all duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40 group-hover:from-black/70 transition-all duration-300" />
                       <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
 
                       <div className="absolute inset-0 flex items-end">
@@ -374,7 +374,7 @@ export default function BlogListClient() {
                           </div>
 
                           {featuredBlogs[0].tags && featuredBlogs[0].tags[0] && (
-                            <span className="inline-block bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-3 sm:mb-4 shadow-lg">
+                            <span className="inline-flex w-max bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-3 sm:mb-4 shadow-lg">
                               {typeof featuredBlogs[0].tags[0] === 'object' ? featuredBlogs[0].tags[0].name || featuredBlogs[0].tags[0].slug || 'Featured' : featuredBlogs[0].tags[0]}
                             </span>
                           )}
@@ -434,7 +434,7 @@ export default function BlogListClient() {
                                     </div>
 
                                     {featured.tags && featured.tags[0] && (
-                                      <span className="inline-block bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-3 sm:mb-4 shadow-lg">
+                                      <span className="inline-flex w-max bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs sm:text-sm font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-3 sm:mb-4 shadow-lg">
                                         {typeof featured.tags[0] === 'object' ? featured.tags[0].name || featured.tags[0].slug || 'Featured' : featured.tags[0]}
                                       </span>
                                     )}
@@ -464,7 +464,7 @@ export default function BlogListClient() {
 
                     <button
                       onClick={() => setCurrentFeaturedIndex(prev => (prev - 1 + featuredBlogs.length) % featuredBlogs.length)}
-                      className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-10 sm:w-12 h-10 sm:h-12 bg-rose-600/20 hover:bg-rose-600/30 text-white rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 transition-all shadow-lg"
+                      className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 sm:w-12 h-10 sm:h-12 bg-rose-600/20 hover:bg-rose-600/30 text-white rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 transition-all shadow-lg"
                     >
                       <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
@@ -472,7 +472,7 @@ export default function BlogListClient() {
                     </button>
                     <button
                       onClick={() => setCurrentFeaturedIndex(prev => (prev + 1) % featuredBlogs.length)}
-                      className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-10 sm:w-12 h-10 sm:h-12 bg-rose-600/20 hover:bg-rose-600/30 text-white rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 transition-all shadow-lg"
+                      className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 sm:w-12 h-10 sm:h-12 bg-rose-600/20 hover:bg-rose-600/30 text-white rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 transition-all shadow-lg"
                     >
                       <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -601,7 +601,7 @@ export default function BlogListClient() {
                       </div>
                     )}
                     {getPrimaryCategory(blog) && (
-                      <span className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-rose-600 text-white text-xs font-medium px-2 sm:px-3 py-1 rounded-full">
+                      <span className="absolute top-2 sm:top-3 left-2 sm:left-3 inline-flex max-w-max items-center bg-rose-600 text-white text-xs font-medium px-2 sm:px-3 py-1 rounded-full">
                         {getPrimaryCategory(blog)}
                       </span>
                     )}
