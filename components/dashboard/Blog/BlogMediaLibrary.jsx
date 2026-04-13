@@ -10,8 +10,7 @@ export default function BlogMediaLibrary({ onSelect = null, showSelection = true
   const { user } = useUser();
 
   const [items, setItems]               = useState([]);
-  const [folders, setFolders]           = useState([]);
-  const [folder, setFolder]             = useState('yourhaat/blog'); // Default to blog folder
+  const [folder, setFolder]             = useState('');
   const [q, setQ]                       = useState('');
   const [nextCursor, setNextCursor]     = useState(null);
   const [loading, setLoading]           = useState(false);
@@ -21,19 +20,6 @@ export default function BlogMediaLibrary({ onSelect = null, showSelection = true
   const [previewItem, setPreviewItem]   = useState(null);
 
   const qTimer = useRef(null);
-
-  const loadFolders = useCallback(async () => {
-    try {
-      const r = await authFetch(`${API}/admin/media/folders`);
-      const b = await r.json();
-      const allFolders = b.folders || [];
-      // Filter to show blog-related folders
-      const blogFolders = allFolders.filter(f => f.includes('blog'));
-      setFolders(['yourhaat/blog', ...blogFolders]);
-    } catch (e) {
-      console.error(e);
-    }
-  }, [API]);
 
   const loadImages = useCallback(async (reset = true) => {
     setLoading(true);
@@ -57,7 +43,6 @@ export default function BlogMediaLibrary({ onSelect = null, showSelection = true
     }
   }, [API, folder, q, nextCursor]);
 
-  useEffect(() => { loadFolders(); }, [loadFolders]);
   useEffect(() => { loadImages(); }, [loadImages]);
 
   const handleQChange = (val) => {
@@ -116,9 +101,6 @@ export default function BlogMediaLibrary({ onSelect = null, showSelection = true
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="">All folders</option>
-            {folders.map(f => (
-              <option key={f} value={f}>{f}</option>
-            ))}
           </select>
         </div>
         <div className="flex-1">
