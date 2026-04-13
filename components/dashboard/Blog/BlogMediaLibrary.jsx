@@ -103,15 +103,7 @@ export default function BlogMediaLibrary({ onSelect = null, showSelection = true
             <option value="">All folders</option>
           </select>
         </div>
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search images..."
-            value={q}
-            onChange={(e) => handleQChange(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          />
-        </div>
+       
         {showSelection && selected.size > 0 && (
           <button
             onClick={deleteSelected}
