@@ -1,4 +1,6 @@
 import BlogDetailClient from '@/components/blog/BlogDetailClient';
+import { Footer } from '@/components/common/Footer';
+import Navbar from '@/components/common/Navbar';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -46,5 +48,15 @@ export async function generateMetadata({ params }) {
 
 export default async function BlogDetailPage({ params }) {
   const { slug } = await params;
-  return <BlogDetailClient slug={slug} />;
+  return (
+  <>
+  <Navbar/>
+  
+  <BlogDetailClient slug={slug} />
+  <Footer/>
+  </>
+  
+
+
+)
 }

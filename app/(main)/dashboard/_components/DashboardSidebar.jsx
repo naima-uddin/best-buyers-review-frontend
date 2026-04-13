@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   Notebook,
+  Images,
 } from "lucide-react";
 
 export default function DashboardSidebar({ userRole }) {
@@ -54,6 +55,11 @@ export default function DashboardSidebar({ userRole }) {
       icon: Notebook,
       path: "/dashboard/blog",
     },
+    {
+      name: "Blog Media",
+      icon: Images,
+      path: "/dashboard/blogmedia",
+    },
   ];
 
   const isActive = (path) => {
@@ -64,7 +70,11 @@ export default function DashboardSidebar({ userRole }) {
     if (normalizedPath === "/dashboard") {
       return normalizedPathname === normalizedPath;
     }
-    return normalizedPathname.startsWith(normalizedPath);
+
+    return (
+      normalizedPathname === normalizedPath ||
+      normalizedPathname.startsWith(`${normalizedPath}/`)
+    );
   };
 
   const handleNavClick = (path) => {
@@ -107,7 +117,7 @@ export default function DashboardSidebar({ userRole }) {
               const Icon = item.icon;
               const active = isActive(item.path);
 
-              if (userRole !== "admin" && index === 3) return null;
+              if (userRole !== "admin" && item.path === "/dashboard/users") return null;
 
               return (
                 <Link
