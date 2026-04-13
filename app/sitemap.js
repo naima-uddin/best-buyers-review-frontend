@@ -7,6 +7,33 @@ export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+  const fetchWithTimeout = async (fullUrl, timeoutMs = 15000) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+      return await fetch(fullUrl, { signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  const fetchJson = async (path, timeoutMs = 15000) => {
+    if (!API_URL) return null;
+
+    try {
+      const res = await fetchWithTimeout(`${API_URL}${path}`, timeoutMs);
+      if (!res.ok) {
+        console.error(`❌ ${path} returned ${res.status}`);
+        return null;
+      }
+      return await res.json();
+    } catch (err) {
+      console.error(`❌ ${path} fetch failed:`, err?.message || err);
+      return null;
+    }
+  };
+
   console.log('🗺️ Generating sitemap...');
 
   // --------------------------------------------
@@ -28,170 +55,113 @@ export default async function sitemap() {
     priority: priority,
   }));
 
-  // --------------------------------------------
-  // Fetch categories from dedicated endpoint
-  // --------------------------------------------
   let mainCategoryPages = [];
   let subCategoryPages = [];
   let subSubCategoryPages = [];
-
-  try {
-    const categoryRes = await fetch(`${API_URL}/categories`);
-
-    if (categoryRes.ok) {
-      const categories = await categoryRes.json();
-      
-      // Process hierarchical category structure
-      categories.forEach((mainCat) => {
-        const mainSlug = slugify(mainCat.name);
-        
-
-        
-        // Process subcategories
-        if (mainCat.children && mainCat.children.length > 0) {
-          mainCat.children.forEach((subCat) => {
-            if (subCat.level === 2) {
-              const subSlug = slugify(subCat.name);
-              
-              // Add subcategory page (e.g., /category/outdoor/air-compressors)
-              subCategoryPages.push({
-                url: `${baseUrl}/category/${mainSlug}/${subSlug}`,
-                lastModified: new Date(subCat.updatedAt || Date.now()),
-                changeFrequency: "daily",
-                priority: 0.80,
-              });
-
-              // Process sub-subcategories
-              if (subCat.children && subCat.children.length > 0) {
-                subCat.children.forEach((subSubCat) => {
-                  if (subSubCat.level === 3) {
-                    const subSubSlug = slugify(subSubCat.name);
-                    
-                    // Add sub-subcategory page with query param (e.g., /category/outdoor/air-compressors?air-inflator)
-                    subSubCategoryPages.push({
-                      url: `${baseUrl}/category/${mainSlug}/${subSlug}?${subSubSlug}`,
-                      lastModified: new Date(subSubCat.updatedAt || Date.now()),
-                      changeFrequency: "weekly",
-                      priority: 0.75,
-                    });
-                  }
-                });
-              }
-            }
-          });
-        }
-      });
-
-      console.log(`✅ Categories: ${mainCategoryPages.length} main, ${subCategoryPages.length} sub, ${subSubCategoryPages.length} sub-sub`);
-    }
-  } catch (err) {
-    console.error("❌ Failed loading category sitemap:", err);
-  }
-
-  // --------------------------------------------
-  // Fetch all products for product pages
-  // --------------------------------------------
   let productPages = [];
+  let blogPages = [];
 
-  try {
-    // Fetch all products with pagination
-    let allProducts = [];
-    let page = 1;
-    let hasMore = true;
-    const limit = 100; // Fetch 100 products per page
+  const limit = 100;
+  const [categoriesData, blogData, firstProductPage] = await Promise.all([
+    fetchJson('/categories'),
+    fetchJson('/blog'),
+    fetchJson(`/products?page=1&limit=${limit}`),
+  ]);
 
-    while (hasMore) {
-      const productRes = await fetch(`${API_URL}/products?page=${page}&limit=${limit}`);
+  if (categoriesData && Array.isArray(categoriesData)) {
+    categoriesData.forEach((mainCat) => {
+      const mainSlug = slugify(mainCat.name);
 
-      if (productRes.ok) {
-        const productData = await productRes.json();
-        const products = productData.data?.products || [];
-        
-        if (products.length === 0) {
-          hasMore = false;
-        } else {
-          allProducts = [...allProducts, ...products];
-          
-          // Check if we have more pages
-          const pagination = productData.data?.pagination;
-          if (pagination && page >= pagination.pages) {
-            hasMore = false;
+      if (mainCat.children && mainCat.children.length > 0) {
+        mainCat.children.forEach((subCat) => {
+          if (subCat.level === 2) {
+            const subSlug = slugify(subCat.name);
+            subCategoryPages.push({
+              url: `${baseUrl}/category/${mainSlug}/${subSlug}`,
+              lastModified: new Date(subCat.updatedAt || Date.now()),
+              changeFrequency: 'daily',
+              priority: 0.8,
+            });
+
+            if (subCat.children && subCat.children.length > 0) {
+              subCat.children.forEach((subSubCat) => {
+                if (subSubCat.level === 3) {
+                  const subSubSlug = slugify(subSubCat.name);
+                  subSubCategoryPages.push({
+                    url: `${baseUrl}/category/${mainSlug}/${subSlug}?${subSubSlug}`,
+                    lastModified: new Date(subSubCat.updatedAt || Date.now()),
+                    changeFrequency: 'weekly',
+                    priority: 0.75,
+                  });
+                }
+              });
+            }
           }
-          
-          page++;
-        }
-      } else {
-        hasMore = false;
+        });
       }
-    }
-
-    console.log(`📦 Processing ${allProducts.length} products...`);
-
-    // Generate product URLs based on category hierarchy
-    allProducts.forEach((product) => {
-      const main = product.mainCategory?.name;
-      const sub = product.subCategory?.name;
-      const subSub = product.subSubCategory?.name;
-      const title = product.title;
-
-      if (!main || !sub || !title) return;
-
-      const mainSlug = slugify(main);
-      const subSlug = slugify(sub);
-      // Generate slug from title + ID
-      const productSlug = createProductSlug(title, product._id);
-
-      let productUrl;
-      
-      if (subSub) {
-        // Product with sub-sub-category: /category/main/sub/subsub/product-slug
-        const subSubSlug = slugify(subSub);
-        productUrl = `${baseUrl}/category/${mainSlug}/${subSlug}/${subSubSlug}/${productSlug}`;
-      } else {
-        // Product without sub-sub-category: /category/main/sub/product-slug
-        productUrl = `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`;
-      }
-
-      productPages.push({
-        url: productUrl,
-        lastModified: product.updatedAt ? new Date(product.updatedAt) : new Date(),
-        changeFrequency: "weekly",
-        priority: product.isFeatured ? 0.85 : 0.70,
-      });
     });
 
-    console.log(`✅ Generated ${productPages.length} product URLs`);
-  } catch (err) {
-    console.error("❌ Failed loading product sitemap:", err);
+    console.log(`✅ Categories: ${mainCategoryPages.length} main, ${subCategoryPages.length} sub, ${subSubCategoryPages.length} sub-sub`);
   }
 
-  // --------------------------------------------
-  // Fetch dynamic blogs
-  // --------------------------------------------
-  let blogPages = [];
-  
-  try {
-    const blogRes = await fetch(`${API_URL}/blog`);
+  const productItems = [];
+  if (firstProductPage?.data) {
+    productItems.push(...(firstProductPage.data.products || []));
 
-    if (blogRes.ok) {
-      const blogData = await blogRes.json();
-      const blogs = blogData.data || [];
+    const totalPages = firstProductPage.data.pagination?.pages || 1;
+    if (totalPages > 1) {
+      const pageRequests = Array.from({ length: totalPages - 1 }, (_, index) =>
+        fetchJson(`/products?page=${index + 2}&limit=${limit}`)
+      );
 
-      blogPages = blogs
-        .filter(blog => blog.published) // Only include published blogs
-        .map((blog) => ({
-          url: `${baseUrl}/blog/${blog.slug}`,
-          lastModified: blog.dateModified
-            ? new Date(blog.dateModified)
-            : new Date(blog.datePublished || Date.now()),
-          changeFrequency: "weekly",
-          priority: blog.isFeatured ? 0.80 : 0.70,
-        }));
-
-      console.log(`✅ Generated ${blogPages.length} blog URLs`);
+      const productResults = await Promise.allSettled(pageRequests);
+      productResults.forEach((result) => {
+        if (result.status === 'fulfilled' && result.value?.data?.products) {
+          productItems.push(...result.value.data.products);
+        }
+      });
     }
-  } catch (err) {
-    console.error("❌ Failed loading blog sitemap:", err);
+  }
+
+  console.log(`📦 Processing ${productItems.length} products...`);
+  productItems.forEach((product) => {
+    const main = product.mainCategory?.name;
+    const sub = product.subCategory?.name;
+    const subSub = product.subSubCategory?.name;
+    const title = product.title;
+
+    if (!main || !sub || !title) return;
+
+    const mainSlug = slugify(main);
+    const subSlug = slugify(sub);
+    const productSlug = createProductSlug(title, product._id);
+
+    const productUrl = subSub
+      ? `${baseUrl}/category/${mainSlug}/${subSlug}/${slugify(subSub)}/${productSlug}`
+      : `${baseUrl}/category/${mainSlug}/${subSlug}/${productSlug}`;
+
+    productPages.push({
+      url: productUrl,
+      lastModified: product.updatedAt ? new Date(product.updatedAt) : new Date(),
+      changeFrequency: 'weekly',
+      priority: product.isFeatured ? 0.85 : 0.7,
+    });
+  });
+
+  if (blogData?.data) {
+    const blogs = Array.isArray(blogData.data) ? blogData.data : [];
+    blogPages = blogs
+      .filter((blog) => blog.published)
+      .map((blog) => ({
+        url: `${baseUrl}/blog/${blog.slug}`,
+        lastModified: blog.dateModified
+          ? new Date(blog.dateModified)
+          : new Date(blog.datePublished || Date.now()),
+        changeFrequency: 'weekly',
+        priority: blog.isFeatured ? 0.8 : 0.7,
+      }));
+
+    console.log(`✅ Generated ${blogPages.length} blog URLs`);
   }
 
   // --------------------------------------------
