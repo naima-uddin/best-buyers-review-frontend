@@ -24,6 +24,33 @@ const getImageUrl = (featuredImage, thumbnail = null) => {
   return thumbnail || null;
 };
 
+const getYouTubeVideoId = (url) => {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace('www.', '');
+
+    if (host === 'youtu.be') {
+      return parsed.pathname.slice(1);
+    }
+
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      if (parsed.pathname.startsWith('/watch')) {
+        return parsed.searchParams.get('v');
+      }
+      if (parsed.pathname.startsWith('/embed/')) {
+        return parsed.pathname.split('/embed/')[1]?.split('/')[0] || null;
+      }
+      if (parsed.pathname.startsWith('/shorts/')) {
+        return parsed.pathname.split('/shorts/')[1]?.split('/')[0] || null;
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+};
+
 export default function BlogDetailClient({ slug }) {
   const [blog, setBlog] = useState(null);
   const [relatedBlogs, setRelatedBlogs] = useState([]);
@@ -225,7 +252,7 @@ export default function BlogDetailClient({ slug }) {
           <div className="mb-8">
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
               <div className="text-center mb-8">
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">Gallery</h3>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2">Explore more by visualizing</h3>
                 <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
@@ -269,9 +296,11 @@ export default function BlogDetailClient({ slug }) {
               </div>
               <div className="grid grid-cols-1 gap-8">
                 {blog.videos.map((video, index) => {
+                  const youtubeId = getYouTubeVideoId(video.url);
+
                   const VideoPlayer = () => {
                     const [isPlaying, setIsPlaying] = React.useState(false);
-                    const [showControls, setShowControls] = React.useState(true);
+                    const [youtubeStarted, setYoutubeStarted] = React.useState(false);
                     const videoRef = React.useRef(null);
                     
                     const handlePlayPause = () => {
@@ -280,11 +309,46 @@ export default function BlogDetailClient({ slug }) {
                           videoRef.current.pause();
                         } else {
                           videoRef.current.play();
-                          setShowControls(false);
-                          setTimeout(() => setShowControls(true), 3000);
                         }
                       }
                     };
+
+                    if (youtubeId) {
+                      return (
+                        <div className="relative aspect-video sm:aspect-[21/9] rounded-xl overflow-hidden shadow-xl group bg-black">
+                          {!youtubeStarted ? (
+                            <button
+                              type="button"
+                              onClick={() => setYoutubeStarted(true)}
+                              className="absolute inset-0 w-full h-full"
+                              aria-label={`Play video ${index + 1}`}
+                            >
+                              <img
+                                src={`https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`}
+                                alt={`Video ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                <div className="w-12 sm:w-16 md:w-20 h-12 sm:h-16 md:h-20 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center shadow-2xl transform hover:scale-110 transition-all duration-300">
+                                  <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                  </svg>
+                                </div>
+                              </div>
+                            </button>
+                          ) : (
+                            <iframe
+                              className="w-full h-full"
+                              src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                              title={`YouTube video ${index + 1}`}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              referrerPolicy="strict-origin-when-cross-origin"
+                              allowFullScreen
+                            />
+                          )}
+                        </div>
+                      );
+                    }
                     
                     return (
                       <div className="relative aspect-video sm:aspect-[21/9] rounded-xl overflow-hidden shadow-xl group">
@@ -296,7 +360,7 @@ export default function BlogDetailClient({ slug }) {
                           preload="metadata"
                           onPlay={() => setIsPlaying(true)}
                           onPause={() => setIsPlaying(false)}
-                          onEnded={() => {setIsPlaying(false); setShowControls(true);}}
+                          onEnded={() => setIsPlaying(false)}
                           controls={isPlaying}
                         >
                           Your browser does not support the video tag.

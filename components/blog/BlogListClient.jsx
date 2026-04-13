@@ -32,6 +32,8 @@ export default function BlogListClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
   const postsSectionRef = useRef(null);
@@ -74,6 +76,19 @@ export default function BlogListClient() {
     scrollToPosts();
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    setSearchQuery(searchInput.trim());
+    scrollToPosts();
+  };
+
+  const handleSearchClear = () => {
+    setSearchInput('');
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     const fetchBlogs = async () => {
       setLoading(true);
@@ -94,6 +109,10 @@ export default function BlogListClient() {
         if (selectedCategory) {
           params.set('category', selectedCategory);
           console.log('📁 Filter by category:', selectedCategory);
+        }
+        if (searchQuery) {
+          params.set('q', searchQuery);
+          console.log('🔎 Search query:', searchQuery);
         }
 
         const fetchUrl = `${API}/blog?${params.toString()}`;
@@ -122,7 +141,7 @@ export default function BlogListClient() {
     };
 
     fetchBlogs();
-  }, [currentPage, selectedCategory]);
+  }, [currentPage, selectedCategory, searchQuery]);
 
   // Auto-advance featured blog slider
   useEffect(() => {
@@ -194,7 +213,33 @@ export default function BlogListClient() {
             <p className="text-sm sm:text-base md:text-lg opacity-90 mb-4 sm:mb-6 leading-relaxed">
               Discover the latest electronics, gadget reviews, tech guides, and digital trends
             </p>
-            
+
+            <form onSubmit={handleSearchSubmit} className="max-w-xl mx-auto">
+              <div className="flex items-center gap-2 bg-white/95 rounded-full p-2 shadow-lg backdrop-blur-sm border border-white/40">
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search blogs by title, excerpt, or content"
+                  className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-500 px-3 py-2 text-sm sm:text-base focus:outline-none"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={handleSearchClear}
+                    className="px-3 py-2 text-xs sm:text-sm text-gray-700 hover:text-gray-900"
+                  >
+                    Clear
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="px-4 sm:px-5 py-2 bg-rose-600 text-white rounded-full text-xs sm:text-sm font-semibold hover:bg-rose-700 transition-colors"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
 
           </div>
         </div>
@@ -524,7 +569,9 @@ export default function BlogListClient() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📝</div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-2">No blogs found</h2>
-            <p className="text-gray-500">Check back later for new articles!</p>
+            <p className="text-gray-500">
+              {searchQuery ? `No results found for "${searchQuery}"` : 'Check back later for new articles!'}
+            </p>
           </div>
         )}
 

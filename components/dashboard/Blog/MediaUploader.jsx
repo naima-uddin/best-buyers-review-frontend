@@ -17,6 +17,7 @@ export default function MediaUploader({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
   const [showLibrary, setShowLibrary] = useState(false);
+  const [dragIndex, setDragIndex] = useState(null);
 
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -90,6 +91,23 @@ export default function MediaUploader({
     onUploadComplete(updated);
   };
 
+  const handleDragStart = (index) => {
+    setDragIndex(index);
+  };
+
+  const handleDrop = (targetIndex) => {
+    if (dragIndex === null || dragIndex === targetIndex) {
+      setDragIndex(null);
+      return;
+    }
+
+    const updated = [...currentMedia];
+    const [moved] = updated.splice(dragIndex, 1);
+    updated.splice(targetIndex, 0, moved);
+    onUploadComplete(updated);
+    setDragIndex(null);
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
@@ -119,7 +137,14 @@ export default function MediaUploader({
       {currentMedia && currentMedia.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {currentMedia.map((asset, idx) => (
-            <div key={idx} className="relative group border rounded overflow-hidden bg-gray-50">
+            <div
+              key={`${asset.publicId || asset.url || 'media'}-${idx}`}
+              className={`relative group border rounded overflow-hidden bg-gray-50 ${dragIndex === idx ? 'opacity-60' : ''}`}
+              draggable={multiple}
+              onDragStart={() => handleDragStart(idx)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop(idx)}
+            >
               {asset.resourceType === 'video' ? (
                 <video 
                   src={asset.url} 
@@ -142,6 +167,11 @@ export default function MediaUploader({
               <div className="p-1 text-xs text-gray-600 truncate">
                 {asset.resourceType === 'video' ? '🎥' : '🖼️'} {asset.format}
               </div>
+              {multiple && (
+                <div className="absolute bottom-1 left-1 text-[10px] px-1.5 py-0.5 rounded bg-black/60 text-white">
+                  Drag to reorder
+                </div>
+              )}
             </div>
           ))}
         </div>

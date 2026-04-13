@@ -11,6 +11,7 @@ export default function CategorySelector({ selectedCategories = [], onChange }) 
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryDesc, setNewCategoryDesc] = useState('');
   const [creating, setCreating] = useState(false);
+  const [deletingCategoryId, setDeletingCategoryId] = useState('');
 
   const fetchCategories = async () => {
     try {
@@ -72,6 +73,36 @@ export default function CategorySelector({ selectedCategories = [], onChange }) 
     }
   };
 
+  const handleDeleteCategory = async (categoryId, categoryName) => {
+    const shouldDelete = window.confirm(`Delete category "${categoryName}"?`);
+    if (!shouldDelete) return;
+
+    setDeletingCategoryId(categoryId);
+    try {
+      const r = await authFetch(`${API}/blog/admin/categories/${categoryId}`, {
+        method: 'DELETE'
+      });
+      const b = await r.json();
+
+      if (!r.ok) {
+        if (r.status === 409 && b.hasAssignedBlogs) {
+          alert(b.message || 'This category has assigned blogs. Remove category from those blogs first.');
+          return;
+        }
+        alert(b.message || b.error || 'Failed to delete category');
+        return;
+      }
+
+      setCategories((prev) => prev.filter((cat) => cat._id !== categoryId));
+      onChange(selectedCategories.filter((id) => id !== categoryId));
+    } catch (err) {
+      console.error('Error deleting category:', err);
+      alert('Failed to delete category');
+    } finally {
+      setDeletingCategoryId('');
+    }
+  };
+
   if (loading) {
     return <div className="text-sm text-gray-500">Loading categories...</div>;
   }
@@ -108,7 +139,28 @@ export default function CategorySelector({ selectedCategories = [], onChange }) 
                     : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
                 }`}
               >
-                {cat.name}
+                <span className="inline-flex items-center gap-2">
+                  <span>{cat.name}</span>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCategory(cat._id, cat.name);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteCategory(cat._id, cat.name);
+                      }
+                    }}
+                    className="inline-flex items-center justify-center w-4 h-4 rounded-full "
+                    aria-label={`Delete ${cat.name}`}
+                  >
+                    {deletingCategoryId === cat._id ? '...' : '×'}
+                  </span>
+                </span>
               </button>
             );
           })}
@@ -117,7 +169,7 @@ export default function CategorySelector({ selectedCategories = [], onChange }) 
 
       {/* Create Category Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-200/50  bg-opacity-10 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
             <h3 className="text-lg font-semibold mb-4">Create New Category</h3>
             

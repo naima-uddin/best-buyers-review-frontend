@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/context/UserContext';
 import { authFetch } from '@/lib/api/authFetch';
-import MediaPicker from '@/components/dashboard/MediaPicker';
 import MediaUploader from './MediaUploader';
 import CategorySelector from './CategorySelector';
 import TagInput from './TagInput';
@@ -30,7 +29,6 @@ export default function BlogCreate() {
   const [readingTime, setReadingTime] = useState(5);
   const [status, setStatus] = useState('draft');
   const [saving, setSaving] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
   const editorRef = useRef(null);
   const lastRange = useRef(null);
 
@@ -42,8 +40,14 @@ export default function BlogCreate() {
   };
   const restoreSelection = () => {
     const sel = window.getSelection();
+    if (!sel) return;
     sel.removeAllRanges();
     if (lastRange.current) sel.addRange(lastRange.current);
+  };
+
+  const handleToolbarMouseDown = (e) => {
+    e.preventDefault();
+    saveSelection();
   };
 
   const exec = (cmd, val = null) => {
@@ -68,6 +72,7 @@ export default function BlogCreate() {
     }
 
     setContent(editorRef.current.innerHTML);
+    saveSelection();
   };
 
   const handleLink = () => {
@@ -126,6 +131,12 @@ export default function BlogCreate() {
     document.execCommand('enableObjectResizing', false, true);
     document.execCommand('enableInlineTableEditing', false, true);
   }, []);
+
+  useEffect(() => {
+    if (editorRef.current && !editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = content || '<p></p>';
+    }
+  }, [content]);
 
   const insertImageFile = async (file) => {
     if (!file) return;
@@ -225,7 +236,7 @@ export default function BlogCreate() {
         videos,
         dynamicSections,
         publishDate: publishDate || null,
-        readingTime: readingTime || 5,
+        readingTime: Number(readingTime) || 5,
         status: publish ? 'published' : status || 'draft'
       };
       const resp = await authFetch(`${API}/blog/admin/blogs`, { 
@@ -301,21 +312,19 @@ export default function BlogCreate() {
           Select text and click 🔗 to add/edit/remove links. Click on existing links to edit or remove them.
         </div>
         <div className="flex flex-wrap gap-2 mb-2 sticky top-0 bg-white z-10 p-2 border-b">
-          <button type="button" onClick={() => exec('bold')} className="px-3 py-1.5 border rounded hover:bg-gray-100">B</button>
-          <button type="button" onClick={() => exec('italic')} className="px-3 py-1.5 border rounded hover:bg-gray-100">I</button>
-          <button type="button" onClick={() => exec('underline')} className="px-3 py-1.5 border rounded hover:bg-gray-100">U</button>
-          <button type="button" onClick={() => exec('formatBlock','<h2>')} className="px-3 py-1.5 border rounded hover:bg-gray-100">H2</button>
-          <button type="button" onClick={() => exec('formatBlock','<p>')} className="px-3 py-1.5 border rounded hover:bg-gray-100">P</button>
-          <button type="button" onClick={() => exec('insertUnorderedList')} className="px-3 py-1.5 border rounded hover:bg-gray-100">• List</button>
-          <button type="button" onClick={() => exec('insertOrderedList')} className="px-3 py-1.5 border rounded hover:bg-gray-100">1. List</button>
-          <button onMouseDown={saveSelection} type="button" onClick={handleLink} className="px-3 py-1.5 border rounded hover:bg-gray-100">🔗 Link</button>
-          <label onMouseDown={saveSelection} className="px-3 py-1.5 border rounded cursor-pointer hover:bg-gray-100">
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('bold')} className="px-3 py-1.5 border rounded hover:bg-gray-100">B</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('italic')} className="px-3 py-1.5 border rounded hover:bg-gray-100">I</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('underline')} className="px-3 py-1.5 border rounded hover:bg-gray-100">U</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('formatBlock','<h2>')} className="px-3 py-1.5 border rounded hover:bg-gray-100">H2</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('formatBlock','<p>')} className="px-3 py-1.5 border rounded hover:bg-gray-100">P</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('insertUnorderedList')} className="px-3 py-1.5 border rounded hover:bg-gray-100">• List</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('insertOrderedList')} className="px-3 py-1.5 border rounded hover:bg-gray-100">1. List</button>
+          <button onMouseDown={handleToolbarMouseDown} type="button" onClick={handleLink} className="px-3 py-1.5 border rounded hover:bg-gray-100">🔗 Link</button>
+          <label onMouseDown={handleToolbarMouseDown} className="px-3 py-1.5 border rounded cursor-pointer hover:bg-gray-100">
             📷 Img<input onChange={handleImageChange} type="file" accept="image/*" className="hidden" />
           </label>
-          <button type="button" onMouseDown={saveSelection} onClick={() => setShowPicker(true)}
-            className="px-3 py-1.5 border rounded text-blue-600 hover:bg-blue-50">📚 Library</button>
-          <button type="button" onClick={() => exec('undo')} className="px-3 py-1.5 border rounded hover:bg-gray-100">↶</button>
-          <button type="button" onClick={() => exec('redo')} className="px-3 py-1.5 border rounded hover:bg-gray-100">↷</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('undo')} className="px-3 py-1.5 border rounded hover:bg-gray-100">↶</button>
+          <button type="button" onMouseDown={handleToolbarMouseDown} onClick={() => exec('redo')} className="px-3 py-1.5 border rounded hover:bg-gray-100">↷</button>
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto border rounded">
@@ -324,6 +333,9 @@ export default function BlogCreate() {
             contentEditable
             className="min-h-[300px] p-4 prose max-w-none focus:outline-none"
             onInput={e => setContent(e.currentTarget.innerHTML)}
+            onMouseUp={saveSelection}
+            onKeyUp={saveSelection}
+            onBlur={saveSelection}
           />
         </div>
       </div>
@@ -379,7 +391,17 @@ export default function BlogCreate() {
               min="1"
               max="60"
               value={readingTime}
-              onChange={(e) => setReadingTime(parseInt(e.target.value) || 5)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '') {
+                  setReadingTime('');
+                  return;
+                }
+                const parsed = Number(value);
+                if (!Number.isNaN(parsed)) {
+                  setReadingTime(parsed);
+                }
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">Estimated reading time for the blog post</p>
@@ -474,15 +496,6 @@ export default function BlogCreate() {
         </button>
       </div>
 
-      <MediaPicker
-        open={showPicker}
-        onClose={() => setShowPicker(false)}
-        onSelect={asset => {
-          restoreSelection();
-          exec('insertImage', asset.url);
-          setShowPicker(false);
-        }}
-      />
     </div>
   );
 }
