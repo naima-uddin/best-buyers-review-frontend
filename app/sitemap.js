@@ -1,10 +1,7 @@
 import { slugify, createProductSlug } from "@/lib/slugify";
 
-// Revalidate the sitemap every 1 hour (3600 seconds)
-export const revalidate = 3600;
-
-// Ensure dynamic rendering for fresh data
-export const dynamic = 'force-dynamic';
+// Generate sitemap at build time for static export
+export const dynamic = 'force-static';
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bestbuyersview.com";
@@ -39,10 +36,7 @@ export default async function sitemap() {
   let subSubCategoryPages = [];
 
   try {
-    const categoryRes = await fetch(`${API_URL}/categories`, {
-      next: { revalidate: 3600 },
-      cache: 'no-store'
-    });
+    const categoryRes = await fetch(`${API_URL}/categories`);
 
     if (categoryRes.ok) {
       const categories = await categoryRes.json();
@@ -107,13 +101,7 @@ export default async function sitemap() {
     const limit = 100; // Fetch 100 products per page
 
     while (hasMore) {
-      const productRes = await fetch(
-        `${API_URL}/products?page=${page}&limit=${limit}`,
-        { 
-          next: { revalidate: 3600 },
-          cache: 'no-store'
-        }
-      );
+      const productRes = await fetch(`${API_URL}/products?page=${page}&limit=${limit}`);
 
       if (productRes.ok) {
         const productData = await productRes.json();
@@ -183,10 +171,7 @@ export default async function sitemap() {
   let blogPages = [];
   
   try {
-    const blogRes = await fetch(`${API_URL}/blog`, { 
-      next: { revalidate: 3600 },
-      cache: 'no-store'
-    });
+    const blogRes = await fetch(`${API_URL}/blog`);
 
     if (blogRes.ok) {
       const blogData = await blogRes.json();
