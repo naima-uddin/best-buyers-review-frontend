@@ -646,5 +646,6 @@ export default function BlogDetailClient({ slug }) {
         </div>
       )}
     </div>
+    </div>
   );
 }
