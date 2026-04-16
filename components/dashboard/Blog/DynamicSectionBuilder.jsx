@@ -8,7 +8,6 @@ export default function DynamicSectionBuilder({ sections = [], onChange }) {
   const addSection = (type) => {
     const newSection = {
       type,
-      title: '',
       items: [{ title: '', content: '', order: 0 }]
     };
     onChange([...sections, newSection]);
@@ -113,9 +112,6 @@ export default function DynamicSectionBuilder({ sections = [], onChange }) {
                   <span className="font-semibold text-sm">
                     {getSectionLabel(section.type)}
                   </span>
-                  {section.title && (
-                    <span className="text-gray-600 text-sm">- {section.title}</span>
-                  )}
                   <span className="text-xs text-gray-500">
                     ({section.items.length} {section.items.length === 1 ? 'item' : 'items'})
                   </span>
@@ -137,19 +133,6 @@ export default function DynamicSectionBuilder({ sections = [], onChange }) {
 
               {isExpanded && (
                 <div className="p-4 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Section Title (optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={section.title || ''}
-                      onChange={(e) => updateSection(sIdx, 'title', e.target.value)}
-                      className="w-full px-3 py-2 border rounded-md"
-                      placeholder={`${getSectionLabel(section.type)} Section Title`}
-                    />
-                  </div>
-
                   <div className="space-y-3">
                     {section.items.map((item, iIdx) => (
                       <div key={iIdx} className="p-3 border rounded bg-gray-50 space-y-2">

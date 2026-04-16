@@ -476,7 +476,7 @@ export default function BlogDetailClient({ slug }) {
             {blog.dynamicSections.filter(section => section.type === 'faq').map((section, index) => (
               <div key={`faq-${index}`} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8">
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 capitalize">{section.type}</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 capitalize">FAQ</h3>
                   <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-pink-400 mx-auto rounded-full"></div>
                 </div>
                 
