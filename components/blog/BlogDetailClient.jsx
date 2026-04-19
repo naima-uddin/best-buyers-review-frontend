@@ -226,7 +226,7 @@ export default function BlogDetailClient({ slug }) {
 
         {/* Featured Image */}
         {getImageUrl(blog.featuredImage, blog.thumbnail) && (
-          <div className="relative aspect-[3/1] mb-8 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-600 shadow-xl">
+          <div className="relative aspect-[5/2] mb-8 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-600 shadow-xl">
             <Image
               src={getImageUrl(blog.featuredImage, blog.thumbnail)}
               alt={blog.title}
