@@ -20,7 +20,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-gray-600 text-sm leading-relaxed">
-              Your trusted source for expert product reviews and buying guides. 
+              Your trusted source for expert product reviews and buying guides.
               Over 1 million shoppers trust us every week.
             </p>
           </div>
@@ -30,17 +30,26 @@ export function Footer() {
             <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/category" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <Link
+                  href="/category"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
                   Categories
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <Link
+                  href="/blog"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <Link
+                  href="/contact"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
                   Contact
                 </Link>
               </li>
@@ -52,17 +61,26 @@ export function Footer() {
             <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <Link
+                  href="/privacy"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <Link
+                  href="/terms"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/AdvertiserDisclosure" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <Link
+                  href="/AdvertiserDisclosure"
+                  className="text-gray-600 hover:text-gray-900 transition-colors"
+                >
                   Advertiser Disclosure
                 </Link>
               </li>
@@ -73,16 +91,28 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Connect</h3>
             <div className="flex gap-4 mb-4">
-              <a href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-gray-600 transition-colors">
+              <a
+                href="#"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -95,7 +125,7 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="border-t pt-8 text-center">
           <p className="text-gray-600 text-sm mb-2">
-            © 2025 Best Buyers View. All rights reserved.
+            © {new Date().getFullYear()} Best Buyers View. All rights reserved.
           </p>
           <p className="text-gray-500 text-xs">
             As an Amazon Associate we earn from qualifying purchases.
