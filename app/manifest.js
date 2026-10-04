@@ -1,3 +1,5 @@
+export const dynamic = "force-static";
+
 export default function manifest() {
   return {
     name: "Best Buyers View - Product Reviews & Comparisons",
