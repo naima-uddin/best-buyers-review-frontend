@@ -20,14 +20,14 @@ const HomePage = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="relative px-4 my-12 md:my-16">
+      <section className="relative px-2 my-4 md:my-8">
         <div className="bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-pink-50/50 rounded-3xl max-w-7xl mx-auto shadow-lg">
           <FeaturedProducts />
         </div>
       </section>
 
       {/* Reviews Section */}
-      <section className="relative py-12 md:py-16 px-4">
+      <section className="relative py-8 md:py-10 px-4">
         <ReviewsSection />
       </section>
 

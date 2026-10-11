@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import {
   ChevronLeft,
@@ -48,6 +48,17 @@ export default function FeaturedProducts() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(false);
   const [cache, setCache] = useState({}); // Cache products by tab+page
+  const tabsScrollRef = useRef(null);
+
+  const scrollTabs = (direction) => {
+    if (tabsScrollRef.current) {
+      const scrollAmount = 200;
+      tabsScrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const tabs = [
     {
@@ -193,7 +204,7 @@ export default function FeaturedProducts() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-2 md:py-8">
+    <div className="max-w-7xl mx-auto px-2 py-2 md:py-8">
       {/* Section Header */}
       <div className="text-center mb-4">
         <h2 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
@@ -204,57 +215,84 @@ export default function FeaturedProducts() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex justify-center gap-2 md:gap-4 mb-8 flex-wrap px-2">
-        {tabs.map((tab) => {
-          const IconComponent = tab.icon;
-          const isActive = activeTab === tab.key;
+      {/* Tabs - horizontal scroll with arrows */}
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+      <div className="relative flex items-center justify-center mb-8">
+        {/* Left Arrow */}
+        <button
+          onClick={() => scrollTabs("left")}
+          aria-label="Scroll tabs left"
+          className="flex-shrink-0 p-1 rounded-full bg-white shadow-md text-gray-600 hover:bg-gray-50 hover:scale-110 transition-all duration-300 lg:hidden"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
 
-          return (
-            <button
-              key={tab.key}
-              onClick={() => handleTabClick(tab.key)}
-              disabled={loading}
-              className={`
-                group relative flex items-center gap-2 px-5 md:px-6 py-2 md:py-2.5 
-                rounded-2xl font-semibold text-sm md:text-base transition-all duration-300 
-                border-2 backdrop-blur-sm min-w-[120px] justify-center
-                ${
-                  isActive
-                    ? `bg-gradient-to-r ${tab.badgeColor} text-white border-transparent shadow-2xl scale-105`
-                    : `bg-white/80 text-gray-700 border-gray-200/60 hover:border-${
-                        tab.textColor.split("-")[1]
-                      }-200 hover:shadow-lg hover:scale-105`
-                }
-                ${loading ? "opacity-50 cursor-not-allowed" : ""}
-              `}
-            >
-              <IconComponent
-                className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 ${
-                  isActive ? "text-white scale-110" : tab.textColor
-                } group-hover:scale-110`}
-              />
-              <span
-                className={`transition-all duration-300 ${
-                  isActive ? "font-bold" : "font-semibold"
-                }`}
+        <div
+          ref={tabsScrollRef}
+          className="flex gap-2 md:gap-4 overflow-x-auto scroll-smooth py-2 lg:justify-center lg:flex-wrap no-scrollbar"
+        >
+          {tabs.map((tab) => {
+            const IconComponent = tab.icon;
+            const isActive = activeTab === tab.key;
+
+            return (
+              <button
+                key={tab.key}
+                onClick={() => handleTabClick(tab.key)}
+                disabled={loading}
+                className={`
+                  group relative flex items-center gap-2 px-5 md:px-6 py-2 md:py-2.5
+                  rounded-2xl font-semibold text-sm md:text-base transition-all duration-300
+                  border-2 backdrop-blur-sm min-w-[120px] justify-center flex-shrink-0
+                  ${
+                    isActive
+                      ? `bg-gradient-to-r ${tab.badgeColor} text-white border-transparent shadow-2xl scale-105`
+                      : `bg-white/80 text-gray-700 border-gray-200/60 hover:border-${
+                          tab.textColor.split("-")[1]
+                        }-200 hover:shadow-lg hover:scale-105`
+                  }
+                  ${loading ? "opacity-50 cursor-not-allowed" : ""}
+                `}
               >
-                {tab.label}
-              </span>
+                <IconComponent
+                  className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 ${
+                    isActive ? "text-white scale-110" : tab.textColor
+                  } group-hover:scale-110`}
+                />
+                <span
+                  className={`transition-all duration-300 ${
+                    isActive ? "font-bold" : "font-semibold"
+                  }`}
+                >
+                  {tab.label}
+                </span>
 
-              {/* Active tab glow effect */}
-              {isActive && (
-                <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${tab.badgeColor} opacity-20 blur-md -z-10`}
-                ></div>
-              )}
-            </button>
-          );
-        })}
+                {/* Active tab glow effect */}
+                {isActive && (
+                  <div
+                    className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${tab.badgeColor} opacity-20 blur-md -z-10`}
+                  ></div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => scrollTabs("right")}
+          aria-label="Scroll tabs right"
+          className="flex-shrink-0 p-1 rounded-full bg-white shadow-md text-gray-600 hover:bg-gray-50 hover:scale-110 transition-all duration-300 lg:hidden"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Product Grid - 6 products per page */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4 -mt-2">
         {loading
           ? // Show skeleton loaders when loading
             Array.from({ length: itemsPerPage }).map((_, index) => (
@@ -264,7 +302,7 @@ export default function FeaturedProducts() {
             products.map((product) => (
               <div
                 key={product.asin}
-                className="group relative bg-white rounded-2xl p-4 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-purple-200 hover:-translate-y-2"
+                className="group relative bg-white rounded-2xl p-2 text-center hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-purple-200 hover:-translate-y-2"
               >
                 {/* Image */}
                 <div className="relative w-full h-36 md:h-44 mb-3 overflow-hidden rounded-xl">
