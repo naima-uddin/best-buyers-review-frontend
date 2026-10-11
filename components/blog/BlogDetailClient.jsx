@@ -532,7 +532,7 @@ export default function BlogDetailClient({ slug }) {
                   <Link
                     key={tag}
                     href={`/blog?tag=${encodeURIComponent(tag)}`}
-                    className="inline-block bg-gradient-to-r from-orange-100 to-pink-100 hover:from-orange-200 hover:to-pink-200 text-orange-700 font-semibold px-6 py-3 rounded-full transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-orange-200"
+                    className="inline-block bg-gradient-to-r from-orange-100 to-pink-100 hover:from-orange-200 hover:to-pink-200 text-orange-700 text-xs sm:text-sm font-medium px-2.5 py-1 rounded-full transition-all transform hover:scale-105 shadow-sm hover:shadow-md border border-orange-200"
                   >
                     #{tag}
                   </Link>
