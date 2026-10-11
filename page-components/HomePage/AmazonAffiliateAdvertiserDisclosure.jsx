@@ -11,7 +11,7 @@ const AmazonAffiliateAdvertiserDisclosure = () => {
         <BackButton />
         {/* Header Section */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
             Amazon Affiliate Advertiser Disclosure
           </h1>
           <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full"></div>

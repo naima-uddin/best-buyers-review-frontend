@@ -17,9 +17,9 @@ const StatCard = ({ number, label, suffix = "" }) => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.6 }}
-    className="text-center p-6"
+    className="text-center p-3 sm:p-6"
   >
-    <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+    <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
       {number}{suffix}
     </div>
     <div className="text-gray-600 font-medium">{label}</div>
@@ -65,7 +65,7 @@ export default function AboutUs() {
               <Breadcrumbs />
         <BackButton />
             </div>
-      <div className="max-w-7xl mx-auto px-6 space-y-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12 lg:space-y-20">
         {/* Hero Section */}
         <section className="relative text-center">
           <motion.div
@@ -85,7 +85,7 @@ export default function AboutUs() {
               About <Highlight>Best Buyers View</Highlight>
             </h1>
             
-            <p className="text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-light">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-light">
               Your trusted companion in the world of online shopping. We cut through the noise to bring you 
               <span className="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> honest, comprehensive reviews </span>
               that help you make smarter buying decisions across 16 essential categories.
@@ -98,7 +98,7 @@ export default function AboutUs() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100"
+          className="bg-white rounded-3xl p-4 sm:p-8 shadow-xl shadow-gray-200/50 border border-gray-100"
         >
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
             <StatCard number="50K+" label="Products Reviewed" />
@@ -117,8 +117,8 @@ export default function AboutUs() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="lg:col-span-2 space-y-8"
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg shadow-gray-200/50 border border-gray-100">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-lg shadow-gray-200/50 border border-gray-100">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
                 Our Story
               </h2>
               <div className="space-y-6">
@@ -143,9 +143,9 @@ export default function AboutUs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8 shadow-lg border border-blue-100/50"
+              className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-blue-100/50"
             >
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">How We Test & Review</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">How We Test & Review</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[
                   {
@@ -186,8 +186,8 @@ export default function AboutUs() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="space-y-8"
           >
-            <div className="bg-white rounded-3xl p-8 shadow-lg shadow-gray-200/50 border border-gray-100">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-lg shadow-gray-200/50 border border-gray-100">
+              <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
                 Our Categories
               </h2>
               <p className="text-gray-600 mb-6">
@@ -206,12 +206,12 @@ export default function AboutUs() {
           </motion.div>
           </div>
           {/* Mission & Vision */}
-            <div className="space-x-6 flex justify-between">
+            <div className="flex flex-col md:flex-row gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 shadow-lg border border-blue-100/50"
+                className="flex-1 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-blue-100/50"
               >
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mr-4 shadow-lg">
@@ -231,7 +231,7 @@ export default function AboutUs() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-lg border border-purple-100/50"
+                className="flex-1 bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-6 sm:p-8 shadow-lg border border-purple-100/50"
               >
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mr-4 shadow-lg">
@@ -255,12 +255,12 @@ export default function AboutUs() {
           transition={{ duration: 0.8, delay: 0.7 }}
           className="text-center"
         >
-          <h2 className="text-5xl font-bold mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Why Trust Us?
             </span>
           </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
             The principles that make Best Buyers View your most reliable shopping companion
           </p>
           
@@ -311,10 +311,10 @@ export default function AboutUs() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          className="bg-gradient-to-r from-blue-300 to-purple-600 rounded-3xl p-12 text-center text-white shadow-2xl"
+          className="bg-gradient-to-r from-blue-300 to-purple-600 rounded-3xl p-6 sm:p-10 lg:p-12 text-center text-white shadow-2xl"
         >
-          <h2 className="text-4xl font-bold mb-4">Start Shopping Smarter Today</h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Start Shopping Smarter Today</h2>
+          <p className="text-lg sm:text-xl mb-8 opacity-90 max-w-2xl mx-auto">
             Join 2 million+ smart shoppers who trust Best Buyers View for honest product reviews across 16 categories.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

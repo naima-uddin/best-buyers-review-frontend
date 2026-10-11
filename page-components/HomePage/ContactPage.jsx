@@ -119,11 +119,11 @@ const CustomerSupport = () => {
             </div>
           </div>
           
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Customer <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Support</span>
           </h1>
-          
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
             Dedicated support for our affiliate partners. Get help with commissions, tracking, payments, and maximizing your earnings.
           </p>
         </div>
@@ -175,8 +175,8 @@ const CustomerSupport = () => {
         {/* Response Time & Urgent Support */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           {/* Response Time Guarantee */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 border border-blue-200">
-            <h3 className="text-2xl font-bold text-gray-900 mb-2 text-center">Affiliate Response Times</h3>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 sm:p-8 border border-blue-200">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-center">Affiliate Response Times</h3>
             <p className="text-gray-600 text-center mb-6">We prioritize our affiliate partners with quick response guarantees</p>
             <div className="space-y-4">
               {responseTimes.map((item, index) => (
@@ -189,20 +189,20 @@ const CustomerSupport = () => {
           </div>
 
           {/* Urgent Support */}
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 border border-orange-200 text-center">
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 sm:p-8 border border-orange-200 text-center">
             <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
               <Zap className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Urgent  Issues?</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Urgent  Issues?</h3>
             <p className="text-gray-600 mb-6">For immediate assistance or critical tracking issues:</p>
-            <div className="text-2xl font-bold text-red-600 mb-2">contact@bestbuyersview.com</div>
+            <div className="text-base sm:text-xl md:text-2xl font-bold text-red-600 mb-2 break-words">contact@bestbuyersview.com</div>
             <p className="text-sm text-gray-500">Priority Affiliate Support • 24/7 Monitoring</p>
           </div>
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-lg border border-gray-100 p-8 mb-12">
-          <h2 className="text-3xl font-bold text-center mb-4">
+        <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8 mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4">
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Affiliate FAQ
             </span>
@@ -229,10 +229,10 @@ const CustomerSupport = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-8 p-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl text-white relative overflow-hidden">
+        <div className="text-center mt-8 p-6 sm:p-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative">
-            <h3 className="text-2xl font-bold mb-4">Ready to Maximize Your Earnings?</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-4">Ready to Maximize Your Earnings?</h3>
             <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
               Join thousands of successful affiliates who trust BestBuyersView for reliable commissions and outstanding support.
             </p>
