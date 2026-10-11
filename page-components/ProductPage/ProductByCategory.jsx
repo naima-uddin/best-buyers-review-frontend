@@ -575,7 +575,7 @@ function ProductByCategoryContent() {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 md:py-10">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-2 md:py-10">
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
           <BackButton className="-mb-2" />
@@ -695,7 +695,7 @@ function ProductByCategoryContent() {
                       {/* Product Card */}
                       <div className="bg-white shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-orange-400 ml-4 md:ml-8 relative">
                         <div className="p-3 sm:p-4 md:p-6">
-                          <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                          <div className="flex flex-col md:flex-row gap-2 md:gap-4">
                             {/* Image Block */}
                             <div className="flex flex-col items-center w-full md:w-40 lg:w-48 relative mx-auto md:mx-0">
                               <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-1 md:mb-2 mt-2 sm:mt-6">
@@ -819,7 +819,7 @@ function ProductByCategoryContent() {
                             </div>
 
                             {/* Price Block */}
-                            <div className="flex flex-col items-center md:items-end w-full md:w-44 lg:w-48 mt-3 md:mt-0 border-t md:border-t-0 pt-3 md:pt-0">
+                            <div className="flex flex-col items-center md:items-end w-full md:w-44 lg:w-48 mt-1 md:mt-0 border-t md:border-t-0 pt-1 md:pt-0">
                               <div className="text-center md:text-right w-full">
                                 {product.discount?.percentage > 0 && (
                                   <div className="text-lg sm:text-xl md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb text-center">
