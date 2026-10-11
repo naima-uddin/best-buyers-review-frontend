@@ -107,7 +107,7 @@ export default function Navbar() {
         {/* LOGO */}
         {/* -------------------------------------- */}
         <Link href="/" className="flex items-center group">
-          <div className="relative w-[120px] h-[70px]">
+          <div className="relative w-[90px] md:w-[120px] h-[46px] md:h-[70px]">
             <Image
               src="/logo.png"
               alt="Logo"
