@@ -1,5 +1,8 @@
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ScrollToTop from "@/components/ScrollToTop";
+import ScrollToTopButton from "@/ui/ScrollToTopButton";
 import { AuthProvider } from "@/lib/auth";
 import "hover.css/css/hover-min.css";
 import { CategoryProvider } from "@/context/CategoryContext";
@@ -174,10 +177,14 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
         <AuthProvider>
           <CategoryProvider>
             <CompareProvider>
               <BlogCacheProvider>{children}</BlogCacheProvider>
+              <ScrollToTopButton />
             </CompareProvider>
           </CategoryProvider>
         </AuthProvider>

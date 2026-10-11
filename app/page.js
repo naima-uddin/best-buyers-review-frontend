@@ -1,7 +1,6 @@
 import { Footer } from "@/components/common/Footer";
 import Navbar from "@/components/common/Navbar";
 import HomePage from "@/page-components/HomePage/HomePage";
-import ScrollToTopButton from "@/ui/ScrollToTopButton";
 import OrganizationSchema from "@/components/seo/OrganizationSchema";
 import WebsiteSchema from "@/components/seo/WebsiteSchema";
 
@@ -73,7 +72,6 @@ export default function Home() {
       <Navbar />
       <HomePage />
       <Footer />
-      <ScrollToTopButton />
 
       {/* JSON-LD Structured Data */}
       <OrganizationSchema />
