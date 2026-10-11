@@ -221,7 +221,7 @@ function ProductDetailsContent({ initialProduct }) {
           <BackButton className="mb-2" />
           {/* Breadcrumb */}
           <nav className="mb-4">
-            <ol className="flex items-center space-x-2 text-sm text-gray-500">
+            <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-gray-500">
               <li>
                 <Link
                   href="/"
@@ -251,7 +251,7 @@ function ProductDetailsContent({ initialProduct }) {
                 </Link>
               </li>
               <li>/</li>
-              <li className="text-gray-900 font-medium truncate max-w-xs">
+              <li className="text-gray-900 font-medium truncate max-w-[150px] sm:max-w-xs">
                 {product.title}
               </li>
             </ol>
@@ -262,7 +262,7 @@ function ProductDetailsContent({ initialProduct }) {
             <div className="lg:w-2/5">
               <div className="relative bg-white rounded-xl overflow-hidden shadow-md p-3 mb-2">
                 <div className="flex justify-center">
-                  <div className="relative w-full h-80">
+                  <div className="relative w-full h-56 sm:h-72 lg:h-80">
                     <Image
                       src={currentImage || "/placeholder-image.jpg"}
                       alt={product.title}
@@ -292,7 +292,7 @@ function ProductDetailsContent({ initialProduct }) {
 
               {/* Thumbnail Images */}
               {product.images?.length > 1 && (
-                <div className="flex space-x-2 justify-center mb-4">
+                <div className="flex flex-wrap gap-2 justify-center mb-4">
                   {product.images.map((image, index) => (
                     <button
                       key={index}
@@ -473,7 +473,7 @@ function ProductDetailsContent({ initialProduct }) {
                   </div>
                 </div>
 
-                <h1 className="text-xl font-bold text-gray-900 mb-3 leading-tight">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight break-words">
                   {product.title}
                 </h1>
 
@@ -569,10 +569,10 @@ function ProductDetailsContent({ initialProduct }) {
 
           {/* Customer Reviews Section */}
           {product.customReviews && product.customReviews.length > 0 && (
-            <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+            <div className="mt-8 bg-white rounded-xl shadow-md p-4 sm:p-6">
               <div className="flex items-center mb-5">
-                <Users className="h-6 w-6 text-blue-500 mr-2" />
-                <h2 className="text-2xl font-bold text-gray-900">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mr-2 shrink-0" />
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Customer Reviews
                 </h2>
               </div>
@@ -635,10 +635,10 @@ function ProductDetailsContent({ initialProduct }) {
 
           {/* Common Questions Section */}
           {product.commonQuestions && product.commonQuestions.length > 0 && (
-            <div className="mt-8 bg-white rounded-xl shadow-md p-6">
+            <div className="mt-8 bg-white rounded-xl shadow-md p-4 sm:p-6">
               <div className="flex items-center mb-6">
                 <svg
-                  className="h-6 w-6 text-blue-500 mr-2"
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500 mr-2 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -650,7 +650,7 @@ function ProductDetailsContent({ initialProduct }) {
                     d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Frequently Asked Questions
                 </h2>
               </div>
