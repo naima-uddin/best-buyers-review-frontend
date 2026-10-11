@@ -217,7 +217,7 @@ function ProductDetailsContent({ initialProduct }) {
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <BackButton className="mb-2" />
           {/* Breadcrumb */}
           <nav className="mb-4">
@@ -297,7 +297,7 @@ function ProductDetailsContent({ initialProduct }) {
                     <button
                       key={index}
                       onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-shrink-0 w-10 h-10 rounded-md overflow-hidden border transition-all ${
+                      className={`shrink-0 w-10 h-10 rounded-md overflow-hidden border transition-all ${
                         selectedImageIndex === index
                           ? "border-blue-600 ring-1 ring-blue-200"
                           : "border-gray-200 hover:border-gray-300"
@@ -512,7 +512,7 @@ function ProductDetailsContent({ initialProduct }) {
                         key={index}
                         className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md"
                       >
-                        <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                         <span className="text-gray-700 text-sm">{feature}</span>
                       </div>
                     ))}
@@ -521,13 +521,13 @@ function ProductDetailsContent({ initialProduct }) {
                     product.features.feature.length === 0) && (
                     <>
                       <div className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md">
-                        <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                         <span className="text-gray-700 text-sm">
                           High-quality materials and construction
                         </span>
                       </div>
                       <div className="flex items-start space-x-2 bg-blue-50 p-2 rounded-md">
-                        <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <Check className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                         <span className="text-gray-700 text-sm">
                           Excellent performance and reliability
                         </span>
@@ -583,9 +583,9 @@ function ProductDetailsContent({ initialProduct }) {
                     key={review._id || index}
                     className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center">
-                        <div className="flex mr-2">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+                      <div className="flex items-start gap-2 min-w-0">
+                        <div className="flex shrink-0 mt-0.5">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
@@ -597,11 +597,11 @@ function ProductDetailsContent({ initialProduct }) {
                             />
                           ))}
                         </div>
-                        <span className="font-semibold text-gray-900">
+                        <span className="font-semibold text-gray-900 break-words">
                           {review.title || "Great Product"}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full shrink-0 self-start whitespace-nowrap">
                         {review.date || "Recently"}
                       </span>
                     </div>
@@ -610,18 +610,18 @@ function ProductDetailsContent({ initialProduct }) {
                       {review.content || review.text}
                     </p>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium text-sm mr-2">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center min-w-0">
+                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-medium text-sm mr-2 shrink-0">
                           {(review.username || "User").charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-sm font-medium text-gray-700 truncate">
                           {review.author || "Customer"}
                         </span>
                       </div>
 
                       {review.verified && (
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center shrink-0 whitespace-nowrap">
                           <Check className="h-3 w-3 mr-1" />
                           Verified Purchase
                         </span>
@@ -667,7 +667,7 @@ function ProductDetailsContent({ initialProduct }) {
             </div>
           )}
         </div>
-        <div className="max-w-7xl mx-auto mt-6 px-6">
+        <div className="max-w-7xl mx-auto mt-6 px-2">
           <ConclusionSection conclusion={product.conclusion} />
         </div>
       </div>

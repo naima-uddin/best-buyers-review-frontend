@@ -6,7 +6,7 @@ export const ColorsSection = ({ colors }) => {
   if (!colors || colors.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div className="bg-white rounded-xl shadow-md p-4 mb-6">
       <div className="flex items-center mb-4">
         <Palette className="h-6 w-6 text-blue-500 mr-2" />
         <h2 className="text-2xl font-bold text-gray-900">Available Colors</h2>
@@ -43,7 +43,7 @@ export const StylesSection = ({ styles }) => {
   if (!styles || styles.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div className="bg-white rounded-xl shadow-md p-4 mb-6">
       <div className="flex items-center mb-4">
         <Award className="h-6 w-6 text-blue-500 mr-2" />
         <h2 className="text-2xl font-bold text-gray-900">Available Styles & Variants</h2>
@@ -69,7 +69,7 @@ export const FactorsToConsiderSection = ({ factors }) => {
   if (!factors || factors.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+    <div className="bg-white rounded-xl shadow-md p-4 mb-6">
       <div className="flex items-center mb-4">
         <HelpCircle className="h-6 w-6 text-blue-500 mr-2" />
         <h2 className="text-2xl font-bold text-gray-900">Key Considerations</h2>
@@ -103,7 +103,7 @@ export const MostImportantFactorsSection = ({ factors }) => {
   const paragraphs = factors.text.split('\n\n').filter(p => p.trim());
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-200 hover:border-gray-300 transition-all duration-200">
+    <div className="bg-white rounded-xl shadow-md p-4 mb-6 border border-gray-200 hover:border-gray-300 transition-all duration-200">
       {/* Collapsible Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}

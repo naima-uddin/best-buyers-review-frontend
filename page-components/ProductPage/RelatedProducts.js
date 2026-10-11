@@ -114,7 +114,7 @@ export default function RelatedProducts({
             return (
               <div
                 key={`${product._id}-${index}`}
-                className="p-3 min-w-[50%] sm:min-w-[33.33%] md:min-w-[25%] lg:min-w-[16.66%]"
+                className="p-2 min-w-[50%] sm:min-w-[33.33%] md:min-w-[25%] lg:min-w-[16.66%]"
               >
                 <Link
                   href={getProductUrl(product)}
@@ -128,7 +128,7 @@ export default function RelatedProducts({
                       className="object-contain p-3"
                     />
                   </div>
-                  <div className="p-3 text-center">
+                  <div className="p-2 text-center">
                     <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
                       {product.title}
                     </h3>
