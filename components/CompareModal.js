@@ -135,11 +135,12 @@ export default function CompareModal() {
                                 Check Price
                               </span>
                               <Image
-                                src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                                src="/amazon_logo.png"
                                 alt="Amazon"
-                                className="h-4 sm:h-5"
-                                width={40}
-                                height={30}
+                                className="h-4 sm:h-5 w-auto"
+                                width={160}
+                                height={60}
+                                quality={100}
                               />
                             </a>
                           </div>

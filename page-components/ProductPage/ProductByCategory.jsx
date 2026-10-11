@@ -838,11 +838,12 @@ function ProductByCategoryContent() {
 
                                 <div className="flex flex-col items-center my-3 sm:my-4">
                                   <Image
-                                    src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                                    src="/amazon_logo.png"
                                     alt="Amazon"
-                                    width={44}
-                                    height={24}
-                                    className="h-5 sm:h-6 mb-1"
+                                    width={160}
+                                    height={60}
+                                    quality={100}
+                                    className="h-5 sm:h-6 w-auto mb-1"
                                   />
                                   <span className="text-xs text-gray-500">
                                     Prime Delivery
@@ -1036,11 +1037,12 @@ function ProductByCategoryContent() {
                             </a>
 
                             <Image
-                              src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                              src="/amazon_logo.png"
                               alt="Amazon"
-                              width={44}
-                              height={24}
-                              className="h-6 mt-2 mx-auto opacity-80"
+                              width={160}
+                              height={60}
+                              quality={100}
+                              className="h-6 w-auto mt-2 mx-auto opacity-80"
                             />
 
                             {topProduct.boughtInPastMonth && (

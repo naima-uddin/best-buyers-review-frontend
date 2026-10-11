@@ -69,11 +69,12 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               >
                 View
                 <Image
-                  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                  src="/amazon_logo.png"
                   alt="Amazon"
-                  width={60}
-                  height={20}
-                  className="h-5 ml-2 mr-2 flex items-center justify-center"
+                  width={160}
+                  height={60}
+                  quality={100}
+                  className="h-5 w-auto ml-2 mr-2 flex items-center justify-center"
                 />
                 Deal
               </a>
@@ -134,11 +135,12 @@ export default function CouponPopup({ show, onClose, couponProduct }) {
               >
                 View
                 <Image
-                  src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                  src="/amazon_logo.png"
                   alt="Amazon"
-                  width={60}
-                  height={20}
-                  className="h-5 ml-2 mr-2 flex items-center justify-center"
+                  width={160}
+                  height={60}
+                  quality={100}
+                  className="h-5 w-auto ml-2 mr-2 flex items-center justify-center"
                 />
                 Deal
               </a>

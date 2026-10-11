@@ -383,11 +383,12 @@ function ProductDetailsContent({ initialProduct }) {
 
                 <div className="flex items-center justify-center mt-4">
                   <Image
-                    src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                    src="/amazon_logo.png"
                     alt="Amazon"
-                    width={24}
-                    height={24}
-                    className="h-4 mr-1"
+                    width={160}
+                    height={60}
+                    quality={100}
+                    className="h-4 w-auto mr-1"
                   />
                   <span className="text-xs text-gray-500">
                     Prime Delivery • 30-Day Returns
@@ -460,11 +461,12 @@ function ProductDetailsContent({ initialProduct }) {
 
                     <div className="flex items-center justify-center mt-2">
                       <Image
-                        src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg"
+                        src="/amazon_logo.png"
                         alt="Amazon"
-                        width={24}
-                        height={24}
-                        className="h-4 mr-1.5"
+                        width={160}
+                        height={60}
+                        quality={100}
+                        className="h-4 w-auto mr-1.5"
                       />
                       <span className="text-xs text-gray-500 font-medium">
                         Prime Delivery • 30-Day Returns
