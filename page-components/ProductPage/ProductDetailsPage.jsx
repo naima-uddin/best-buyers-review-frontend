@@ -216,7 +216,7 @@ function ProductDetailsContent({ initialProduct }) {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 py-6">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-50 py-6 overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <BackButton className="mb-2" />
           {/* Breadcrumb */}
