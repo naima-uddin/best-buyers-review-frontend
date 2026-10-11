@@ -11,14 +11,14 @@ function ReviewsSection() {
       name: "Sarah Johnson",
       role: "New Parent",
       rating: 5,
-      text: "BuyersGuide helped me find the perfect baby carrier! The detailed reviews and comparison charts saved me hours of research.",
+      text: "Buyers View helped me find the perfect baby carrier! The detailed reviews and comparison charts saved me hours of research.",
       avatar: "/woman-portrait.png",
     },
     {
       name: "Michael Chen",
       role: "Tech Enthusiast",
       rating: 5,
-      text: "I trust BuyersGuide for all my purchases. Their expert analysis and unbiased reviews are incredibly helpful.",
+      text: "I trust Buyers View for all my purchases. Their expert analysis and unbiased reviews are incredibly helpful.",
       avatar: "/thoughtful-man-portrait.png",
     },
     {

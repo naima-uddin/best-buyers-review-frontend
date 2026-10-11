@@ -5,12 +5,12 @@ import Image from "next/image";
 export function Footer() {
   return (
     <footer className="border-t bg-gradient-to-b from-blue-100/30 to-blue-100/50 text-[#0215A6]">
-      <div className="max-w-7xl mx-auto px-4 py-10">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
           {/* Brand Section */}
           <div className="md:col-span-1">
-            <Link href="/" className="inline-block mb-4">
+            <Link href="/" className="inline-block mb-2">
               <Image
                 src="/logo.png"
                 width={120}
@@ -25,8 +25,10 @@ export function Footer() {
             </p>
           </div>
 
+          {/* Quick Links + Legal (row on mobile, part of grid on desktop) */}
+          <div className="flex flex-row gap-8 md:contents">
           {/* Quick Links */}
-          <div>
+          <div className="flex-1">
             <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-3 text-sm">
               <li>
@@ -57,7 +59,7 @@ export function Footer() {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="flex-1">
             <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
             <ul className="space-y-3 text-sm">
               <li>
@@ -85,6 +87,7 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
+          </div>
           </div>
 
           {/* Connect */}
@@ -123,7 +126,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t pt-8 text-center">
+        <div className="border-t pt-4 text-center">
           <p className="text-gray-600 text-sm mb-2">
             © {new Date().getFullYear()} Best Buyers View. All rights reserved.
           </p>

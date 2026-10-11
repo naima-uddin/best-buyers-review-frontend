@@ -344,9 +344,9 @@ const handleSubSubCategoryClick = (subSubCat) => {
               </p>
             </div>
             <div className="text-center mb-4">
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium underline">
+              <a href="/about" className="text-blue-600 hover:text-blue-800 text-sm font-medium underline">
                 Learn more about our rankings
-              </button>
+              </a>
             </div>
             <div className="bg-gray-50 rounded-lg p-4 text-center">
               <h4 className="font-semibold text-gray-900 mb-1">

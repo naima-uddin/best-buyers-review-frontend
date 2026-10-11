@@ -38,7 +38,29 @@ export default function BlogListClient() {
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
   const postsSectionRef = useRef(null);
 
-  const BLOGS_PER_PAGE = 9;
+  // Blogs per page = columns × 2 rows, so every breakpoint shows exactly 2 full rows.
+  // mobile/sm: 2 cols → 4, lg: 3 cols → 6, xl: 4 cols → 8
+  const getBlogsPerPage = () => {
+    if (typeof window === 'undefined') return 8;
+    const w = window.innerWidth;
+    if (w >= 1280) return 8; // xl: 4 cols
+    if (w >= 1024) return 6; // lg: 3 cols
+    return 4; // base/sm: 2 cols
+  };
+
+  const [BLOGS_PER_PAGE, setBlogsPerPage] = useState(8);
+
+  useEffect(() => {
+    const updatePerPage = () => {
+      setBlogsPerPage((prev) => {
+        const next = getBlogsPerPage();
+        return next !== prev ? next : prev;
+      });
+    };
+    updatePerPage();
+    window.addEventListener('resize', updatePerPage);
+    return () => window.removeEventListener('resize', updatePerPage);
+  }, []);
 
   const getCategoryLabel = (category) => {
     if (!category) return '';
@@ -141,7 +163,7 @@ export default function BlogListClient() {
     };
 
     fetchBlogs();
-  }, [currentPage, selectedCategory, searchQuery]);
+  }, [currentPage, selectedCategory, searchQuery, BLOGS_PER_PAGE]);
 
   // Auto-advance featured blog slider
   useEffect(() => {
