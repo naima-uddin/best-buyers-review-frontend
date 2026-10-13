@@ -49,18 +49,10 @@ function ProductByCategoryContent() {
     ? unslugify(params.subCategory)
     : null;
   const pageParam = parseInt(searchParams?.get("page")) || 1;
-  const allParams = Object.fromEntries(searchParams?.entries() || []);
-  const subSubCategoryParam = Object.keys(allParams).find(
-    (key) => key !== "page" && key !== "sort"
-  );
 
   console.log("🔍 ProductByCategory - Raw params:", params);
   console.log("🔍 ProductByCategory - mainCategoryName:", mainCategoryName);
   console.log("🔍 ProductByCategory - subCategoryName:", subCategoryName);
-  console.log(
-    "🔍 ProductByCategory - subSubCategoryParam:",
-    subSubCategoryParam
-  );
 
   // Compute date values once to avoid hydration mismatch
   const currentMonth = useMemo(
@@ -171,6 +163,21 @@ function ProductByCategoryContent() {
     return subSubCat ? subSubCat.name : null;
   };
 
+  // Sub-subcategories are represented as query-string keys. Validate the key
+  // against the category tree so tracking parameters such as fbclid are ignored.
+  const allParams = Object.fromEntries(searchParams?.entries() || []);
+  const subSubCategoryParam = Object.keys(allParams).find(
+    (key) =>
+      key !== "page" &&
+      key !== "sort" &&
+      findExactSubSubCategoryName(key)
+  );
+
+  console.log(
+    "🔍 ProductByCategory - subSubCategoryParam:",
+    subSubCategoryParam
+  );
+
   useEffect(() => {
     if (!mainCategoryName || !subCategoryName) {
       setLoading(false);
@@ -251,6 +258,7 @@ function ProductByCategoryContent() {
     pageParam,
     sortParam,
     subSubCategoryParam,
+    categories,
   ]);
 
   // Update page change handler to preserve subSubCategory
